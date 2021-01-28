@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/mitchellh/mapstructure"
@@ -20,7 +21,7 @@ func authenticate(server string, username string, password string, domain string
 	return response.Result().(*AuthenticationResponse).AccessToken, err
 }
 
-func getExecutions(id string) ([]*CodestreamAPIExecutions, error) {
+func getExecutions(id string, status string) ([]*CodestreamAPIExecutions, error) {
 	var arrExecutions []*CodestreamAPIExecutions
 	if id != "" {
 		x, err := getExecution("/codestream/api/executions/" + id)
@@ -30,10 +31,14 @@ func getExecutions(id string) ([]*CodestreamAPIExecutions, error) {
 		arrExecutions = append(arrExecutions, x)
 		return arrExecutions, err
 	}
-	//fmt.Println(qParams)
+	fmt.Println(status)
 
 	client := resty.New()
 	var qParams = make(map[string]string)
+	qParams["$orderby"] = "_requestTimeInMicros desc"
+	if status != "" {
+		qParams["$filter"] = "((status eq '" + strings.ToUpper(status) + "')) and _nested eq 'false'"
+	}
 	response, err := client.R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
