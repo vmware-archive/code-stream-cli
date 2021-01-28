@@ -20,8 +20,8 @@ func authenticate(server string, username string, password string, domain string
 	return response.Result().(*AuthenticationResponse).AccessToken, err
 }
 
-func getExecutions(id string) ([]*Execution, error) {
-	var arrExecutions []*Execution
+func getExecutions(id string) ([]*CodestreamAPIExecutions, error) {
+	var arrExecutions []*CodestreamAPIExecutions
 	if id != "" {
 		x, err := getExecution("/codestream/api/executions/" + id)
 		if err != nil {
@@ -32,7 +32,6 @@ func getExecutions(id string) ([]*Execution, error) {
 	}
 	//fmt.Println(qParams)
 
-	//var i map[string]interface{}
 	client := resty.New()
 	var qParams = make(map[string]string)
 	response, err := client.R().
@@ -44,34 +43,24 @@ func getExecutions(id string) ([]*Execution, error) {
 	if response.IsError() {
 		fmt.Println("GET request failed", err)
 	}
-	var documents = i["documents"]
-	for k, v := range i {
-		if k == "documents" {
-			c := CodestreamAPIExecutions{}
-			mapstructure.Decode(v, c)
-			fmt.Println(c)
-		}
-	}
 
-	// for _, value := range response.Result() {
-	// 	x, err := getExecution(value)
-	// 	if err != nil {
-	// 		fmt.Print("Error: ", response.Error())
-	// 	}
-	// 	arrExecutions = append(arrExecutions, x)
-	// }
+	for _, value := range response.Result().(*ExecutionsList).Documents {
+		c := CodestreamAPIExecutions{}
+		mapstructure.Decode(value, &c)
+		arrExecutions = append(arrExecutions, &c)
+	}
 	return arrExecutions, err
 }
 
-func getExecution(executionLink string) (*Execution, error) {
+func getExecution(executionLink string) (*CodestreamAPIExecutions, error) {
 	client := resty.New()
 	response, err := client.R().
 		SetHeader("Accept", "application/json").
-		SetResult(&Execution{}).
+		SetResult(&CodestreamAPIExecutions{}).
 		SetAuthToken(apiKey).
 		Get("https://" + server + executionLink)
 	if response.IsError() {
 		fmt.Println("GET request failed", err)
 	}
-	return response.Result().(*Execution), err
+	return response.Result().(*CodestreamAPIExecutions), err
 }
