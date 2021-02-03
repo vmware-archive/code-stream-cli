@@ -72,36 +72,3 @@ type CodestreamAPIExecutions struct {
 	} `json:"workspaceResults"`
 	Tags []interface{} `json:"tags"`
 }
-
-// Execution - Code Stream Execution structure
-type Execution struct {
-	Project            string        `json:"project"`
-	ID                 string        `json:"id"`
-	Name               string        `json:"name"`
-	UpdatedAt          string        `json:"updatedAt"`
-	Link               string        `json:"_link"`
-	UpdateTimeInMicros int64         `json:"_updateTimeInMicros"`
-	CreateTimeInMicros int64         `json:"_createTimeInMicros"`
-	ProjectID          string        `json:"_projectId"`
-	Index              int           `json:"index"`
-	Notifications      []interface{} `json:"notifications"`
-	Comments           string        `json:"comments"`
-	Icon               string        `json:"icon"`
-	Starred            struct {
-	} `json:"starred"`
-	Status                string `json:"status"`
-	StatusMessage         string `json:"statusMessage"`
-	DurationInMicros      int    `json:"_durationInMicros"`
-	TotalDurationInMicros int    `json:"_totalDurationInMicros"`
-	RequestTimeInMicros   int64  `json:"_requestTimeInMicros"`
-	ExecutedBy            string `json:"_executedBy"`
-	PipelineLink          string `json:"_pipelineLink"`
-	Nested                bool   `json:"_nested"`
-	Rollback              bool   `json:"_rollback"`
-	WorkspaceResults      []struct {
-		Status string   `json:"status"`
-		Step   string   `json:"step"`
-		Logs   []string `json:"logs"`
-	} `json:"workspaceResults"`
-	Tags []interface{} `json:"tags"`
-}

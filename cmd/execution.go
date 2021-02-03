@@ -54,17 +54,11 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		response, err := getExecutions(i, s)
+		response, err := deleteExecution(i)
 		if err != nil {
-			fmt.Print("Unable to get executions: ", err)
+			fmt.Print("Unable to delete execution: ", err)
 		}
-		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"Id", "Name", "Project", "Status", "Message"})
-
-		for _, c := range response {
-			table.Append([]string{c.ID, c.Name + "#" + fmt.Sprint(c.Index), c.Project, c.Status, c.StatusMessage})
-		}
-		table.Render()
+		fmt.Println("Execution with id " + response.ID + " deleted")
 
 	},
 }

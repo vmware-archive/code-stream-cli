@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/go-resty/resty/v2"
@@ -16,9 +17,26 @@ func authenticate(server string, username string, password string, domain string
 		SetError(&AuthenticationError{}).
 		Post("https://" + server + "/csp/gateway/am/idp/auth/login?access_token")
 	if response.IsError() {
-		fmt.Print("Unable to get an access token: ", response.Error())
+		return "", err
 	}
 	return response.Result().(*AuthenticationResponse).AccessToken, err
+}
+
+func testAccessToken() bool {
+	client := resty.New()
+	response, err := client.R().
+		SetHeader("Accept", "application/json").
+		SetAuthToken(apiKey).
+		Get("https://" + server + "/iaas/api/projects")
+	if response.IsError() {
+		fmt.Println("Key test failed", err)
+		return false
+	}
+	if response.StatusCode() == 401 {
+		//fmt.Println("Token authentication failed: ", response.StatusCode())
+		return false
+	}
+	return true
 }
 
 func getExecutions(id string, status string) ([]*CodestreamAPIExecutions, error) {
@@ -31,8 +49,6 @@ func getExecutions(id string, status string) ([]*CodestreamAPIExecutions, error)
 		arrExecutions = append(arrExecutions, x)
 		return arrExecutions, err
 	}
-	fmt.Println(status)
-
 	client := resty.New()
 	var qParams = make(map[string]string)
 	qParams["$orderby"] = "_requestTimeInMicros desc"
@@ -46,7 +62,8 @@ func getExecutions(id string, status string) ([]*CodestreamAPIExecutions, error)
 		SetAuthToken(apiKey).
 		Get("https://" + server + "/pipeline/api/executions")
 	if response.IsError() {
-		fmt.Println("GET request failed", err)
+		fmt.Println("GET Executions failed", err)
+		os.Exit(1)
 	}
 
 	for _, value := range response.Result().(*ExecutionsList).Documents {
@@ -65,7 +82,20 @@ func getExecution(executionLink string) (*CodestreamAPIExecutions, error) {
 		SetAuthToken(apiKey).
 		Get("https://" + server + executionLink)
 	if response.IsError() {
-		fmt.Println("GET request failed", err)
+		fmt.Println("GET Execution failed", err)
+	}
+	return response.Result().(*CodestreamAPIExecutions), err
+}
+
+func deleteExecution(id string) (*CodestreamAPIExecutions, error) {
+	client := resty.New()
+	response, err := client.R().
+		SetHeader("Accept", "application/json").
+		SetResult(&CodestreamAPIExecutions{}).
+		SetAuthToken(apiKey).
+		Delete("https://" + server + "/pipeline/api/executions/" + id)
+	if response.IsError() {
+		fmt.Println("DELETE Execution failed", err)
 	}
 	return response.Result().(*CodestreamAPIExecutions), err
 }
