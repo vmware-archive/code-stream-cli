@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -98,4 +99,90 @@ func deleteExecution(id string) (*CodestreamAPIExecutions, error) {
 		fmt.Println("DELETE Execution failed", err)
 	}
 	return response.Result().(*CodestreamAPIExecutions), err
+}
+
+func getVariable(id, name, project string) ([]*CodeStreamVariableResponse, error) {
+	var arrVariables []*CodeStreamVariableResponse
+	var queryString = "https://" + server + "/pipeline/api/variables"
+	var qParams = make(map[string]string)
+	qParams["$orderby"] = "_updateTimeInMicros desc"
+	// Get by ID
+	if id != "" {
+		queryString += "/" + id
+	} else {
+		// Get by name
+		if name != "" {
+			qParams["$filter"] = "(name eq '" + name + "')"
+		}
+		// Get by project
+		if project != "" {
+			qParams["$filter"] = "(project eq '" + project + "')"
+		}
+	}
+	client := resty.New()
+	response, err := client.R().
+		SetQueryParams(qParams).
+		SetHeader("Accept", "application/json").
+		SetResult(&VariablesList{}).
+		SetAuthToken(apiKey).
+		Get(queryString)
+	if response.IsError() {
+		fmt.Println("GET Variables failed", err)
+		os.Exit(1)
+	}
+
+	for _, value := range response.Result().(*VariablesList).Documents {
+		c := CodeStreamVariableResponse{}
+		mapstructure.Decode(value, &c)
+		arrVariables = append(arrVariables, &c)
+	}
+	return arrVariables, err
+}
+
+// createVariable - Create a new Code Stream Variable
+func createVariable(name string, description string, variableType string, project string, value string) (*CodeStreamVariableResponse, error) {
+	client := resty.New()
+	response, err := client.R().
+		SetBody(
+			CodeStreamVariableRequest{
+				Project:     project,
+				Kind:        "VARIABLE",
+				Name:        name,
+				Description: description,
+				Type:        variableType,
+				Value:       value,
+			}).
+		SetHeader("Accept", "application/json").
+		SetResult(&CodeStreamVariableResponse{}).
+		SetAuthToken(apiKey).
+		Post("https://" + server + "/pipeline/api/variables")
+	if response.IsError() {
+		fmt.Println("Create Variable failed", err)
+		os.Exit(1)
+	}
+	return response.Result().(*CodeStreamVariableResponse), err
+}
+
+// deleteVariable - Delete a Code Stream Variable
+func deleteVariable(id string) (*CodeStreamVariableResponse, error) {
+	client := resty.New()
+	response, err := client.R().
+		SetHeader("Accept", "application/json").
+		SetResult(&CodeStreamVariableResponse{}).
+		SetAuthToken(apiKey).
+		Delete("https://" + server + "/pipeline/api/variables/" + id)
+	if response.IsError() {
+		fmt.Println("Create Variable failed", err)
+		os.Exit(1)
+	}
+	return response.Result().(*CodeStreamVariableResponse), err
+}
+
+// PrettyPrint prints interfaces
+func PrettyPrint(v interface{}) (err error) {
+	b, err := json.MarshalIndent(v, "", "  ")
+	if err == nil {
+		fmt.Println(string(b))
+	}
+	return
 }

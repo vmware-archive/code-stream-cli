@@ -83,19 +83,24 @@ func initConfig() {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
 
-	apiKey = viper.GetString("endpoint.apiKey")
-	server = viper.GetString("endpoint.server")
+	var currentEndpointName = viper.GetString("currentEndpointName")
+	if currentEndpointName != "" {
+		fmt.Println("Using Endpoint:", currentEndpointName)
+	}
+
+	apiKey = viper.GetString("endpoint." + currentEndpointName + ".apiKey")
+	server = viper.GetString("endpoint." + currentEndpointName + ".server")
 
 	// If the apiKey is not set or testAccesToken returns false
 	if apiKey == "" || testAccessToken() == false {
 		// Authenticate
-		accessToken, authError := authenticate(viper.GetString("endpoint.server"), viper.GetString("endpoint.username"), viper.GetString("endpoint.password"), viper.GetString("endpoint.domain"))
+		accessToken, authError := authenticate(viper.GetString("endpoint."+currentEndpointName+".server"), viper.GetString("endpoint."+currentEndpointName+".username"), viper.GetString("endpoint."+currentEndpointName+".password"), viper.GetString("endpoint."+currentEndpointName+".domain"))
 		if authError != nil {
 			fmt.Println("Authentication failed", authError.Error())
 			os.Exit(1)
 		}
-		viper.Set("endpoint.apiKey", accessToken)
+		viper.Set("endpoint."+currentEndpointName+".apiKey", accessToken)
 		viper.WriteConfig()
-		apiKey = viper.GetString("endpoint.apiKey")
+		apiKey = viper.GetString("endpoint." + currentEndpointName + ".apiKey")
 	}
 }

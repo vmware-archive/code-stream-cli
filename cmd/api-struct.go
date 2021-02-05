@@ -72,3 +72,40 @@ type CodestreamAPIExecutions struct {
 	} `json:"workspaceResults"`
 	Tags []interface{} `json:"tags"`
 }
+
+// VariablesList - Code Stream Variables API response
+type VariablesList struct {
+	Count      int                    `json:"count"`
+	TotalCount int                    `json:"totalCount"`
+	Links      []string               `json:"links"`
+	Documents  map[string]interface{} `json:"documents"`
+}
+
+// CodeStreamVariableResponse - Code Stream API Variable response
+type CodeStreamVariableResponse struct {
+	Project            string `json:"project"`
+	Kind               string `json:"kind"`
+	ID                 string `json:"id"`
+	Name               string `json:"name"`
+	Description        string `json:"description"`
+	Version            string `json:"version"`
+	CreatedBy          string `json:"createdBy"`
+	CreatedAt          string `json:"createdAt"`
+	UpdatedAt          string `json:"updatedAt"`
+	Link               string `json:"_link"`
+	UpdateTimeInMicros int64  `json:"_updateTimeInMicros"`
+	CreateTimeInMicros int64  `json:"_createTimeInMicros"`
+	ProjectID          string `json:"_projectId"`
+	Type               string `json:"type"`
+	Value              string `json:"value"`
+}
+
+// CodeStreamVariableRequest - Code Stream API Variable Create Request
+type CodeStreamVariableRequest struct {
+	Project     string `json:"project"`
+	Kind        string `json:"kind"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Type        string `json:"type"`
+	Value       string `json:"value"`
+}

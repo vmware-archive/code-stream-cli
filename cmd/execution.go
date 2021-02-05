@@ -64,11 +64,12 @@ to quickly create a Cobra application.`,
 }
 
 func init() {
+	// Get
 	getCmd.AddCommand(getExecutionCmd)
 	getExecutionCmd.Flags().StringVarP(&n, "name", "n", "", "Name of the pipeline to list executions for")
 	getExecutionCmd.Flags().StringVarP(&i, "id", "i", "", "ID of the executions to list")
 	getExecutionCmd.Flags().StringVarP(&s, "status", "s", "", "Filter executions by status (Completed|Waiting|Pausing|Paused|Resuming|Running)")
-
+	// Delete
 	deleteCmd.AddCommand(delExecutionCmd)
 	delExecutionCmd.Flags().StringVarP(&i, "id", "i", "", "ID of the pipeline to delete")
 	delExecutionCmd.MarkFlagRequired("id")
