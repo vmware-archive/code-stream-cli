@@ -103,40 +103,55 @@ func deleteExecution(id string) (*CodestreamAPIExecutions, error) {
 
 func getVariable(id, name, project string) ([]*CodeStreamVariableResponse, error) {
 	var arrVariables []*CodeStreamVariableResponse
-	var queryString = "https://" + server + "/pipeline/api/variables"
 	var qParams = make(map[string]string)
-	qParams["$orderby"] = "_updateTimeInMicros desc"
+	client := resty.New()
+
 	// Get by ID
 	if id != "" {
-		queryString += "/" + id
-	} else {
-		// Get by name
-		if name != "" {
-			qParams["$filter"] = "(name eq '" + name + "')"
-		}
-		// Get by project
-		if project != "" {
-			qParams["$filter"] = "(project eq '" + project + "')"
-		}
+		v, e := getVariableByID(id)
+		arrVariables = append(arrVariables, v)
+		return arrVariables, e
 	}
-	client := resty.New()
-	response, err := client.R().
+	// Get by name
+	if name != "" {
+		qParams["$filter"] = "(name eq '" + name + "')"
+	}
+	// Get by project
+	if project != "" {
+		qParams["$filter"] = "(project eq '" + project + "')"
+	}
+	queryResponse, err := client.R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&VariablesList{}).
 		SetAuthToken(apiKey).
-		Get(queryString)
-	if response.IsError() {
+		Get("https://" + server + "/pipeline/api/variables")
+
+	if queryResponse.IsError() {
 		fmt.Println("GET Variables failed", err)
 		os.Exit(1)
 	}
 
-	for _, value := range response.Result().(*VariablesList).Documents {
+	for _, value := range queryResponse.Result().(*VariablesList).Documents {
 		c := CodeStreamVariableResponse{}
 		mapstructure.Decode(value, &c)
 		arrVariables = append(arrVariables, &c)
 	}
 	return arrVariables, err
+}
+
+// getVariableByID - get Code Stream Variable by ID
+func getVariableByID(id string) (*CodeStreamVariableResponse, error) {
+	client := resty.New()
+	response, err := client.R().
+		SetHeader("Accept", "application/json").
+		SetResult(&CodeStreamVariableResponse{}).
+		SetAuthToken(apiKey).
+		Get("https://" + server + "/pipeline/api/variables/" + id)
+	if response.IsError() {
+		fmt.Println("GET Variable failed", err)
+	}
+	return response.Result().(*CodeStreamVariableResponse), err
 }
 
 // createVariable - Create a new Code Stream Variable

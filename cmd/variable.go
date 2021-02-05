@@ -32,13 +32,17 @@ var value string
 // getVariableCmd represents the variable command
 var getVariableCmd = &cobra.Command{
 	Use:   "variable",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Get vRealize Code Stream Variables",
+	Long: `Get vRealize Code Stream Variables by name, project or by id - e.g:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Get by ID
+	cs-cli get variable --id 6b7936d3-a19d-4298-897a-65e9dc6620c8
+	
+Get by Name
+	cs-cli get variable --name my-variable
+	
+Get by Project
+	cs-cli get variable --project production`,
 	Run: func(cmd *cobra.Command, args []string) {
 		response, err := getVariable(id, name, project)
 		if err != nil {
@@ -47,7 +51,7 @@ to quickly create a Cobra application.`,
 		var resultCount = len(response)
 		if resultCount == 0 {
 			// No results
-			fmt.Print("No results found")
+			fmt.Println("No results found")
 		} else if resultCount == 1 {
 			// Print the single result
 			PrettyPrint(response[0])
