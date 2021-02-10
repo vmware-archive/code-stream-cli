@@ -59,7 +59,7 @@ func getExecutions(id string, status string) ([]*CodestreamAPIExecutions, error)
 	response, err := client.R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
-		SetResult(&ExecutionsList{}).
+		SetResult(&documentsList{}).
 		SetAuthToken(apiKey).
 		Get("https://" + server + "/pipeline/api/executions")
 	if response.IsError() {
@@ -67,7 +67,7 @@ func getExecutions(id string, status string) ([]*CodestreamAPIExecutions, error)
 		os.Exit(1)
 	}
 
-	for _, value := range response.Result().(*ExecutionsList).Documents {
+	for _, value := range response.Result().(*documentsList).Documents {
 		c := CodestreamAPIExecutions{}
 		mapstructure.Decode(value, &c)
 		arrExecutions = append(arrExecutions, &c)
@@ -123,7 +123,7 @@ func getVariable(id, name, project string) ([]*CodeStreamVariableResponse, error
 	queryResponse, err := client.R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
-		SetResult(&VariablesList{}).
+		SetResult(&documentsList{}).
 		SetAuthToken(apiKey).
 		Get("https://" + server + "/pipeline/api/variables")
 
@@ -132,7 +132,7 @@ func getVariable(id, name, project string) ([]*CodeStreamVariableResponse, error
 		os.Exit(1)
 	}
 
-	for _, value := range queryResponse.Result().(*VariablesList).Documents {
+	for _, value := range queryResponse.Result().(*documentsList).Documents {
 		c := CodeStreamVariableResponse{}
 		mapstructure.Decode(value, &c)
 		arrVariables = append(arrVariables, &c)
@@ -178,6 +178,35 @@ func createVariable(name string, description string, variableType string, projec
 	return response.Result().(*CodeStreamVariableResponse), err
 }
 
+// updateVariable - Create a new Code Stream Variable
+func updateVariable(id string, name string, description string, typename string, value string) (*CodeStreamVariableResponse, error) {
+	variable, _ := getVariableByID(id)
+	if name != "" {
+		variable.Name = name
+	}
+	if description != "" {
+		variable.Description = description
+	}
+	if typename != "" {
+		variable.Type = typename
+	}
+	if value != "" {
+		variable.Value = value
+	}
+	client := resty.New()
+	response, err := client.R().
+		SetBody(variable).
+		SetHeader("Accept", "application/json").
+		SetResult(&CodeStreamVariableResponse{}).
+		SetAuthToken(apiKey).
+		Put("https://" + server + "/pipeline/api/variables/" + id)
+	if response.IsError() {
+		fmt.Println("Create Variable failed", err)
+		os.Exit(1)
+	}
+	return response.Result().(*CodeStreamVariableResponse), err
+}
+
 // deleteVariable - Delete a Code Stream Variable
 func deleteVariable(id string) (*CodeStreamVariableResponse, error) {
 	client := resty.New()
@@ -200,4 +229,43 @@ func PrettyPrint(v interface{}) (err error) {
 		fmt.Println(string(b))
 	}
 	return
+}
+
+func getPipelines(id, name, project string) ([]*CodeStreamVariableResponse, error) {
+	var arrVariables []*CodeStreamVariableResponse
+	var qParams = make(map[string]string)
+	client := resty.New()
+
+	// Get by ID
+	if id != "" {
+		v, e := getVariableByID(id)
+		arrVariables = append(arrVariables, v)
+		return arrVariables, e
+	}
+	// Get by name
+	if name != "" {
+		qParams["$filter"] = "(name eq '" + name + "')"
+	}
+	// Get by project
+	if project != "" {
+		qParams["$filter"] = "(project eq '" + project + "')"
+	}
+	queryResponse, err := client.R().
+		SetQueryParams(qParams).
+		SetHeader("Accept", "application/json").
+		SetResult(&documentsList{}).
+		SetAuthToken(apiKey).
+		Get("https://" + server + "/pipeline/api/variables")
+
+	if queryResponse.IsError() {
+		fmt.Println("GET Variables failed", err)
+		os.Exit(1)
+	}
+
+	for _, value := range queryResponse.Result().(*documentsList).Documents {
+		c := CodeStreamVariableResponse{}
+		mapstructure.Decode(value, &c)
+		arrVariables = append(arrVariables, &c)
+	}
+	return arrVariables, err
 }

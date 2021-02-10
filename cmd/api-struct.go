@@ -26,8 +26,8 @@ type AuthenticationError struct {
 	ServerMessage string `json:"serverMessage"`
 }
 
-// ExecutionsList - Code Stream Execution List structure
-type ExecutionsList struct {
+// documentsList - Code Stream Documents List structure
+type documentsList struct {
 	Count      int                    `json:"count"`
 	TotalCount int                    `json:"totalCount"`
 	Links      []string               `json:"links"`
@@ -73,14 +73,6 @@ type CodestreamAPIExecutions struct {
 	Tags []interface{} `json:"tags"`
 }
 
-// VariablesList - Code Stream Variables API response
-type VariablesList struct {
-	Count      int                    `json:"count"`
-	TotalCount int                    `json:"totalCount"`
-	Links      []string               `json:"links"`
-	Documents  map[string]interface{} `json:"documents"`
-}
-
 // CodeStreamVariableResponse - Code Stream API Variable response
 type CodeStreamVariableResponse struct {
 	Project            string `json:"project"`
@@ -108,4 +100,54 @@ type CodeStreamVariableRequest struct {
 	Description string `json:"description"`
 	Type        string `json:"type"`
 	Value       string `json:"value"`
+}
+
+// CodeStreamPipeline - Code Stream Pipeline API
+type CodeStreamPipeline struct {
+	Project            string `json:"project"`
+	Kind               string `json:"kind"`
+	ID                 string `json:"id"`
+	Name               string `json:"name"`
+	CreatedBy          string `json:"createdBy"`
+	UpdatedBy          string `json:"updatedBy"`
+	CreatedAt          string `json:"createdAt"`
+	UpdatedAt          string `json:"updatedAt"`
+	Link               string `json:"_link"`
+	UpdateTimeInMicros int64  `json:"_updateTimeInMicros"`
+	CreateTimeInMicros int64  `json:"_createTimeInMicros"`
+	ProjectID          string `json:"_projectId"`
+	Icon               string `json:"icon"`
+	Enabled            bool   `json:"enabled"`
+	Concurrency        int    `json:"concurrency"`
+	Input              interface {
+	} `json:"input"`
+	Output interface {
+	} `json:"output"`
+	Starred struct {
+	} `json:"starred"`
+	StageOrder    []string    `json:"stageOrder"`
+	Stages        interface{} `json:"stages"`
+	Notifications struct {
+		Email   []interface{} `json:"email"`
+		Jira    []interface{} `json:"jira"`
+		Webhook []interface{} `json:"webhook"`
+	} `json:"notifications"`
+	Options   []interface{} `json:"options"`
+	Workspace struct {
+		Image    string        `json:"image"`
+		Path     string        `json:"path"`
+		Endpoint string        `json:"endpoint"`
+		Cache    []interface{} `json:"cache"`
+		Limits   struct {
+			CPU    float64 `json:"cpu"`
+			Memory int     `json:"memory"`
+		} `json:"limits"`
+		AutoCloneForTrigger bool `json:"autoCloneForTrigger"`
+	} `json:"workspace"`
+	InputMeta  interface{}   `json:"_inputMeta"`
+	OutputMeta interface{}   `json:"_outputMeta"`
+	Warnings   []interface{} `json:"_warnings"`
+	Rollbacks  []interface{} `json:"rollbacks"`
+	Tags       []interface{} `json:"tags"`
+	State      string        `json:"state"`
 }

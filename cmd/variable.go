@@ -28,6 +28,7 @@ var name string
 var project string
 var typename string
 var value string
+var description string
 
 // getVariableCmd represents the variable command
 var getVariableCmd = &cobra.Command{
@@ -73,17 +74,27 @@ var createVariableCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		name, _ := cmd.Flags().GetString("name")
-		vtype, _ := cmd.Flags().GetString("type")
-		project, _ := cmd.Flags().GetString("project")
-		value, _ := cmd.Flags().GetString("value")
-
-		createResponse, err := createVariable(name, "", vtype, project, value)
+		createResponse, err := createVariable(name, description, typename, project, value)
 		if err != nil {
 			fmt.Print("Unable to create Code Stream Variable: ", err)
 		}
 
 		PrettyPrint(createResponse)
+	},
+}
+
+// updateVariableCmd represents the variable command
+var updateVariableCmd = &cobra.Command{
+	Use:   "variable",
+	Short: "A brief description of your command",
+	Long:  ``,
+	Run: func(cmd *cobra.Command, args []string) {
+		updateResponse, err := updateVariable(id, name, description, typename, value)
+		if err != nil {
+			fmt.Print("Unable to update Code Stream Variable: ", err)
+		}
+
+		PrettyPrint(updateResponse)
 	},
 }
 
@@ -116,9 +127,18 @@ func init() {
 	// Create Variable
 	createCmd.AddCommand(createVariableCmd)
 	createVariableCmd.Flags().StringVarP(&name, "name", "n", "", "The name of the variable to create")
-	createVariableCmd.Flags().StringVarP(&typename, "typename", "t", "", "The type of the variable to create REGULAR|SECRET|RESTRICTED")
+	createVariableCmd.Flags().StringVarP(&typename, "type", "t", "", "The type of the variable to create REGULAR|SECRET|RESTRICTED")
 	createVariableCmd.Flags().StringVarP(&project, "project", "p", "", "The project in which to create the variable")
 	createVariableCmd.Flags().StringVarP(&value, "value", "v", "", "The value of the variable to create")
+	createVariableCmd.Flags().StringVarP(&description, "description", "d", "", "The description of the variable to create")
+	// Update Variable
+	updateCmd.AddCommand(updateVariableCmd)
+	updateVariableCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the variable to update")
+	updateVariableCmd.Flags().StringVarP(&name, "name", "n", "", "Update the name of the variable")
+	updateVariableCmd.Flags().StringVarP(&typename, "type", "t", "", "Update the type of the variable REGULAR|SECRET|RESTRICTED")
+	updateVariableCmd.Flags().StringVarP(&value, "value", "v", "", "Update the value of the variable ")
+	updateVariableCmd.Flags().StringVarP(&description, "description", "d", "", "Update the description of the variable")
+	updateVariableCmd.MarkFlagRequired("id")
 	// Delete Variable
 	deleteCmd.AddCommand(deleteVariableCmd)
 	deleteVariableCmd.Flags().StringVarP(&id, "id", "i", "", "Delete variable by id")
