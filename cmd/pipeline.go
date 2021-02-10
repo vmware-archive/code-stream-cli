@@ -16,36 +16,114 @@ limitations under the License.
 package cmd
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"strings"
 
+	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 )
 
-// pipelineCmd represents the pipeline command
-var pipelineCmd = &cobra.Command{
+var state string
+var export bool
+
+// getPipelineCmd represents the pipeline command
+var getPipelineCmd = &cobra.Command{
 	Use:   "pipeline",
 	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long:  `A longer description that spans multiple lines`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("pipeline called")
+		if export {
+			exportPipeline(name, project)
+			fmt.Println("Exported" + name)
+			return
+		}
+		response, err := getPipelines(id, name, project)
+		if err != nil {
+			fmt.Print("Unable to get Code Stream Pipelines: ", err)
+		}
+		var resultCount = len(response)
+		if resultCount == 0 {
+			// No results
+			fmt.Println("No results found")
+		} else if resultCount == 1 {
+			// Print the single result
+			PrettyPrint(response[0])
+		} else {
+			// Print result table
+			table := tablewriter.NewWriter(os.Stdout)
+			table.SetHeader([]string{"Id", "Name", "Project"})
+			for _, c := range response {
+				table.Append([]string{c.ID, c.Name, c.Project})
+			}
+			table.Render()
+		}
+	},
+}
+
+// updatePipelineCmd represents the pipeline update command
+var updatePipelineCmd = &cobra.Command{
+	Use:   "pipeline",
+	Short: "A brief description of your command",
+	Long: `A longer description that spans multiple lines
+	Enable/Disable:
+	cs-cli update pipeline --id d0185f04-2e87-4f3c-b6d7-ee58abba3e92 --enable
+	cs-cli update pipeline --id d0185f04-2e87-4f3c-b6d7-ee58abba3e92 --disable
+	`,
+	Args: func(cmd *cobra.Command, args []string) error {
+		if state != "" {
+			switch strings.ToUpper(state) {
+			case "ENABLED", "DISABLED", "RELEASED":
+				// Valid states
+				return nil
+			}
+			return errors.New("--state is not valid, must be ENABLED, DISABLED or RELEASED")
+		}
+		return fmt.Errorf("invalid color specified: %s", args[0])
+	},
+	Run: func(cmd *cobra.Command, args []string) {
+		if state != "" {
+			response, err := patchPipeline(id, `{"state":"`+state+`"}`)
+			if err != nil {
+				fmt.Print("Unable to update Code Stream Pipeline: ", err)
+			}
+			fmt.Println("Setting pipeline " + response.Name + " to " + state)
+		}
+
+		// response, err := getPipelines(id, name, project)
+		// if err != nil {
+		// 	fmt.Print("Unable to get Code Stream Pipelines: ", err)
+		// }
+		// var resultCount = len(response)
+		// if resultCount == 0 {
+		// 	// No results
+		// 	fmt.Println("No results found")
+		// } else if resultCount == 1 {
+		// 	// Print the single result
+		// 	PrettyPrint(response[0])
+		// } else {
+		// 	// Print result table
+		// 	table := tablewriter.NewWriter(os.Stdout)
+		// 	table.SetHeader([]string{"Id", "Name", "Project"})
+		// 	for _, c := range response {
+		// 		table.Append([]string{c.ID, c.Name, c.Project})
+		// 	}
+		// 	table.Render()
+		// }
 	},
 }
 
 func init() {
-	getCmd.AddCommand(pipelineCmd)
+	// Get
+	getCmd.AddCommand(getPipelineCmd)
+	getPipelineCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the pipeline to list executions for")
+	getPipelineCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the pipeline to list")
+	getPipelineCmd.Flags().StringVarP(&project, "project", "p", "", "List pipeline in project")
+	getPipelineCmd.Flags().BoolVarP(&export, "export", "e", true, "Export pipeline")
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// pipelineCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// pipelineCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// Update
+	updateCmd.AddCommand(updatePipelineCmd)
+	updatePipelineCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the pipeline to list")
+	updatePipelineCmd.Flags().StringVarP(&state, "state", "s", "", "Set the state of the pipeline (ENABLED|DISABLED|RELEASED")
 }

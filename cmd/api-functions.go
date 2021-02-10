@@ -231,16 +231,16 @@ func PrettyPrint(v interface{}) (err error) {
 	return
 }
 
-func getPipelines(id, name, project string) ([]*CodeStreamVariableResponse, error) {
-	var arrVariables []*CodeStreamVariableResponse
+func getPipelines(id, name, project string) ([]*CodeStreamPipeline, error) {
+	var arrResults []*CodeStreamPipeline
 	var qParams = make(map[string]string)
 	client := resty.New()
 
 	// Get by ID
 	if id != "" {
-		v, e := getVariableByID(id)
-		arrVariables = append(arrVariables, v)
-		return arrVariables, e
+		v, e := getPipelineByID(id)
+		arrResults = append(arrResults, v)
+		return arrResults, e
 	}
 	// Get by name
 	if name != "" {
@@ -255,7 +255,7 @@ func getPipelines(id, name, project string) ([]*CodeStreamVariableResponse, erro
 		SetHeader("Accept", "application/json").
 		SetResult(&documentsList{}).
 		SetAuthToken(apiKey).
-		Get("https://" + server + "/pipeline/api/variables")
+		Get("https://" + server + "/pipeline/api/pipelines")
 
 	if queryResponse.IsError() {
 		fmt.Println("GET Variables failed", err)
@@ -263,9 +263,57 @@ func getPipelines(id, name, project string) ([]*CodeStreamVariableResponse, erro
 	}
 
 	for _, value := range queryResponse.Result().(*documentsList).Documents {
-		c := CodeStreamVariableResponse{}
+		c := CodeStreamPipeline{}
 		mapstructure.Decode(value, &c)
-		arrVariables = append(arrVariables, &c)
+		arrResults = append(arrResults, &c)
 	}
-	return arrVariables, err
+	return arrResults, err
+}
+func exportPipeline(name, project string) {
+	var qParams = make(map[string]string)
+	qParams["pipelines"] = name
+	qParams["project"] = project
+	client := resty.New()
+	queryResponse, err := client.R().
+		SetQueryParams(qParams).
+		SetHeader("Accept", "application/x-yaml;charset=UTF-8").
+		SetAuthToken(apiKey).
+		SetOutput(name + ".yaml").
+		Get("https://" + server + "/pipeline/api/export")
+
+	if queryResponse.IsError() {
+		fmt.Println("Exit pipeline failed", err)
+		os.Exit(1)
+	}
+}
+
+// getPipelineByID - get Code Stream Pipeline by ID
+func getPipelineByID(id string) (*CodeStreamPipeline, error) {
+	client := resty.New()
+	response, err := client.R().
+		SetHeader("Accept", "application/json").
+		SetResult(&CodeStreamPipeline{}).
+		SetAuthToken(apiKey).
+		Get("https://" + server + "/pipeline/api/pipelines/" + id)
+	if response.IsError() {
+		fmt.Println("GET Pipeline failed", err)
+	}
+	return response.Result().(*CodeStreamPipeline), err
+}
+
+// patchPipeline - Patch Code Stream Pipeline by ID
+func patchPipeline(id string, payload string) (*CodeStreamPipeline, error) {
+	client := resty.New()
+	response, err := client.R().
+		SetHeader("Accept", "application/json").
+		SetHeader("Content-Type", "application/json").
+		SetBody(payload).
+		SetResult(&CodeStreamPipeline{}).
+		SetAuthToken(apiKey).
+		Patch("https://" + server + "/pipeline/api/pipelines/" + id)
+	if response.IsError() {
+		fmt.Println("GET Pipeline failed", response.StatusCode())
+		return nil, err
+	}
+	return response.Result().(*CodeStreamPipeline), nil
 }

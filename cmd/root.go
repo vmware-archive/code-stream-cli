@@ -80,12 +80,12 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		//fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
 
 	var currentEndpointName = viper.GetString("currentEndpointName")
 	if currentEndpointName != "" {
-		fmt.Println("Using Endpoint:", currentEndpointName)
+		//fmt.Println("Using Endpoint:", currentEndpointName)
 	}
 
 	apiKey = viper.GetString("endpoint." + currentEndpointName + ".apiKey")
