@@ -26,6 +26,7 @@ import (
 )
 
 var state string
+var exportPath string
 var export bool
 
 // getPipelineCmd represents the pipeline command
@@ -34,12 +35,12 @@ var getPipelineCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Long:  `A longer description that spans multiple lines`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if export {
-			exportPipeline(name, project)
-			fmt.Println("Exported" + name)
-			return
-		}
-		response, err := getPipelines(id, name, project)
+		// if export {
+		// 	exportPipeline(name, project, exportPath)
+		// 	fmt.Println("Exported" + name)
+		// 	return
+		// }
+		response, err := getPipelines(id, name, project, export, exportPath)
 		if err != nil {
 			fmt.Print("Unable to get Code Stream Pipelines: ", err)
 		}
@@ -67,9 +68,8 @@ var updatePipelineCmd = &cobra.Command{
 	Use:   "pipeline",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines
-	Enable/Disable:
-	cs-cli update pipeline --id d0185f04-2e87-4f3c-b6d7-ee58abba3e92 --enable
-	cs-cli update pipeline --id d0185f04-2e87-4f3c-b6d7-ee58abba3e92 --disable
+	Enable/Disable/Release:
+	cs-cli update pipeline --id d0185f04-2e87-4f3c-b6d7-ee58abba3e92 --state enabled/disabled/released
 	`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if state != "" {
@@ -80,7 +80,10 @@ var updatePipelineCmd = &cobra.Command{
 			}
 			return errors.New("--state is not valid, must be ENABLED, DISABLED or RELEASED")
 		}
-		return fmt.Errorf("invalid color specified: %s", args[0])
+		if export {
+
+		}
+		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		if state != "" {
@@ -120,7 +123,8 @@ func init() {
 	getPipelineCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the pipeline to list executions for")
 	getPipelineCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the pipeline to list")
 	getPipelineCmd.Flags().StringVarP(&project, "project", "p", "", "List pipeline in project")
-	getPipelineCmd.Flags().BoolVarP(&export, "export", "e", true, "Export pipeline")
+	getPipelineCmd.Flags().StringVarP(&exportPath, "exportPath", "", "", "Path to export objects - relative or absolute location")
+	getPipelineCmd.Flags().BoolVarP(&export, "export", "e", false, "Export pipeline")
 
 	// Update
 	updateCmd.AddCommand(updatePipelineCmd)

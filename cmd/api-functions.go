@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -222,16 +221,7 @@ func deleteVariable(id string) (*CodeStreamVariableResponse, error) {
 	return response.Result().(*CodeStreamVariableResponse), err
 }
 
-// PrettyPrint prints interfaces
-func PrettyPrint(v interface{}) (err error) {
-	b, err := json.MarshalIndent(v, "", "  ")
-	if err == nil {
-		fmt.Println(string(b))
-	}
-	return
-}
-
-func getPipelines(id, name, project string) ([]*CodeStreamPipeline, error) {
+func getPipelines(id string, name string, project string, export bool, exportPath string) ([]*CodeStreamPipeline, error) {
 	var arrResults []*CodeStreamPipeline
 	var qParams = make(map[string]string)
 	client := resty.New()
@@ -242,13 +232,17 @@ func getPipelines(id, name, project string) ([]*CodeStreamPipeline, error) {
 		arrResults = append(arrResults, v)
 		return arrResults, e
 	}
-	// Get by name
-	if name != "" {
-		qParams["$filter"] = "(name eq '" + name + "')"
-	}
-	// Get by project
-	if project != "" {
-		qParams["$filter"] = "(project eq '" + project + "')"
+	if name != "" && project != "" {
+		qParams["$filter"] = "((name eq '" + name + "') and (project eq '" + project + "'))"
+	} else {
+		// Get by name
+		if name != "" {
+			qParams["$filter"] = "(name eq '" + name + "')"
+		}
+		// Get by project
+		if project != "" {
+			qParams["$filter"] = "(project eq '" + project + "')"
+		}
 	}
 	queryResponse, err := client.R().
 		SetQueryParams(qParams).
@@ -269,7 +263,7 @@ func getPipelines(id, name, project string) ([]*CodeStreamPipeline, error) {
 	}
 	return arrResults, err
 }
-func exportPipeline(name, project string) {
+func exportPipeline(name, project, path string) {
 	var qParams = make(map[string]string)
 	qParams["pipelines"] = name
 	qParams["project"] = project
@@ -278,7 +272,7 @@ func exportPipeline(name, project string) {
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/x-yaml;charset=UTF-8").
 		SetAuthToken(apiKey).
-		SetOutput(name + ".yaml").
+		SetOutput(path + name + ".yaml").
 		Get("https://" + server + "/pipeline/api/export")
 
 	if queryResponse.IsError() {
