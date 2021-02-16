@@ -75,10 +75,6 @@ func initConfig() {
 	}
 
 	var currentEndpointName = viper.GetString("currentEndpointName")
-	if currentEndpointName != "" {
-		//fmt.Println("Using Endpoint:", currentEndpointName)
-	}
-
 	apiKey = viper.GetString("endpoint." + currentEndpointName + ".apiKey")
 	server = viper.GetString("endpoint." + currentEndpointName + ".server")
 

@@ -77,7 +77,7 @@ to quickly create a Cobra application.`,
 // deleteCmd represents the delete command
 var deleteCmd = &cobra.Command{
 	Use:   "delete",
-	Short: "Delete resources in code stream",
+	Short: "Delete resources in Code Stream",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -89,10 +89,26 @@ to quickly create a Cobra application.`,
 	},
 }
 
+// configCmd represents the config command
+var configCmd = &cobra.Command{
+	Use:   "config",
+	Short: "Modify the configuration of cs-cli",
+	Long: `A longer description that spans multiple lines and likely contains examples
+and usage of using your command. For example:
+
+Cobra is a CLI library for Go that empowers applications.
+This application is a tool to generate the needed files
+to quickly create a Cobra application.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("config called")
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(getCmd)
 	rootCmd.AddCommand(updateCmd)
 	rootCmd.AddCommand(createCmd)
 	rootCmd.AddCommand(deleteCmd)
+	rootCmd.AddCommand(configCmd)
 
 }
