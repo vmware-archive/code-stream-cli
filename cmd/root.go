@@ -27,6 +27,16 @@ import (
 var cfgFile string
 var apiKey string
 var server string
+var id string
+var name string
+var project string
+var typename string
+var value string
+var description string
+var status string
+var username string
+var password string
+var domain string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{

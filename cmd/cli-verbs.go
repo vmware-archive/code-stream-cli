@@ -21,13 +21,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var id string
-var name string
-var project string
-var typename string
-var value string
-var description string
-var status string
 
 // getCmd represents the get command
 var getCmd = &cobra.Command{
