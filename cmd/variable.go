@@ -23,13 +23,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var id string
-var name string
-var project string
-var typename string
-var value string
-var description string
-
 // getVariableCmd represents the variable command
 var getVariableCmd = &cobra.Command{
 	Use:   "variable",
@@ -110,7 +103,7 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		response, err := deleteVariable(i)
+		response, err := deleteVariable(id)
 		if err != nil {
 			fmt.Print("Unable to delete variable: ", err)
 		}

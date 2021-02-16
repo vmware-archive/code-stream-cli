@@ -31,8 +31,8 @@ var server string
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "cs-cli",
-	Short: "CLI Interface for VMware vRealize Code Stream",
-	Long:  `Command line interface for VMware vRealize Automation`,
+	Short: "CLI Interface for VMware vRealize Automation Code Stream",
+	Long:  `Command line interface for VMware vRealize Automation Code Stream`,
 }
 
 // Execute is the main process

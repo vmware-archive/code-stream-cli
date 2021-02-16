@@ -21,10 +21,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var id string
+var name string
+var project string
+var typename string
+var value string
+var description string
+var status string
+
 // getCmd represents the get command
 var getCmd = &cobra.Command{
 	Use:   "get",
-	Short: "Retrieve or export resources from Code Stream",
+	Short: "Get resources in Code Stream",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -54,7 +62,7 @@ to quickly create a Cobra application.`,
 // createCmd represents the create command
 var createCmd = &cobra.Command{
 	Use:   "create",
-	Short: "Create resources in code stream",
+	Short: "Create resources in Code Stream",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 

@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/go-resty/resty/v2"
@@ -41,7 +42,7 @@ func testAccessToken() bool {
 	return true
 }
 
-func getExecutions(id string, status string) ([]*CodestreamAPIExecutions, error) {
+func getExecutions(id string, status string, name string, nested bool) ([]*CodestreamAPIExecutions, error) {
 	var arrExecutions []*CodestreamAPIExecutions
 	if id != "" {
 		x, err := getExecution("/codestream/api/executions/" + id)
@@ -55,7 +56,10 @@ func getExecutions(id string, status string) ([]*CodestreamAPIExecutions, error)
 	var qParams = make(map[string]string)
 	qParams["$orderby"] = "_requestTimeInMicros desc"
 	if status != "" {
-		qParams["$filter"] = "((status eq '" + strings.ToUpper(status) + "')) and _nested eq 'false'"
+		qParams["$filter"] = "((status eq '" + strings.ToUpper(status) + "') and (_nested eq '" + strconv.FormatBool(nested) + "'))"
+	}
+	if name != "" {
+		qParams["$filter"] = "((name eq '" + name + "') and (_nested eq '" + strconv.FormatBool(nested) + "'))"
 	}
 	response, err := client.R().
 		SetQueryParams(qParams).
@@ -263,6 +267,7 @@ func getPipelines(id string, name string, project string, export bool, exportPat
 		mapstructure.Decode(value, &c)
 		if export {
 			exportPipeline(c.Name, c.Project, exportPath)
+			arrResults = append(arrResults, &c)
 		} else {
 			arrResults = append(arrResults, &c)
 		}
@@ -278,11 +283,11 @@ func exportPipeline(name, project, path string) {
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/x-yaml;charset=UTF-8").
 		SetAuthToken(apiKey).
-		SetOutput(path + name + ".yaml").
+		SetOutput(path + "/" + name + ".yaml").
 		Get("https://" + server + "/pipeline/api/export")
 
 	if queryResponse.IsError() {
-		fmt.Println("Exit pipeline failed", err)
+		fmt.Println("Export pipeline failed", err)
 		os.Exit(1)
 	}
 }

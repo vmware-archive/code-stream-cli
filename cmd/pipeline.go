@@ -112,7 +112,7 @@ var createPipelineCmd = &cobra.Command{
 	Long: `Create a pipeline by importing a YAML specification.
 	
 	Create from YAML
-	cs-cli create pipeline --importPath "/Users/sammcgeown/Desktop/pipelines/SSH Exports.yaml"
+	  cs-cli create pipeline --importPath "/Users/sammcgeown/Desktop/pipelines/SSH Exports.yaml"
 	`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		return nil
