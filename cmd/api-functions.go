@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"strings"
 
@@ -225,7 +227,6 @@ func getPipelines(id string, name string, project string, export bool, exportPat
 	var arrResults []*CodeStreamPipeline
 	var qParams = make(map[string]string)
 	client := resty.New()
-
 	// Get by ID
 	if id != "" {
 		v, e := getPipelineByID(id)
@@ -237,10 +238,12 @@ func getPipelines(id string, name string, project string, export bool, exportPat
 	} else {
 		// Get by name
 		if name != "" {
+			fmt.Println("Filter: " + name)
 			qParams["$filter"] = "(name eq '" + name + "')"
 		}
 		// Get by project
 		if project != "" {
+			fmt.Println("Filter: " + project)
 			qParams["$filter"] = "(project eq '" + project + "')"
 		}
 	}
@@ -255,11 +258,14 @@ func getPipelines(id string, name string, project string, export bool, exportPat
 		fmt.Println("GET Variables failed", err)
 		os.Exit(1)
 	}
-
 	for _, value := range queryResponse.Result().(*documentsList).Documents {
 		c := CodeStreamPipeline{}
 		mapstructure.Decode(value, &c)
-		arrResults = append(arrResults, &c)
+		if export {
+			exportPipeline(c.Name, c.Project, exportPath)
+		} else {
+			arrResults = append(arrResults, &c)
+		}
 	}
 	return arrResults, err
 }
@@ -310,4 +316,27 @@ func patchPipeline(id string, payload string) (*CodeStreamPipeline, error) {
 		return nil, err
 	}
 	return response.Result().(*CodeStreamPipeline), nil
+}
+
+// importPipeline import a yaml file
+func importPipeline(yamlPath, action string) bool {
+	var qParams = make(map[string]string)
+	qParams["action"] = action
+	yamlBytes, err := ioutil.ReadFile(yamlPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	yamlPayload := string(yamlBytes)
+	client := resty.New()
+	response, err := client.R().
+		SetQueryParams(qParams).
+		SetHeader("Content-Type", "application/x-yaml").
+		SetBody(yamlPayload).
+		SetAuthToken(apiKey).
+		Post("https://" + server + "/pipeline/api/import")
+	if response.IsError() {
+		fmt.Println("Import/Update Pipeline failed", response.StatusCode())
+		return false
+	}
+	return true
 }

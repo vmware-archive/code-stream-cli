@@ -27,6 +27,7 @@ import (
 
 var state string
 var exportPath string
+var importPath string
 var export bool
 
 // getPipelineCmd represents the pipeline command
@@ -66,10 +67,12 @@ var getPipelineCmd = &cobra.Command{
 // updatePipelineCmd represents the pipeline update command
 var updatePipelineCmd = &cobra.Command{
 	Use:   "pipeline",
-	Short: "A brief description of your command",
+	Short: "Update a pipeline",
 	Long: `A longer description that spans multiple lines
 	Enable/Disable/Release:
 	cs-cli update pipeline --id d0185f04-2e87-4f3c-b6d7-ee58abba3e92 --state enabled/disabled/released
+	Update from YAML
+	cs-cli update pipeline --importPath "/Users/sammcgeown/Desktop/pipelines/SSH Exports.yaml"
 	`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if state != "" {
@@ -94,26 +97,32 @@ var updatePipelineCmd = &cobra.Command{
 			fmt.Println("Setting pipeline " + response.Name + " to " + state)
 		}
 
-		// response, err := getPipelines(id, name, project)
-		// if err != nil {
-		// 	fmt.Print("Unable to get Code Stream Pipelines: ", err)
-		// }
-		// var resultCount = len(response)
-		// if resultCount == 0 {
-		// 	// No results
-		// 	fmt.Println("No results found")
-		// } else if resultCount == 1 {
-		// 	// Print the single result
-		// 	PrettyPrint(response[0])
-		// } else {
-		// 	// Print result table
-		// 	table := tablewriter.NewWriter(os.Stdout)
-		// 	table.SetHeader([]string{"Id", "Name", "Project"})
-		// 	for _, c := range response {
-		// 		table.Append([]string{c.ID, c.Name, c.Project})
-		// 	}
-		// 	table.Render()
-		// }
+		if importPath != "" {
+			if importPipeline(importPath, "apply") {
+				fmt.Println("Imported successfully, pipeline updated.")
+			}
+		}
+	},
+}
+
+// createPipelineCmd represents the pipeline create command
+var createPipelineCmd = &cobra.Command{
+	Use:   "pipeline",
+	Short: "Create a pipeline",
+	Long: `Create a pipeline by importing a YAML specification.
+	
+	Create from YAML
+	cs-cli create pipeline --importPath "/Users/sammcgeown/Desktop/pipelines/SSH Exports.yaml"
+	`,
+	Args: func(cmd *cobra.Command, args []string) error {
+		return nil
+	},
+	Run: func(cmd *cobra.Command, args []string) {
+		if importPath != "" {
+			if importPipeline(importPath, "create") {
+				fmt.Println("Imported successfully, pipeline created.")
+			}
+		}
 	},
 }
 
@@ -126,8 +135,13 @@ func init() {
 	getPipelineCmd.Flags().StringVarP(&exportPath, "exportPath", "", "", "Path to export objects - relative or absolute location")
 	getPipelineCmd.Flags().BoolVarP(&export, "export", "e", false, "Export pipeline")
 
+	// Create
+	createCmd.AddCommand(createPipelineCmd)
+	createPipelineCmd.Flags().StringVarP(&importPath, "importPath", "c", "", "YAML configuration file to import")
+	createPipelineCmd.MarkFlagRequired("importPath")
 	// Update
 	updateCmd.AddCommand(updatePipelineCmd)
 	updatePipelineCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the pipeline to list")
+	updatePipelineCmd.Flags().StringVarP(&importPath, "importPath", "c", "", "Configuration file to import")
 	updatePipelineCmd.Flags().StringVarP(&state, "state", "s", "", "Set the state of the pipeline (ENABLED|DISABLED|RELEASED")
 }
