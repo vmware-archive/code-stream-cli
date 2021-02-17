@@ -29,6 +29,7 @@ var state string
 var exportPath string
 var importPath string
 var export bool
+var form bool
 
 // getPipelineCmd represents the pipeline command
 var getPipelineCmd = &cobra.Command{
@@ -36,11 +37,7 @@ var getPipelineCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Long:  `A longer description that spans multiple lines`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// if export {
-		// 	exportPipeline(name, project, exportPath)
-		// 	fmt.Println("Exported" + name)
-		// 	return
-		// }
+		ensureEndpointConnection()
 		response, err := getPipelines(id, name, project, export, exportPath)
 		if err != nil {
 			fmt.Print("Unable to get Code Stream Pipelines: ", err)
@@ -50,8 +47,14 @@ var getPipelineCmd = &cobra.Command{
 			// No results
 			fmt.Println("No results found")
 		} else if resultCount == 1 {
-			// Print the single result
-			PrettyPrint(response[0])
+			if form {
+				// Get the input form
+				var inputs = response[0].Input
+				PrettyPrint(inputs)
+			} else {
+				// Print the single result
+				PrettyPrint(response[0])
+			}
 		} else {
 			// Print result table
 			table := tablewriter.NewWriter(os.Stdout)
@@ -89,6 +92,7 @@ var updatePipelineCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		ensureEndpointConnection()
 		if state != "" {
 			response, err := patchPipeline(id, `{"state":"`+state+`"}`)
 			if err != nil {
@@ -118,6 +122,7 @@ var createPipelineCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		ensureEndpointConnection()
 		if importPath != "" {
 			if importPipeline(importPath, "create") {
 				fmt.Println("Imported successfully, pipeline created.")
@@ -134,6 +139,7 @@ func init() {
 	getPipelineCmd.Flags().StringVarP(&project, "project", "p", "", "List pipeline in project")
 	getPipelineCmd.Flags().StringVarP(&exportPath, "exportPath", "", "", "Path to export objects - relative or absolute location")
 	getPipelineCmd.Flags().BoolVarP(&export, "export", "e", false, "Export pipeline")
+	getPipelineCmd.Flags().BoolVarP(&form, "form", "f", false, "Get pipeline inputs")
 
 	// Create
 	createCmd.AddCommand(createPipelineCmd)

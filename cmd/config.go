@@ -40,6 +40,28 @@ Examples:
 	},
 }
 
+// useEndpointCmd represents the use-endpoint command
+var useEndpointCmd = &cobra.Command{
+	Use:   "use-endpoint",
+	Short: "Set the current endpoint",
+	Long: `Set the current endpoint
+
+Examples:
+	# Display the current-endpoint
+	cs-cli config use-endpoint --name vra8-test-ga
+`,
+	Run: func(cmd *cobra.Command, args []string) {
+		var endpoint = viper.Get("endpoint." + name)
+		if endpoint == nil {
+			fmt.Println("Endpoint not found! Current endpoint is", viper.GetString("currentEndpointName"))
+			return
+		}
+		viper.Set("currentEndpointName", name)
+		viper.WriteConfig()
+		fmt.Println("Current endpoint: ", name)
+	},
+}
+
 // getEndpointCmd represents the get-endpoint command
 var getEndpointCmd = &cobra.Command{
 	Use:   "get-endpoint",
@@ -66,36 +88,85 @@ Examples:
 	},
 }
 
+var newServer string
+
 // setEndpointCmd represents the set-endpoint command
 var setEndpointCmd = &cobra.Command{
 	Use:   "set-endpoint",
-	Short: "Creates a new endpoint config",
-	Long: `Creates a new endpoint config
+	Short: "Creates or updates an endpoint config",
+	Long: `Creates or updates an endpoint config
 
 Examples:
 	cs-cli config set-endpoint --name vra-test-ga --server vra8-test-ga.cmbu.local --username test-user --password VMware1! --domain cmbu.local
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-
+		if viper.IsSet("endpoint." + name) {
+			fmt.Println("Updating", name)
+		} else {
+			fmt.Println("Creating new endpoint", name)
+		}
+		fmt.Println("Use `cs-cli config use-endpoint --name " + name + "` to use this endpoint")
+		if newServer != "" {
+			viper.Set("endpoint."+name+".server", newServer)
+		}
+		if username != "" {
+			viper.Set("endpoint."+name+".username", username)
+		}
+		if password != "" {
+			viper.Set("endpoint."+name+".password", password)
+		}
+		if domain != "" {
+			viper.Set("endpoint."+name+".domain", domain)
+		}
+		err := viper.WriteConfig()
+		if err != nil {
+			fmt.Println(err)
+		}
+		var endpoint = viper.Get("endpoint." + name)
+		PrettyPrint(endpoint)
 	},
 }
+
+// deleteEndpointCmd represents the set-endpoint command
+// var deleteEndpointCmd = &cobra.Command{
+// 	Use:   "delete-endpoint",
+// 	Short: "Deletes an endpoint config",
+// 	Long: `Deletes an endpoint config
+
+// Examples:
+// 	cs-cli config delete-endpoint --name vra-test-ga
+// `,
+// 	Run: func(cmd *cobra.Command, args []string) {
+// 		if viper.IsSet("endpoint." + name) {
+// 			err := Unset(name)
+// 			if err != nil {
+// 				fmt.Println(err)
+// 			}
+// 			fmt.Println("Endpoint deleted.")
+// 		}
+// 	},
+// }
 
 func init() {
 	// current-endpoint
 	configCmd.AddCommand(currentEndpointCmd)
+	// use-endpoint
+	configCmd.AddCommand(useEndpointCmd)
+	useEndpointCmd.Flags().StringVarP(&name, "name", "n", "", "Use the endpoint with this name")
+	useEndpointCmd.MarkFlagRequired("name")
 	// get-endpoint
 	configCmd.AddCommand(getEndpointCmd)
 	getEndpointCmd.Flags().StringVarP(&name, "name", "n", "", "Display the endpoint with this name")
 	// set-endpoint
 	configCmd.AddCommand(setEndpointCmd)
-	setEndpointCmd.Flags().StringVarP(&name, "name", "n", "", "Display the endpoint with this name")
-	setEndpointCmd.Flags().StringVarP(&server, "server", "s", "", "Display the endpoint with this name")
-	setEndpointCmd.Flags().StringVarP(&username, "username", "u", "", "Display the endpoint with this name")
-	setEndpointCmd.Flags().StringVarP(&password, "password", "p", "", "Display the endpoint with this name")
-	setEndpointCmd.Flags().StringVarP(&domain, "domain", "d", "", "Display the endpoint with this name")
+	setEndpointCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the endpoint configuration")
+	setEndpointCmd.Flags().StringVarP(&newServer, "server", "s", "", "Server FQDN of the endpoint")
+	setEndpointCmd.Flags().StringVarP(&username, "username", "u", "", "Username to authenticate with the endpoint")
+	setEndpointCmd.Flags().StringVarP(&password, "password", "p", "", "Password to authenticate with the endpoint")
+	setEndpointCmd.Flags().StringVarP(&domain, "domain", "d", "", "Domain to authenticate with the endpoint (not required for System Domain)")
 	setEndpointCmd.MarkFlagRequired("name")
-	setEndpointCmd.MarkFlagRequired("server")
-	setEndpointCmd.MarkFlagRequired("username")
-	setEndpointCmd.MarkFlagRequired("password")
-
+	// delete-endpoint
+	// configCmd.AddCommand(deleteEndpointCmd)
+	// deleteEndpointCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the endpoint configuration")
+	// deleteEndpointCmd.MarkFlagRequired("name")
 }

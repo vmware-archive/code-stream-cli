@@ -151,3 +151,15 @@ type CodeStreamPipeline struct {
 	Tags       []interface{} `json:"tags"`
 	State      string        `json:"state"`
 }
+
+type CodeStreamCreateExecutionRequest struct {
+	Comments string      `json:"comments"`
+	Input    interface{} `json:"input"`
+}
+type CodeStreamCreateExecutionResponse struct {
+	Comments      string      `json:"comments"`
+	Source        string      `json:"source"`
+	Input         interface{} `json:"input"`
+	ExecutionLink string      `json:"executionLink"`
+	Tags          []string    `json:"tags"`
+}

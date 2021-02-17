@@ -24,19 +24,22 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
-var apiKey string
-var server string
-var id string
-var name string
-var project string
-var typename string
-var value string
-var description string
-var status string
-var username string
-var password string
-var domain string
+var (
+	cfgFile     string
+	currentEndpointName string
+	apiKey      string
+	server      string
+	id          string
+	name        string
+	project     string
+	typename    string
+	value       string
+	description string
+	status      string
+	username    string
+	password    string
+	domain      string
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -84,20 +87,8 @@ func initConfig() {
 		//fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
 
-	var currentEndpointName = viper.GetString("currentEndpointName")
+	currentEndpointName = viper.GetString("currentEndpointName")
 	apiKey = viper.GetString("endpoint." + currentEndpointName + ".apiKey")
 	server = viper.GetString("endpoint." + currentEndpointName + ".server")
 
-	// If the apiKey is not set or testAccesToken returns false
-	if apiKey == "" || testAccessToken() == false {
-		// Authenticate
-		accessToken, authError := authenticate(viper.GetString("endpoint."+currentEndpointName+".server"), viper.GetString("endpoint."+currentEndpointName+".username"), viper.GetString("endpoint."+currentEndpointName+".password"), viper.GetString("endpoint."+currentEndpointName+".domain"))
-		if authError != nil {
-			fmt.Println("Authentication failed", authError.Error())
-			os.Exit(1)
-		}
-		viper.Set("endpoint."+currentEndpointName+".apiKey", accessToken)
-		viper.WriteConfig()
-		apiKey = viper.GetString("endpoint." + currentEndpointName + ".apiKey")
-	}
 }

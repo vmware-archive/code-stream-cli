@@ -12,6 +12,9 @@ import (
 )
 
 var nested bool
+var inputs string
+var comments string
+var inputPath string
 
 // getExecutionCmd represents the executions command
 var getExecutionCmd = &cobra.Command{
@@ -24,6 +27,7 @@ var getExecutionCmd = &cobra.Command{
 	  cs-cli get execution --id bb3f6aff-311a-45fe-8081-5845a529068d
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
+		ensureEndpointConnection()
 
 		response, err := getExecutions(id, status, name, nested)
 		if err != nil {
@@ -43,20 +47,37 @@ var getExecutionCmd = &cobra.Command{
 // delExecutionCmd represents the executions command
 var delExecutionCmd = &cobra.Command{
 	Use:   "execution",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Delete an execution",
+	Long: `Delete an execution with a specific execution ID
+	
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
+		ensureEndpointConnection()
 
 		response, err := deleteExecution(id)
 		if err != nil {
 			fmt.Print("Unable to delete execution: ", err)
 		}
 		fmt.Println("Execution with id " + response.ID + " deleted")
+
+	},
+}
+
+// createExecutionCmd represents the executions command
+var createExecutionCmd = &cobra.Command{
+	Use:   "execution",
+	Short: "Create an execution",
+	Long: `Create an execution with a specific pipeline ID and form payload.
+	
+	`,
+	Run: func(cmd *cobra.Command, args []string) {
+		ensureEndpointConnection()
+
+		response, err := createExecution(id, inputs, comments)
+		if err != nil {
+			fmt.Print("Unable to create execution: ", err)
+		}
+		fmt.Println("Execution " + response.ExecutionLink + " created")
 
 	},
 }
@@ -72,4 +93,11 @@ func init() {
 	deleteCmd.AddCommand(delExecutionCmd)
 	delExecutionCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the pipeline to delete")
 	delExecutionCmd.MarkFlagRequired("id")
+	// Create
+	createCmd.AddCommand(createExecutionCmd)
+	createExecutionCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the pipeline to execute")
+	createExecutionCmd.Flags().StringVarP(&inputs, "inputs", "", "", "JSON form inputs")
+	createExecutionCmd.Flags().StringVarP(&inputPath, "inputPath", "", "", "JSON input file")
+	createExecutionCmd.Flags().StringVarP(&comments, "comments", "", "", "Execution comments")
+	createExecutionCmd.MarkFlagRequired("id")
 }

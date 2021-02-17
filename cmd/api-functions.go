@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -10,7 +11,23 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/viper"
 )
+
+func ensureEndpointConnection() {
+	// If the apiKey is not set or testAccesToken returns false
+	if apiKey == "" || testAccessToken() == false {
+		// Authenticate
+		accessToken, authError := authenticate(viper.GetString("endpoint."+currentEndpointName+".server"), viper.GetString("endpoint."+currentEndpointName+".username"), viper.GetString("endpoint."+currentEndpointName+".password"), viper.GetString("endpoint."+currentEndpointName+".domain"))
+		if authError != nil {
+			fmt.Println("Authentication failed", authError.Error())
+			os.Exit(1)
+		}
+		viper.Set("endpoint."+currentEndpointName+".apiKey", accessToken)
+		viper.WriteConfig()
+		apiKey = viper.GetString("endpoint." + currentEndpointName + ".apiKey")
+	}
+}
 
 func authenticate(server string, username string, password string, domain string) (string, error) {
 	client := resty.New()
@@ -104,6 +121,38 @@ func deleteExecution(id string) (*CodestreamAPIExecutions, error) {
 		fmt.Println("DELETE Execution failed", err)
 	}
 	return response.Result().(*CodestreamAPIExecutions), err
+}
+
+func createExecution(id string, inputs string, comment string) (*CodeStreamCreateExecutionResponse, error) {
+	// Convert JSON string to byte array
+	var inputBytes = []byte(inputs)
+	// Unmarshal inputs using a generic interface
+	var inputsInterface interface{}
+	err := json.Unmarshal(inputBytes, &inputsInterface)
+	if err != nil {
+		return nil, err
+	}
+	// Create CodeStreamCreateExecutionRequest struct
+	var execution CodeStreamCreateExecutionRequest
+	execution.Comments = comment
+	execution.Input = inputsInterface
+	//Marshal struct to JSON []byte
+	executionBytes, err := json.Marshal(execution)
+	if err != nil {
+		return nil, err
+	}
+	client := resty.New()
+	response, err := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(executionBytes).
+		SetResult(&CodeStreamCreateExecutionResponse{}).
+		SetAuthToken(apiKey).
+		Post("https://" + server + "/pipeline/api/pipelines/" + id + "/executions")
+	fmt.Println(response.StatusCode())
+	if response.IsError() {
+		return nil, response.Error().(error)
+	}
+	return response.Result().(*CodeStreamCreateExecutionResponse), nil
 }
 
 func getVariable(id, name, project string) ([]*CodeStreamVariableResponse, error) {
@@ -242,12 +291,10 @@ func getPipelines(id string, name string, project string, export bool, exportPat
 	} else {
 		// Get by name
 		if name != "" {
-			fmt.Println("Filter: " + name)
 			qParams["$filter"] = "(name eq '" + name + "')"
 		}
 		// Get by project
 		if project != "" {
-			fmt.Println("Filter: " + project)
 			qParams["$filter"] = "(project eq '" + project + "')"
 		}
 	}
