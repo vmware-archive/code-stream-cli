@@ -13,6 +13,7 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
 
 func ensureTargetConnection() {
@@ -274,6 +275,27 @@ func deleteVariable(id string) (*CodeStreamVariableResponse, error) {
 		os.Exit(1)
 	}
 	return response.Result().(*CodeStreamVariableResponse), err
+}
+
+// exportVariable - Export a variable to YAML
+func exportVariable(variable interface{}, exportFile string) {
+	// variable will be a CodeStreamVariableResponse, so lets remap to CodeStreamVariableRequest
+	c := CodeStreamVariableRequest{}
+	mapstructure.Decode(variable, &c)
+	yaml, err := yaml.Marshal(c)
+	if err != nil {
+		fmt.Println("Unable to export variable ", c.Name)
+	}
+	if exportFile == "" {
+		exportFile = "variables.yaml"
+	}
+	file, err := os.OpenFile(exportFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer file.Close()
+	file.WriteString("---\n" + string(yaml))
 }
 
 func getPipelines(id string, name string, project string, export bool, exportPath string) ([]*CodeStreamPipeline, error) {

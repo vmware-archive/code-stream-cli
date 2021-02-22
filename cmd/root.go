@@ -25,20 +25,21 @@ import (
 )
 
 var (
-	cfgFile     string
+	cfgFile           string
 	currentTargetName string
-	apiKey      string
-	server      string
-	id          string
-	name        string
-	project     string
-	typename    string
-	value       string
-	description string
-	status      string
-	username    string
-	password    string
-	domain      string
+	apiKey            string
+	server            string
+	id                string
+	name              string
+	project           string
+	typename          string
+	value             string
+	description       string
+	status            string
+	username          string
+	password          string
+	domain            string
+	exportFile        string
 )
 
 // rootCmd represents the base command when called without any subcommands
