@@ -331,7 +331,6 @@ func exportPipeline(name, project, path string) {
 	} else {
 		exportPath, _ = os.Getwd()
 	}
-	fmt.Println("Exporting pipline(s) to " + exportPath)
 	client := resty.New()
 	queryResponse, err := client.R().
 		SetQueryParams(qParams).
