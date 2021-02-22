@@ -62,8 +62,8 @@ Examples:
 	},
 }
 
-// getEndpointCmd represents the get-endpoint command
-var getEndpointCmd = &cobra.Command{
+// getConfigEndpointCmd represents the get-endpoint command
+var getConfigEndpointCmd = &cobra.Command{
 	Use:   "get-endpoint",
 	Short: "Display available endpoint configs",
 	Long: `Displays a list of the available endpoint configs
@@ -155,8 +155,8 @@ func init() {
 	useEndpointCmd.Flags().StringVarP(&name, "name", "n", "", "Use the endpoint with this name")
 	useEndpointCmd.MarkFlagRequired("name")
 	// get-endpoint
-	configCmd.AddCommand(getEndpointCmd)
-	getEndpointCmd.Flags().StringVarP(&name, "name", "n", "", "Display the endpoint with this name")
+	configCmd.AddCommand(getConfigEndpointCmd)
+	getConfigEndpointCmd.Flags().StringVarP(&name, "name", "n", "", "Display the endpoint with this name")
 	// set-endpoint
 	configCmd.AddCommand(setEndpointCmd)
 	setEndpointCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the endpoint configuration")

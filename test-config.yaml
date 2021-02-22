@@ -1,0 +1,6 @@
+endpoint:
+  my-vra-server:
+    domain: mydomain.com
+    password: mypassword
+    server: my-vra-server.mydomain.com
+    username: myuser

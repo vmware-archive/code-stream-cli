@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -48,8 +49,7 @@ func testAccessToken() bool {
 		SetHeader("Accept", "application/json").
 		SetAuthToken(apiKey).
 		Get("https://" + server + "/iaas/api/projects")
-	if response.IsError() {
-		fmt.Println("Key test failed", err)
+	if err != nil {
 		return false
 	}
 	if response.StatusCode() == 401 {
@@ -322,15 +322,22 @@ func getPipelines(id string, name string, project string, export bool, exportPat
 	return arrResults, err
 }
 func exportPipeline(name, project, path string) {
+	var exportPath string
 	var qParams = make(map[string]string)
 	qParams["pipelines"] = name
 	qParams["project"] = project
+	if path != "" {
+		exportPath = path
+	} else {
+		exportPath, _ = os.Getwd()
+	}
+	fmt.Println("Exporting pipline(s) to " + exportPath)
 	client := resty.New()
 	queryResponse, err := client.R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/x-yaml;charset=UTF-8").
 		SetAuthToken(apiKey).
-		SetOutput(path + "/" + name + ".yaml").
+		SetOutput(filepath.Join(exportPath, name+".yaml")).
 		Get("https://" + server + "/pipeline/api/export")
 
 	if queryResponse.IsError() {
