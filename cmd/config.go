@@ -22,66 +22,66 @@ import (
 	"github.com/spf13/viper"
 )
 
-// currentEndpointCmd represents the current-endpoint command
-var currentEndpointCmd = &cobra.Command{
-	Use:   "current-endpoint",
-	Short: "Display the current-endpoint",
-	Long: `Displays the current-endpoint
+// currentTargetCmd represents the current-target command
+var currentTargetCmd = &cobra.Command{
+	Use:   "current-target",
+	Short: "Display the current-target",
+	Long: `Displays the current-target
 
 Examples:
-	# Display the current-endpoint
-	cs-cli config current-endpoint
+	# Display the current-target
+	cs-cli config current-target
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		var currentEndpointName = viper.GetString("currentEndpointName")
-		if currentEndpointName != "" {
-			fmt.Println(currentEndpointName)
+		var currentTargetName = viper.GetString("currentTargetName")
+		if currentTargetName != "" {
+			fmt.Println(currentTargetName)
 		}
 	},
 }
 
-// useEndpointCmd represents the use-endpoint command
-var useEndpointCmd = &cobra.Command{
-	Use:   "use-endpoint",
-	Short: "Set the current endpoint",
-	Long: `Set the current endpoint
+// useTargetCmd represents the use-target command
+var useTargetCmd = &cobra.Command{
+	Use:   "use-target",
+	Short: "Set the current target",
+	Long: `Set the current target
 
 Examples:
-	# Display the current-endpoint
-	cs-cli config use-endpoint --name vra8-test-ga
+	# Display the current-target
+	cs-cli config use-target --name vra8-test-ga
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		var endpoint = viper.Get("endpoint." + name)
-		if endpoint == nil {
-			fmt.Println("Endpoint not found! Current endpoint is", viper.GetString("currentEndpointName"))
+		var target = viper.Get("target." + name)
+		if target == nil {
+			fmt.Println("Target not found! Current target is", viper.GetString("currentTargetName"))
 			return
 		}
-		viper.Set("currentEndpointName", name)
+		viper.Set("currentTargetName", name)
 		viper.WriteConfig()
-		fmt.Println("Current endpoint: ", name)
+		fmt.Println("Current target: ", name)
 	},
 }
 
-// getConfigEndpointCmd represents the get-endpoint command
-var getConfigEndpointCmd = &cobra.Command{
-	Use:   "get-endpoint",
-	Short: "Display available endpoint configs",
-	Long: `Displays a list of the available endpoint configs
+// getConfigTargetCmd represents the get-target command
+var getConfigTargetCmd = &cobra.Command{
+	Use:   "get-target",
+	Short: "Display available target configs",
+	Long: `Displays a list of the available target configs
 
 Examples:
-	cs-cli config get-endpoint
+	cs-cli config get-target
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if name != "" {
-			var endpoint = viper.Get("endpoint." + name)
-			if endpoint == nil {
-				fmt.Println("Endpoint not found.")
+			var target = viper.Get("target." + name)
+			if target == nil {
+				fmt.Println("Target not found.")
 			} else {
-				PrettyPrint(endpoint)
+				PrettyPrint(target)
 			}
 		} else {
-			var endpoints = viper.GetStringMapString("endpoint")
-			for key := range endpoints {
+			var targets = viper.GetStringMapString("target")
+			for key := range targets {
 				fmt.Println(key)
 			}
 		}
@@ -90,83 +90,83 @@ Examples:
 
 var newServer string
 
-// setEndpointCmd represents the set-endpoint command
-var setEndpointCmd = &cobra.Command{
-	Use:   "set-endpoint",
-	Short: "Creates or updates an endpoint config",
-	Long: `Creates or updates an endpoint config
+// setTargetCmd represents the set-target command
+var setTargetCmd = &cobra.Command{
+	Use:   "set-target",
+	Short: "Creates or updates an target config",
+	Long: `Creates or updates an target config
 
 Examples:
-	cs-cli config set-endpoint --name vra-test-ga --server vra8-test-ga.cmbu.local --username test-user --password VMware1! --domain cmbu.local
+	cs-cli config set-target --name vra-test-ga --server vra8-test-ga.cmbu.local --username test-user --password VMware1! --domain cmbu.local
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		if viper.IsSet("endpoint." + name) {
+		if viper.IsSet("target." + name) {
 			fmt.Println("Updating", name)
 		} else {
-			fmt.Println("Creating new endpoint", name)
+			fmt.Println("Creating new target", name)
 		}
-		fmt.Println("Use `cs-cli config use-endpoint --name " + name + "` to use this endpoint")
+		fmt.Println("Use `cs-cli config use-target --name " + name + "` to use this target")
 		if newServer != "" {
-			viper.Set("endpoint."+name+".server", newServer)
+			viper.Set("target."+name+".server", newServer)
 		}
 		if username != "" {
-			viper.Set("endpoint."+name+".username", username)
+			viper.Set("target."+name+".username", username)
 		}
 		if password != "" {
-			viper.Set("endpoint."+name+".password", password)
+			viper.Set("target."+name+".password", password)
 		}
 		if domain != "" {
-			viper.Set("endpoint."+name+".domain", domain)
+			viper.Set("target."+name+".domain", domain)
 		}
 		err := viper.WriteConfig()
 		if err != nil {
 			fmt.Println(err)
 		}
-		var endpoint = viper.Get("endpoint." + name)
-		PrettyPrint(endpoint)
+		var target = viper.Get("target." + name)
+		PrettyPrint(target)
 	},
 }
 
-// deleteEndpointCmd represents the set-endpoint command
-// var deleteEndpointCmd = &cobra.Command{
-// 	Use:   "delete-endpoint",
-// 	Short: "Deletes an endpoint config",
-// 	Long: `Deletes an endpoint config
+// deleteTargetCmd represents the set-target command
+// var deleteTargetCmd = &cobra.Command{
+// 	Use:   "delete-target",
+// 	Short: "Deletes an target config",
+// 	Long: `Deletes an target config
 
 // Examples:
-// 	cs-cli config delete-endpoint --name vra-test-ga
+// 	cs-cli config delete-target --name vra-test-ga
 // `,
 // 	Run: func(cmd *cobra.Command, args []string) {
-// 		if viper.IsSet("endpoint." + name) {
+// 		if viper.IsSet("target." + name) {
 // 			err := Unset(name)
 // 			if err != nil {
 // 				fmt.Println(err)
 // 			}
-// 			fmt.Println("Endpoint deleted.")
+// 			fmt.Println("Target deleted.")
 // 		}
 // 	},
 // }
 
 func init() {
-	// current-endpoint
-	configCmd.AddCommand(currentEndpointCmd)
-	// use-endpoint
-	configCmd.AddCommand(useEndpointCmd)
-	useEndpointCmd.Flags().StringVarP(&name, "name", "n", "", "Use the endpoint with this name")
-	useEndpointCmd.MarkFlagRequired("name")
-	// get-endpoint
-	configCmd.AddCommand(getConfigEndpointCmd)
-	getConfigEndpointCmd.Flags().StringVarP(&name, "name", "n", "", "Display the endpoint with this name")
-	// set-endpoint
-	configCmd.AddCommand(setEndpointCmd)
-	setEndpointCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the endpoint configuration")
-	setEndpointCmd.Flags().StringVarP(&newServer, "server", "s", "", "Server FQDN of the endpoint")
-	setEndpointCmd.Flags().StringVarP(&username, "username", "u", "", "Username to authenticate with the endpoint")
-	setEndpointCmd.Flags().StringVarP(&password, "password", "p", "", "Password to authenticate with the endpoint")
-	setEndpointCmd.Flags().StringVarP(&domain, "domain", "d", "", "Domain to authenticate with the endpoint (not required for System Domain)")
-	setEndpointCmd.MarkFlagRequired("name")
-	// delete-endpoint
-	// configCmd.AddCommand(deleteEndpointCmd)
-	// deleteEndpointCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the endpoint configuration")
-	// deleteEndpointCmd.MarkFlagRequired("name")
+	// current-target
+	configCmd.AddCommand(currentTargetCmd)
+	// use-target
+	configCmd.AddCommand(useTargetCmd)
+	useTargetCmd.Flags().StringVarP(&name, "name", "n", "", "Use the target with this name")
+	useTargetCmd.MarkFlagRequired("name")
+	// get-target
+	configCmd.AddCommand(getConfigTargetCmd)
+	getConfigTargetCmd.Flags().StringVarP(&name, "name", "n", "", "Display the target with this name")
+	// set-target
+	configCmd.AddCommand(setTargetCmd)
+	setTargetCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the target configuration")
+	setTargetCmd.Flags().StringVarP(&newServer, "server", "s", "", "Server FQDN of the target")
+	setTargetCmd.Flags().StringVarP(&username, "username", "u", "", "Username to authenticate with the target")
+	setTargetCmd.Flags().StringVarP(&password, "password", "p", "", "Password to authenticate with the target")
+	setTargetCmd.Flags().StringVarP(&domain, "domain", "d", "", "Domain to authenticate with the target (not required for System Domain)")
+	setTargetCmd.MarkFlagRequired("name")
+	// delete-target
+	// configCmd.AddCommand(deleteTargetCmd)
+	// deleteTargetCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the target configuration")
+	// deleteTargetCmd.MarkFlagRequired("name")
 }

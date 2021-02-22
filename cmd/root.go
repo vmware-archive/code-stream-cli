@@ -26,7 +26,7 @@ import (
 
 var (
 	cfgFile     string
-	currentEndpointName string
+	currentTargetName string
 	apiKey      string
 	server      string
 	id          string
@@ -87,8 +87,8 @@ func initConfig() {
 		//fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
 
-	currentEndpointName = viper.GetString("currentEndpointName")
-	apiKey = viper.GetString("endpoint." + currentEndpointName + ".apiKey")
-	server = viper.GetString("endpoint." + currentEndpointName + ".server")
+	currentTargetName = viper.GetString("currentTargetName")
+	apiKey = viper.GetString("target." + currentTargetName + ".apiKey")
+	server = viper.GetString("target." + currentTargetName + ".server")
 
 }

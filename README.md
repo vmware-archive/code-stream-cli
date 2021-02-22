@@ -1,22 +1,23 @@
+# cs-cli
 
+## Configuration
 
-## Config
-The configuration file stores the endpoints (vRA servers and credentials) that the CLI will use. By default cs-cli will use `$HOME/.cs-cli.yaml` as the config file. You can override this using the `--config` flag.
+The configuration file stores the targets (vRA servers and credentials) that the CLI will use. By default cs-cli will use `$HOME/.cs-cli.yaml` as the config file. You can override this using the `--config` flag.
 
 ```bash
 cs-cli --config /path/to/config.yaml get pipeline
 ```
 
-### Working with endpoints
+### Working with targets
 
-List available endpoints:
-`cs-cli config get-endpoint`
+List available targets:
+`cs-cli config get-target`
 
-Add an endpoint configuration:
+Add an target configuration:
 ```bash
-❯ cs-cli config set-endpoint --config test-config.yaml --name my-vra-server --password mypassword --username myuser --domain mydomain.com --server my-vra-server.mydomain.com
-Creating new endpoint my-vra-server
-Use `cs-cli config use-endpoint --name my-vra-server` to use this endpoint
+❯ cs-cli config set-target --config test-config.yaml --name my-vra-server --password mypassword --username myuser --domain mydomain.com --server my-vra-server.mydomain.com
+Creating new target my-vra-server
+Use `cs-cli config use-target --name my-vra-server` to use this target
 {
   "domain": "mydomain.com",
   "password": "mypassword",
@@ -26,10 +27,10 @@ Use `cs-cli config use-endpoint --name my-vra-server` to use this endpoint
 ```
 
 ```bash
-#Set the active endpoint
-cs-cli config use-endpoint --name my-vra-server --config test-config.yaml
-#View the current active endpoint
-cs-cli config current-endpoint --config test-config.yaml
+#Set the active target
+cs-cli config use-target --name my-vra-server --config test-config.yaml
+#View the current active target
+cs-cli config current-target --config test-config.yaml
 ```
 
 ## Working with Pipelines
@@ -57,3 +58,8 @@ cs-cli get pipeline --export
 # Export all pipelines in a project
 cs-cli get pipeline --project "Field Demo" --export
 ```
+
+## Working with Variables
+
+
+## Working with Endpoints

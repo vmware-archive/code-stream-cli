@@ -15,18 +15,18 @@ import (
 	"github.com/spf13/viper"
 )
 
-func ensureEndpointConnection() {
+func ensureTargetConnection() {
 	// If the apiKey is not set or testAccesToken returns false
 	if apiKey == "" || testAccessToken() == false {
 		// Authenticate
-		accessToken, authError := authenticate(viper.GetString("endpoint."+currentEndpointName+".server"), viper.GetString("endpoint."+currentEndpointName+".username"), viper.GetString("endpoint."+currentEndpointName+".password"), viper.GetString("endpoint."+currentEndpointName+".domain"))
+		accessToken, authError := authenticate(viper.GetString("target."+currentTargetName+".server"), viper.GetString("target."+currentTargetName+".username"), viper.GetString("target."+currentTargetName+".password"), viper.GetString("target."+currentTargetName+".domain"))
 		if authError != nil {
 			fmt.Println("Authentication failed", authError.Error())
 			os.Exit(1)
 		}
-		viper.Set("endpoint."+currentEndpointName+".apiKey", accessToken)
+		viper.Set("target."+currentTargetName+".apiKey", accessToken)
 		viper.WriteConfig()
-		apiKey = viper.GetString("endpoint." + currentEndpointName + ".apiKey")
+		apiKey = viper.GetString("target." + currentTargetName + ".apiKey")
 	}
 }
 

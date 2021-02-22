@@ -38,7 +38,7 @@ Get by Name
 Get by Project
 	cs-cli get variable --project production`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureEndpointConnection()
+		ensureTargetConnection()
 		response, err := getVariable(id, name, project)
 		if err != nil {
 			fmt.Print("Unable to get Code Stream Variables: ", err)
@@ -68,7 +68,7 @@ var createVariableCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureEndpointConnection()
+		ensureTargetConnection()
 		createResponse, err := createVariable(name, description, typename, project, value)
 		if err != nil {
 			fmt.Print("Unable to create Code Stream Variable: ", err)
@@ -84,7 +84,7 @@ var updateVariableCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureEndpointConnection()
+		ensureTargetConnection()
 		updateResponse, err := updateVariable(id, name, description, typename, value)
 		if err != nil {
 			fmt.Print("Unable to update Code Stream Variable: ", err)
@@ -105,7 +105,7 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureEndpointConnection()
+		ensureTargetConnection()
 
 		response, err := deleteVariable(id)
 		if err != nil {

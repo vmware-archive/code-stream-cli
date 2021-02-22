@@ -37,7 +37,7 @@ var getPipelineCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Long:  `A longer description that spans multiple lines`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureEndpointConnection()
+		ensureTargetConnection()
 		response, err := getPipelines(id, name, project, export, exportPath)
 		if err != nil {
 			fmt.Print("Unable to get Code Stream Pipelines: ", err)
@@ -92,7 +92,7 @@ var updatePipelineCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureEndpointConnection()
+		ensureTargetConnection()
 		if state != "" {
 			response, err := patchPipeline(id, `{"state":"`+state+`"}`)
 			if err != nil {
@@ -122,7 +122,7 @@ var createPipelineCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureEndpointConnection()
+		ensureTargetConnection()
 		if importPath != "" {
 			if importPipeline(importPath, "create") {
 				fmt.Println("Imported successfully, pipeline created.")

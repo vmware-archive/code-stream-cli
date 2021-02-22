@@ -27,7 +27,7 @@ var getExecutionCmd = &cobra.Command{
 	  cs-cli get execution --id bb3f6aff-311a-45fe-8081-5845a529068d
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureEndpointConnection()
+		ensureTargetConnection()
 
 		response, err := getExecutions(id, status, name, nested)
 		if err != nil {
@@ -60,7 +60,7 @@ var delExecutionCmd = &cobra.Command{
 	
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureEndpointConnection()
+		ensureTargetConnection()
 
 		response, err := deleteExecution(id)
 		if err != nil {
@@ -79,7 +79,7 @@ var createExecutionCmd = &cobra.Command{
 	
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureEndpointConnection()
+		ensureTargetConnection()
 
 		response, err := createExecution(id, inputs, comments)
 		if err != nil {
