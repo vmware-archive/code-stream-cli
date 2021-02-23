@@ -17,6 +17,17 @@ type AuthenticationResponse struct {
 	ExpiresIn    int    `json:"expires_in"`
 }
 
+// AuthenticationRequestCloud - vRA Authentication request structure for Cloud
+type AuthenticationRequestCloud struct {
+	RefreshToken string `json:"refreshToken"`
+}
+
+// AuthenticationResponseCloud - Authentication response structure for Cloud
+type AuthenticationResponseCloud struct {
+	TokenType string `json:"tokenType"`
+	Token     string `json:"token"`
+}
+
 // AuthenticationError - Authentication error structure
 type AuthenticationError struct {
 	Timestamp     int64  `json:"timestamp"`

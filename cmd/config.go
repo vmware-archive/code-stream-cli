@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -93,12 +94,20 @@ var newServer string
 // setTargetCmd represents the set-target command
 var setTargetCmd = &cobra.Command{
 	Use:   "set-target",
-	Short: "Creates or updates an target config",
-	Long: `Creates or updates an target config
+	Short: "Creates or updates a target config",
+	Long: `Creates or updates a target configuration.
 
 Examples:
 	cs-cli config set-target --name vra-test-ga --server vra8-test-ga.cmbu.local --username test-user --password VMware1! --domain cmbu.local
-`,
+	cs-cli config set-target --name vrac-org --server api.mgmt.cloud.vmware.com --apitoken JhbGciOiJSUzI1NiIsImtpZCI6IjEzNjY3NDcwMTA2Mzk2MTUxNDk0In0
+`, Args: func(cmd *cobra.Command, args []string) error {
+		if apiToken != "" && server != "" && username == "" && password == "" {
+			return nil
+		} else if apiToken == "" && server != "" && username != "" && password != "" {
+			return nil
+		}
+		return errors.New("Incorrect combination of flags, please use  --server and --apitoken for vRealize Automation Cloud, or --server, --username, --password and --domain (optional) for vRealize Automation 8.x")
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		if viper.IsSet("target." + name) {
 			fmt.Println("Updating", name)
@@ -160,10 +169,11 @@ func init() {
 	// set-target
 	configCmd.AddCommand(setTargetCmd)
 	setTargetCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the target configuration")
-	setTargetCmd.Flags().StringVarP(&newServer, "server", "s", "", "Server FQDN of the target")
-	setTargetCmd.Flags().StringVarP(&username, "username", "u", "", "Username to authenticate with the target")
-	setTargetCmd.Flags().StringVarP(&password, "password", "p", "", "Password to authenticate with the target")
-	setTargetCmd.Flags().StringVarP(&domain, "domain", "d", "", "Domain to authenticate with the target (not required for System Domain)")
+	setTargetCmd.Flags().StringVarP(&newServer, "server", "s", "", "Server FQDN of the vRealize Automation instance")
+	setTargetCmd.Flags().StringVarP(&username, "username", "u", "", "Username to authenticate")
+	setTargetCmd.Flags().StringVarP(&password, "password", "p", "", "Password to authenticate")
+	setTargetCmd.Flags().StringVarP(&domain, "domain", "d", "", "Domain to authenticate (not required for System Domain)")
+	setTargetCmd.Flags().StringVarP(&apiToken, "apitoken", "a", "", "API token for vRealize Automation Cloud")
 	setTargetCmd.MarkFlagRequired("name")
 	// delete-target
 	// configCmd.AddCommand(deleteTargetCmd)

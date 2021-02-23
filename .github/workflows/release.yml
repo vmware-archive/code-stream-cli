@@ -23,10 +23,10 @@ jobs:
       #    echo "::set-output name=content::$content"
       - name: Set up go
         uses: actions/setup-go@v2
-        #with:
+        with:
           # TODO: Replace with go-version-from-file when it is supported
           # https://github.com/actions/setup-go/pull/62
-          # go-version: ${{ steps.go-version.outputs.content }}
+          go-version: 1.15 #${{ steps.go-version.outputs.content }}
 
       - name: Release static binaries
         uses: goreleaser/goreleaser-action@v2
@@ -34,4 +34,4 @@ jobs:
           version: latest
           args: release
         env:
-          GITHUB_TOKEN: $${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -17,21 +17,26 @@ import (
 )
 
 func ensureTargetConnection() {
-	// If the apiKey is not set or testAccesToken returns false
-	if apiKey == "" || testAccessToken() == false {
+	// If the accessToken is not set or testAccesToken returns false
+	if accessToken == "" || testAccessToken() == false {
+		var authError error
 		// Authenticate
-		accessToken, authError := authenticate(viper.GetString("target."+currentTargetName+".server"), viper.GetString("target."+currentTargetName+".username"), viper.GetString("target."+currentTargetName+".password"), viper.GetString("target."+currentTargetName+".domain"))
+		if apiToken != "" {
+			accessToken, authError = authenticateCloud(viper.GetString("target."+currentTargetName+".server"), viper.GetString("target."+currentTargetName+".apiToken"))
+		} else {
+			accessToken, authError = authenticateOnPrem(viper.GetString("target."+currentTargetName+".server"), viper.GetString("target."+currentTargetName+".username"), viper.GetString("target."+currentTargetName+".password"), viper.GetString("target."+currentTargetName+".domain"))
+		}
 		if authError != nil {
 			fmt.Println("Authentication failed", authError.Error())
 			os.Exit(1)
 		}
-		viper.Set("target."+currentTargetName+".apiKey", accessToken)
+		viper.Set("target."+currentTargetName+".accessToken", accessToken)
 		viper.WriteConfig()
-		apiKey = viper.GetString("target." + currentTargetName + ".apiKey")
+		accessToken = viper.GetString("target." + currentTargetName + ".accessToken")
 	}
 }
 
-func authenticate(server string, username string, password string, domain string) (string, error) {
+func authenticateOnPrem(server string, username string, password string, domain string) (string, error) {
 	client := resty.New()
 	response, err := client.R().
 		SetBody(AuthenticationRequest{username, password, domain}).
@@ -43,12 +48,24 @@ func authenticate(server string, username string, password string, domain string
 	}
 	return response.Result().(*AuthenticationResponse).AccessToken, err
 }
+func authenticateCloud(server string, apiToken string) (string, error) {
+	client := resty.New()
+	response, err := client.R().
+		SetBody(AuthenticationRequestCloud{apiToken}).
+		SetResult(&AuthenticationResponseCloud{}).
+		SetError(&AuthenticationError{}).
+		Post("https://" + server + "/iaas/api/login")
+	if response.IsError() {
+		return "", err
+	}
+	return response.Result().(*AuthenticationResponseCloud).Token, err
+}
 
 func testAccessToken() bool {
 	client := resty.New()
 	response, err := client.R().
 		SetHeader("Accept", "application/json").
-		SetAuthToken(apiKey).
+		SetAuthToken(accessToken).
 		Get("https://" + server + "/iaas/api/projects")
 	if err != nil {
 		return false
@@ -83,7 +100,7 @@ func getExecutions(id string, status string, name string, nested bool) ([]*Codes
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&documentsList{}).
-		SetAuthToken(apiKey).
+		SetAuthToken(accessToken).
 		Get("https://" + server + "/pipeline/api/executions")
 	if response.IsError() {
 		fmt.Println("GET Executions failed", err)
@@ -103,7 +120,7 @@ func getExecution(executionLink string) (*CodestreamAPIExecutions, error) {
 	response, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetResult(&CodestreamAPIExecutions{}).
-		SetAuthToken(apiKey).
+		SetAuthToken(accessToken).
 		Get("https://" + server + executionLink)
 	if response.IsError() {
 		fmt.Println("GET Execution failed", err)
@@ -116,7 +133,7 @@ func deleteExecution(id string) (*CodestreamAPIExecutions, error) {
 	response, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetResult(&CodestreamAPIExecutions{}).
-		SetAuthToken(apiKey).
+		SetAuthToken(accessToken).
 		Delete("https://" + server + "/pipeline/api/executions/" + id)
 	if response.IsError() {
 		fmt.Println("DELETE Execution failed", err)
@@ -147,7 +164,7 @@ func createExecution(id string, inputs string, comment string) (*CodeStreamCreat
 		SetHeader("Content-Type", "application/json").
 		SetBody(executionBytes).
 		SetResult(&CodeStreamCreateExecutionResponse{}).
-		SetAuthToken(apiKey).
+		SetAuthToken(accessToken).
 		Post("https://" + server + "/pipeline/api/pipelines/" + id + "/executions")
 	fmt.Println(response.StatusCode())
 	if response.IsError() {
@@ -179,7 +196,7 @@ func getVariable(id, name, project string) ([]*CodeStreamVariableResponse, error
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&documentsList{}).
-		SetAuthToken(apiKey).
+		SetAuthToken(accessToken).
 		Get("https://" + server + "/pipeline/api/variables")
 
 	if queryResponse.IsError() {
@@ -201,7 +218,7 @@ func getVariableByID(id string) (*CodeStreamVariableResponse, error) {
 	response, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamVariableResponse{}).
-		SetAuthToken(apiKey).
+		SetAuthToken(accessToken).
 		Get("https://" + server + "/pipeline/api/variables/" + id)
 	if response.IsError() {
 		fmt.Println("GET Variable failed", err)
@@ -224,7 +241,7 @@ func createVariable(name string, description string, variableType string, projec
 			}).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamVariableResponse{}).
-		SetAuthToken(apiKey).
+		SetAuthToken(accessToken).
 		Post("https://" + server + "/pipeline/api/variables")
 	if response.IsError() {
 		fmt.Println("Create Variable failed", err)
@@ -253,7 +270,7 @@ func updateVariable(id string, name string, description string, typename string,
 		SetBody(variable).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamVariableResponse{}).
-		SetAuthToken(apiKey).
+		SetAuthToken(accessToken).
 		Put("https://" + server + "/pipeline/api/variables/" + id)
 	if response.IsError() {
 		fmt.Println("Create Variable failed", err)
@@ -268,7 +285,7 @@ func deleteVariable(id string) (*CodeStreamVariableResponse, error) {
 	response, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamVariableResponse{}).
-		SetAuthToken(apiKey).
+		SetAuthToken(accessToken).
 		Delete("https://" + server + "/pipeline/api/variables/" + id)
 	if response.IsError() {
 		fmt.Println("Create Variable failed", err)
@@ -324,7 +341,7 @@ func getPipelines(id string, name string, project string, export bool, exportPat
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&documentsList{}).
-		SetAuthToken(apiKey).
+		SetAuthToken(accessToken).
 		Get("https://" + server + "/pipeline/api/pipelines")
 
 	if queryResponse.IsError() {
@@ -357,7 +374,7 @@ func exportPipeline(name, project, path string) {
 	queryResponse, err := client.R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/x-yaml;charset=UTF-8").
-		SetAuthToken(apiKey).
+		SetAuthToken(accessToken).
 		SetOutput(filepath.Join(exportPath, name+".yaml")).
 		Get("https://" + server + "/pipeline/api/export")
 
@@ -373,7 +390,7 @@ func getPipelineByID(id string) (*CodeStreamPipeline, error) {
 	response, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamPipeline{}).
-		SetAuthToken(apiKey).
+		SetAuthToken(accessToken).
 		Get("https://" + server + "/pipeline/api/pipelines/" + id)
 	if response.IsError() {
 		fmt.Println("GET Pipeline failed", err)
@@ -389,7 +406,7 @@ func patchPipeline(id string, payload string) (*CodeStreamPipeline, error) {
 		SetHeader("Content-Type", "application/json").
 		SetBody(payload).
 		SetResult(&CodeStreamPipeline{}).
-		SetAuthToken(apiKey).
+		SetAuthToken(accessToken).
 		Patch("https://" + server + "/pipeline/api/pipelines/" + id)
 	if response.IsError() {
 		fmt.Println("GET Pipeline failed", response.StatusCode())
@@ -412,7 +429,7 @@ func importPipeline(yamlPath, action string) bool {
 		SetQueryParams(qParams).
 		SetHeader("Content-Type", "application/x-yaml").
 		SetBody(yamlPayload).
-		SetAuthToken(apiKey).
+		SetAuthToken(accessToken).
 		Post("https://" + server + "/pipeline/api/import")
 	if response.IsError() {
 		fmt.Println("Import/Update Pipeline failed", response.StatusCode())

@@ -27,7 +27,8 @@ import (
 var (
 	cfgFile           string
 	currentTargetName string
-	apiKey            string
+	accessToken       string
+	apiToken          string
 	server            string
 	id                string
 	name              string
@@ -89,7 +90,8 @@ func initConfig() {
 	}
 
 	currentTargetName = viper.GetString("currentTargetName")
-	apiKey = viper.GetString("target." + currentTargetName + ".apiKey")
+	accessToken = viper.GetString("target." + currentTargetName + ".accessToken")
 	server = viper.GetString("target." + currentTargetName + ".server")
+	apiToken =  viper.GetString("target." + currentTargetName + ".apiToken")
 
 }
