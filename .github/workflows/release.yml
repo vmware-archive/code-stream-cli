@@ -1,4 +1,4 @@
-name: release
+name: build-releases
 
 on:
   push:
@@ -6,32 +6,19 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+*"
 
 jobs:
-  release:
-    name: release (static binaries)
+  releases-matrix:
+    name: Release Go Binary
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # build and publish in parallel: linux/386, linux/amd64, windows/386, windows/amd64, darwin/386, darwin/amd64 
+        goos: [linux, windows, darwin]
+        goarch: ["386", amd64]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Unshallow
-        run: git fetch --prune --unshallow
-
-      #- name: Read go version
-      #  id: go-version
-      #  run: |
-      #    content=`cat ./.go-version`
-      #    echo "::set-output name=content::$content"
-      - name: Set up go
-        uses: actions/setup-go@v2h
-        #with:
-          # TODO: Replace with go-version-from-file when it is supported
-          # https://github.com/actions/setup-go/pull/62
-          # go-version: ${{ steps.go-version.outputs.content }}
-
-      - name: Release static binaries
-        uses: goreleaser/goreleaser-action@v2
-        with:
-          version: latest
-          args: release
-        env:
-          GITHUB_TOKEN: $${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/checkout@v2
+    - uses: wangyoucao577/go-release-action@v1.14
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        goos: ${{ matrix.goos }}
+        goarch: ${{ matrix.goarch }}
+        extra_files: LICENSE.md
