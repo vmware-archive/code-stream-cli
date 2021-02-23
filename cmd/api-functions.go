@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -184,13 +186,17 @@ func getVariable(id, name, project string) ([]*CodeStreamVariableResponse, error
 		arrVariables = append(arrVariables, v)
 		return arrVariables, e
 	}
-	// Get by name
-	if name != "" {
-		qParams["$filter"] = "(name eq '" + name + "')"
-	}
-	// Get by project
-	if project != "" {
-		qParams["$filter"] = "(project eq '" + project + "')"
+	if name != "" && project != "" {
+		qParams["$filter"] = "((name eq '" + name + "') and (project eq '" + project + "'))"
+	} else {
+		// Get by name
+		if name != "" {
+			qParams["$filter"] = "(name eq '" + name + "')"
+		}
+		// Get by project
+		if project != "" {
+			qParams["$filter"] = "(project eq '" + project + "')"
+		}
 	}
 	queryResponse, err := client.R().
 		SetQueryParams(qParams).
@@ -241,11 +247,11 @@ func createVariable(name string, description string, variableType string, projec
 			}).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamVariableResponse{}).
+		SetError(&CodeStreamException{}).
 		SetAuthToken(accessToken).
 		Post("https://" + server + "/pipeline/api/variables")
 	if response.IsError() {
-		fmt.Println("Create Variable failed", err)
-		os.Exit(1)
+		return nil, errors.New(response.Error().(*CodeStreamException).Message)
 	}
 	return response.Result().(*CodeStreamVariableResponse), err
 }
@@ -270,11 +276,11 @@ func updateVariable(id string, name string, description string, typename string,
 		SetBody(variable).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamVariableResponse{}).
+		SetError(&CodeStreamException{}).
 		SetAuthToken(accessToken).
 		Put("https://" + server + "/pipeline/api/variables/" + id)
 	if response.IsError() {
-		fmt.Println("Create Variable failed", err)
-		os.Exit(1)
+		return nil, errors.New(response.Error().(*CodeStreamException).Message)
 	}
 	return response.Result().(*CodeStreamVariableResponse), err
 }
@@ -313,6 +319,23 @@ func exportVariable(variable interface{}, exportFile string) {
 
 	defer file.Close()
 	file.WriteString("---\n" + string(yaml))
+}
+
+// importVariables - Import variables from the filePath
+func importVariables(filePath string) []CodeStreamVariableRequest {
+	var returnVariables []CodeStreamVariableRequest
+	filename, _ := filepath.Abs(filePath)
+	yamlFile, err := ioutil.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+	reader := bytes.NewReader(yamlFile)
+	decoder := yaml.NewDecoder(reader)
+	var request CodeStreamVariableRequest
+	for decoder.Decode(&request) == nil {
+		returnVariables = append(returnVariables, request)
+	}
+	return returnVariables
 }
 
 func getPipelines(id string, name string, project string, export bool, exportPath string) ([]*CodeStreamPipeline, error) {

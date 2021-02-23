@@ -75,12 +75,27 @@ var createVariableCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		ensureTargetConnection()
-		createResponse, err := createVariable(name, description, typename, project, value)
-		if err != nil {
-			fmt.Print("Unable to create Code Stream Variable: ", err)
-		}
 
-		PrettyPrint(createResponse)
+		if importFile != "" {
+			variables := importVariables(importFile)
+			for _, value := range variables {
+				if project != "" { // If the project is specified update the object
+					value.Project = project
+				}
+				createResponse, err := createVariable(value.Name, value.Description, value.Type, value.Project, value.Value)
+				if err != nil {
+					fmt.Println("Unable to create Code Stream Variable: ", err)
+				} else {
+					fmt.Println("Created variable", createResponse.Name, "in", createResponse.Project)
+				}
+			}
+		} else {
+			createResponse, err := createVariable(name, description, typename, project, value)
+			if err != nil {
+				fmt.Print("Unable to create Code Stream Variable: ", err)
+			}
+			PrettyPrint(createResponse)
+		}
 	},
 }
 
@@ -91,12 +106,28 @@ var updateVariableCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		ensureTargetConnection()
-		updateResponse, err := updateVariable(id, name, description, typename, value)
-		if err != nil {
-			fmt.Print("Unable to update Code Stream Variable: ", err)
+		if importFile != "" {
+			variables := importVariables(importFile)
+			for _, value := range variables {
+				exisitingVariable, err := getVariable("", value.Name, value.Project)
+				if err != nil {
+					fmt.Println("Update failed - unable to find existing Code Stream Variable", value.Name, "in", value.Project)
+				} else {
+					_, err := updateVariable(exisitingVariable[0].ID, value.Name, value.Description, value.Type, value.Value)
+					if err != nil {
+						fmt.Println("Unable to update Code Stream Variable: ", err)
+					} else {
+						fmt.Println("Updated variable", value.Name)
+					}
+				}
+			}
+		} else {
+			updateResponse, err := updateVariable(id, name, description, typename, value)
+			if err != nil {
+				fmt.Print("Unable to update Code Stream Variable: ", err)
+			}
+			fmt.Println("Updated variable", updateResponse.Name)
 		}
-
-		PrettyPrint(updateResponse)
 	},
 }
 
@@ -136,6 +167,8 @@ func init() {
 	createVariableCmd.Flags().StringVarP(&project, "project", "p", "", "The project in which to create the variable")
 	createVariableCmd.Flags().StringVarP(&value, "value", "v", "", "The value of the variable to create")
 	createVariableCmd.Flags().StringVarP(&description, "description", "d", "", "The description of the variable to create")
+	createVariableCmd.Flags().StringVarP(&importFile, "importfile", "i", "", "Path to a YAML file with the variables to import")
+
 	// Update Variable
 	updateCmd.AddCommand(updateVariableCmd)
 	updateVariableCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the variable to update")
@@ -143,7 +176,8 @@ func init() {
 	updateVariableCmd.Flags().StringVarP(&typename, "type", "t", "", "Update the type of the variable REGULAR|SECRET|RESTRICTED")
 	updateVariableCmd.Flags().StringVarP(&value, "value", "v", "", "Update the value of the variable ")
 	updateVariableCmd.Flags().StringVarP(&description, "description", "d", "", "Update the description of the variable")
-	updateVariableCmd.MarkFlagRequired("id")
+	updateVariableCmd.Flags().StringVarP(&importFile, "importfile", "", "", "Path to a YAML file with the variables to import")
+	//updateVariableCmd.MarkFlagRequired("id")
 	// Delete Variable
 	deleteCmd.AddCommand(deleteVariableCmd)
 	deleteVariableCmd.Flags().StringVarP(&id, "id", "i", "", "Delete variable by id")

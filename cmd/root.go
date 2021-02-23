@@ -41,6 +41,7 @@ var (
 	password          string
 	domain            string
 	exportFile        string
+	importFile        string
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -92,6 +93,6 @@ func initConfig() {
 	currentTargetName = viper.GetString("currentTargetName")
 	accessToken = viper.GetString("target." + currentTargetName + ".accessToken")
 	server = viper.GetString("target." + currentTargetName + ".server")
-	apiToken =  viper.GetString("target." + currentTargetName + ".apiToken")
+	apiToken = viper.GetString("target." + currentTargetName + ".apiToken")
 
 }

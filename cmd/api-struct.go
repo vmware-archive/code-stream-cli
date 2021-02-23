@@ -174,3 +174,13 @@ type CodeStreamCreateExecutionResponse struct {
 	ExecutionLink string      `json:"executionLink"`
 	Tags          []string    `json:"tags"`
 }
+
+type CodeStreamException struct {
+	Timestamp int64  `json:"timestamp"`
+	Path      string `json:"path"`
+	Status    int    `json:"status"`
+	Error     string `json:"error"`
+	Message   string `json:"message"`
+	RequestID string `json:"requestId"`
+	Type      string `json:"@type"`
+}
