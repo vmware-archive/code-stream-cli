@@ -70,8 +70,21 @@ cs-cli get variable --id 50613ab6-6f25-4976-8b3e-5be7a4bc60eb
 cs-cli get variable --name cs-cli
 # Create a new variable manually
 cs-cli create variable --name cli-demo --project "Field Demo"  --type REGULAR --value "New variable..." --description "Now from the CLI\!"
-```
 
+# Export all variables to variables.yaml
+cs-cli get variable --export
+# Export all variables to /your/own/filename.yaml
+cs-cli get variable --export --exportFile /your/own/filename.yaml
+
+# Create new variables from file
+cs-cli create variable --importfile variables.yaml
+# Create new variables from file, overwrite the Project
+cs-cli create variable --importfile variables.yaml --project TestProject
+
+# Update existing variables from file
+cs-cli update variable --importfile variables.yaml
+```
+*Note that SECRET variables will not export, so if you export your secrets, be sure to add the value data before re-importing them!*
 # Working with Executions
 
 ```bash
