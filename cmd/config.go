@@ -1,5 +1,5 @@
 /*
-Package cmd Copyright © 2021 NAME HERE <EMAIL ADDRESS>
+Package cmd Copyright © 2021 Sam McGeown <smcgeown@vmware.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -101,12 +100,13 @@ Examples:
 	cs-cli config set-target --name vra-test-ga --server vra8-test-ga.cmbu.local --username test-user --password VMware1! --domain cmbu.local
 	cs-cli config set-target --name vrac-org --server api.mgmt.cloud.vmware.com --apitoken JhbGciOiJSUzI1NiIsImtpZCI6IjEzNjY3NDcwMTA2Mzk2MTUxNDk0In0
 `, Args: func(cmd *cobra.Command, args []string) error {
-		if apiToken != "" && server != "" && username == "" && password == "" {
-			return nil
-		} else if apiToken == "" && server != "" && username != "" && password != "" {
-			return nil
-		}
-		return errors.New("Incorrect combination of flags, please use  --server and --apitoken for vRealize Automation Cloud, or --server, --username, --password and --domain (optional) for vRealize Automation 8.x")
+		// if apiToken != "" && server != "" && username == "" && password == "" {
+		// 	return nil
+		// } else if apiToken == "" && server != "" && username != "" && password != "" {
+		// 	return nil
+		// }
+		// return errors.New("Incorrect combination of flags, please use  --server and --apitoken for vRealize Automation Cloud, or --server, --username, --password and --domain (optional) for vRealize Automation 8.x")
+		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		if viper.IsSet("target." + name) {

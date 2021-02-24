@@ -1,5 +1,5 @@
 /*
-Package cmd Copyright © 2021 NAME HERE <EMAIL ADDRESS>
+Package cmd Copyright © 2021 Sam McGeown <smcgeown@vmware.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import (
 
 	"github.com/spf13/cobra"
 )
-
 
 // getCmd represents the get command
 var getCmd = &cobra.Command{
