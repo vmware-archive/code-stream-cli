@@ -3,7 +3,7 @@ stages:
 
 release:
   stage: release
-  image: docker:stable
+  image: harbor-repo.vmware.com/dockerhub-proxy-cache/library/docker:stable
   services:
     - docker:dind
 
@@ -34,4 +34,4 @@ release:
       -v /var/run/docker.sock:/var/run/docker.sock \
       -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DOCKER_REGISTRY  \
       -e GITLAB_TOKEN \
-      goreleaser/goreleaser release --rm-dist
+      harbor-repo.vmware.com/dockerhub-proxy-cache/goreleaser/goreleaser release --rm-dist
