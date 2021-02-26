@@ -6,6 +6,11 @@ before:
     - go mod download
     # you may remove this if you don't need go generate
     - go generate ./...
+gitlab_urls:
+  api: https://gitlab.eng.vmware.com/api/v4
+  download: https://gitlab.company.com
+  # set to true if you use a self-signed certificate
+  skip_tls_verify: false
 builds:
   - env:
       - CGO_ENABLED=0
