@@ -6,6 +6,10 @@ before:
     - go mod download
     # you may remove this if you don't need go generate
     - go generate ./...
+release:
+  gitlab:
+    owner: smcgeown
+    name: cs-cli
 gitlab_urls:
   api: https://gitlab.eng.vmware.com/api/v4
   download: https://gitlab.company.com
