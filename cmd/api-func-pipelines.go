@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -66,4 +67,17 @@ func patchPipeline(id string, payload string) (*CodeStreamPipeline, error) {
 		return nil, err
 	}
 	return response.Result().(*CodeStreamPipeline), nil
+}
+
+func deletePipeline(id string) (*CodeStreamPipeline, error) {
+	client := resty.New()
+	response, err := client.R().
+		SetHeader("Accept", "application/json").
+		SetResult(&CodeStreamPipeline{}).
+		SetAuthToken(accessToken).
+		Delete("https://" + server + "/pipeline/api/pipelines/" + id)
+	if response.IsError() {
+		return nil, errors.New(response.Status())
+	}
+	return response.Result().(*CodeStreamPipeline), err
 }

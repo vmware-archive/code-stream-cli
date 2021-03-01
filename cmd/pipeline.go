@@ -18,6 +18,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -131,6 +132,25 @@ var createPipelineCmd = &cobra.Command{
 	},
 }
 
+// deletePipelineCmd represents the delete pipeline command
+var deletePipelineCmd = &cobra.Command{
+	Use:   "pipeline",
+	Short: "Delete a Pipeline",
+	Long: `Delete a Pipeline with a specific ID
+	
+	`,
+	Run: func(cmd *cobra.Command, args []string) {
+		ensureTargetConnection()
+
+		response, err := deletePipeline(id)
+		if err != nil {
+			log.Fatalln("Delete Pipeline failed:", err)
+		}
+		fmt.Println("Pipeline with id " + response.ID + " deleted")
+
+	},
+}
+
 func init() {
 	// Get
 	getCmd.AddCommand(getPipelineCmd)
@@ -150,4 +170,9 @@ func init() {
 	updatePipelineCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the pipeline to list")
 	updatePipelineCmd.Flags().StringVarP(&importPath, "importPath", "c", "", "Configuration file to import")
 	updatePipelineCmd.Flags().StringVarP(&state, "state", "s", "", "Set the state of the pipeline (ENABLED|DISABLED|RELEASED")
+	// Delete
+	deleteCmd.AddCommand(deletePipelineCmd)
+	deletePipelineCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the Pipeline to delete")
+	deletePipelineCmd.MarkFlagRequired("id")
+
 }
