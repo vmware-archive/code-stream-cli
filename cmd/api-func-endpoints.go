@@ -28,18 +28,6 @@ func getEndpoint(id, name, project, endpointtype string, export bool, exportPath
 		qParams["$filter"] = "(" + strings.Join(filters, " and ") + ")"
 	}
 
-	// if name != "" && project != "" {
-	// 	qParams["$filter"] = "((name eq '" + name + "') and (project eq '" + project + "'))"
-	// } else {
-	// 	// Get by name
-	// 	if name != "" {
-	// 		qParams["$filter"] = "(name eq '" + name + "')"
-	// 	}
-	// 	// Get by project
-	// 	if project != "" {
-	// 		qParams["$filter"] = "(project eq '" + project + "')"
-	// 	}
-	// }
 	queryResponse, err := client.R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").

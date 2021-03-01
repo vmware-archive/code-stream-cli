@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/mitchellh/mapstructure"
@@ -12,23 +13,19 @@ func getPipelines(id string, name string, project string, export bool, exportPat
 	var arrResults []*CodeStreamPipeline
 	var qParams = make(map[string]string)
 	client := resty.New()
-	// Get by ID
+
+	var filters []string
 	if id != "" {
-		v, e := getPipelineByID(id)
-		arrResults = append(arrResults, v)
-		return arrResults, e
+		filters = append(filters, "(id eq '"+id+"')")
 	}
-	if name != "" && project != "" {
-		qParams["$filter"] = "((name eq '" + name + "') and (project eq '" + project + "'))"
-	} else {
-		// Get by name
-		if name != "" {
-			qParams["$filter"] = "(name eq '" + name + "')"
-		}
-		// Get by project
-		if project != "" {
-			qParams["$filter"] = "(project eq '" + project + "')"
-		}
+	if name != "" {
+		filters = append(filters, "(name eq '"+name+"')")
+	}
+	if project != "" {
+		filters = append(filters, "(project eq '"+project+"')")
+	}
+	if len(filters) > 0 {
+		qParams["$filter"] = "(" + strings.Join(filters, " and ") + ")"
 	}
 	queryResponse, err := client.R().
 		SetQueryParams(qParams).
@@ -52,20 +49,6 @@ func getPipelines(id string, name string, project string, export bool, exportPat
 		}
 	}
 	return arrResults, err
-}
-
-// getPipelineByID - get Code Stream Pipeline by ID
-func getPipelineByID(id string) (*CodeStreamPipeline, error) {
-	client := resty.New()
-	response, err := client.R().
-		SetHeader("Accept", "application/json").
-		SetResult(&CodeStreamPipeline{}).
-		SetAuthToken(accessToken).
-		Get("https://" + server + "/pipeline/api/pipelines/" + id)
-	if response.IsError() {
-		fmt.Println("GET Pipeline failed", err)
-	}
-	return response.Result().(*CodeStreamPipeline), err
 }
 
 // patchPipeline - Patch Code Stream Pipeline by ID
