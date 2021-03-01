@@ -8,7 +8,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-func getEndpoint(id, name, project string) ([]*CodeStreamEndpoint, error) {
+func getEndpoint(id, name, project string, export bool, exportPath string) ([]*CodeStreamEndpoint, error) {
 	var endpoints []*CodeStreamEndpoint
 	var qParams = make(map[string]string)
 	client := resty.New()
@@ -47,7 +47,7 @@ func getEndpoint(id, name, project string) ([]*CodeStreamEndpoint, error) {
 		c := CodeStreamEndpoint{}
 		mapstructure.Decode(value, &c)
 		if export {
-			exportYaml(c.Name, c.Project, exportPath, "piplines")
+			exportYaml(c.Name, c.Project, exportPath, "endpoints")
 			endpoints = append(endpoints, &c)
 		} else {
 			endpoints = append(endpoints, &c)

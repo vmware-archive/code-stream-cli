@@ -31,7 +31,7 @@ var getEndpointCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ensureTargetConnection()
 
-		response, err := getEndpoint(id, name, project)
+		response, err := getEndpoint(id, name, project, export, exportPath)
 		if err != nil {
 			fmt.Print("Unable to get endpoints: ", err)
 		}
@@ -59,5 +59,7 @@ func init() {
 	getEndpointCmd.Flags().StringVarP(&name, "name", "n", "", "Get Endpoint by Name")
 	getEndpointCmd.Flags().StringVarP(&id, "id", "i", "", "Get Endpoint by ID")
 	getEndpointCmd.Flags().StringVarP(&project, "project", "p", "", "Filter Endpoint by Project")
+	getEndpointCmd.Flags().StringVarP(&exportPath, "exportPath", "", "", "Path to export objects - relative or absolute location")
+	getEndpointCmd.Flags().BoolVarP(&export, "export", "e", false, "Export Endpoint")
 
 }
