@@ -76,7 +76,7 @@ var createVariableCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ensureTargetConnection()
 
-		if importFile != "" {
+		if importFile != "" { // If we are importing a file
 			variables := importVariables(importFile)
 			for _, value := range variables {
 				if project != "" { // If the project is specified update the object
@@ -106,7 +106,7 @@ var updateVariableCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		ensureTargetConnection()
-		if importFile != "" {
+		if importFile != "" { // If we are importing a file
 			variables := importVariables(importFile)
 			for _, value := range variables {
 				exisitingVariable, err := getVariable("", value.Name, value.Project)
@@ -121,7 +121,7 @@ var updateVariableCmd = &cobra.Command{
 					}
 				}
 			}
-		} else {
+		} else { // Else we are updating using flags
 			updateResponse, err := updateVariable(id, name, description, typename, value)
 			if err != nil {
 				fmt.Print("Unable to update Code Stream Variable: ", err)

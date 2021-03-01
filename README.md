@@ -2,7 +2,7 @@
 
 ## Configuration
 
-The configuration file stores the targets (vRA servers and credentials) that the CLI will use. By default cs-cli will use `$HOME/.cs-cli.yaml` as the config file. You can override this using the `--config` flag.
+The configuration file stores the targets (vRA servers and credentials) that the CLI will use. By default cs-cli will use `$HOME/.cs-cli.yaml` as the config file. You can override this using the `--config` flag. The configuration file should be secured using file-level permissions to protect your credentials. 
 
 ```bash
 cs-cli --config /path/to/config.yaml get pipeline
@@ -72,6 +72,7 @@ cs-cli update pipeline --importPath /my/updated-pipe.yaml
 
 Delete a pipeline:
 ```bash
+# Delete pipeline by ID
 cs-cli delete pipeline --id 7a3b41af-0e49-4e3d-999b-6c4c5ec55956
 ```
 
@@ -151,5 +152,22 @@ cs-cli get endpoint --project "Field Demo"
 cs-cli get endpoint --name "My-Git-Endpoint"
 # Get endpoint by Type
 cs-cli get endpoint --type "git"
+```
 
+Exporting endpoints:
+```bash
+# Export all endpoints
+cs-cli get endpoint --export --exportPath my-endpoints/
+# Export endpoint by Name
+cs-cli get endpoint --name "My-Git-Endpoint" --export
+```
+
+Importing endpoints
+```bash
+# Create a new endpoint
+cs-cli create endpoint --importPath /path/to/my/endpoint.yaml
+# Update an existing endpoint
+# Note: You cannot change the endpoint name - this
+#       will result in a new endpoint being created
+cs-cli update endpoint --importPath updated-endpoint.yaml
 ```

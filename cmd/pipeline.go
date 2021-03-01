@@ -164,6 +164,7 @@ func init() {
 	// Create
 	createCmd.AddCommand(createPipelineCmd)
 	createPipelineCmd.Flags().StringVarP(&importPath, "importPath", "", "", "YAML configuration file to import")
+	// createPipelineCmd.Flags().StringVarP(&project, "project", "p", "", "Manually specify the Project in which to create the Pipeline (overrides YAML)")
 	createPipelineCmd.MarkFlagRequired("importPath")
 	// Update
 	updateCmd.AddCommand(updatePipelineCmd)
