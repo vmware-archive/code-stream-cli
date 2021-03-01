@@ -102,7 +102,7 @@ var updatePipelineCmd = &cobra.Command{
 		}
 
 		if importPath != "" {
-			if importPipeline(importPath, "apply") {
+			if importYaml(importPath, "apply") {
 				fmt.Println("Imported successfully, pipeline updated.")
 			}
 		}
@@ -124,7 +124,7 @@ var createPipelineCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ensureTargetConnection()
 		if importPath != "" {
-			if importPipeline(importPath, "create") {
+			if importYaml(importPath, "create") {
 				fmt.Println("Imported successfully, pipeline created.")
 			}
 		}

@@ -3,34 +3,43 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/mitchellh/mapstructure"
 )
 
-func getEndpoint(id, name, project string, export bool, exportPath string) ([]*CodeStreamEndpoint, error) {
+func getEndpoint(id, name, project, endpointtype string, export bool, exportPath string) ([]*CodeStreamEndpoint, error) {
 	var endpoints []*CodeStreamEndpoint
 	var qParams = make(map[string]string)
 	client := resty.New()
 
-	// Get by ID
-	// if id != "" {
-	// 	v, e := getVariableByID(id)
-	// 	endpoints = append(endpoints, v)
-	// 	return endpoints, e
-	// }
-	if name != "" && project != "" {
-		qParams["$filter"] = "((name eq '" + name + "') and (project eq '" + project + "'))"
-	} else {
-		// Get by name
-		if name != "" {
-			qParams["$filter"] = "(name eq '" + name + "')"
-		}
-		// Get by project
-		if project != "" {
-			qParams["$filter"] = "(project eq '" + project + "')"
-		}
+	var filters []string
+	if name != "" {
+		filters = append(filters, "(name eq '"+name+"')")
 	}
+	if project != "" {
+		filters = append(filters, "(project eq '"+project+"')")
+	}
+	if endpointtype != "" {
+		filters = append(filters, "(type eq '"+endpointtype+"')")
+	}
+	if len(filters) > 0 {
+		qParams["$filter"] = "(" + strings.Join(filters, " and ") + ")"
+	}
+
+	// if name != "" && project != "" {
+	// 	qParams["$filter"] = "((name eq '" + name + "') and (project eq '" + project + "'))"
+	// } else {
+	// 	// Get by name
+	// 	if name != "" {
+	// 		qParams["$filter"] = "(name eq '" + name + "')"
+	// 	}
+	// 	// Get by project
+	// 	if project != "" {
+	// 		qParams["$filter"] = "(project eq '" + project + "')"
+	// 	}
+	// }
 	queryResponse, err := client.R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").

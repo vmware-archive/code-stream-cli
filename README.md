@@ -125,4 +125,15 @@ cs-cli get execution --id 9cc5aedc-db48-4c02-a5e4-086de3160dc0
 
 
 ## Working with Endpoints
-\\
+Getting Endpoints
+```bash
+# Get all endpoints
+cs-cli get endpoint
+# Get endpoints by project
+cs-cli get endpoint --project "Field Demo"
+# Get endpoint by Name
+cs-cli get endpoint --name "My-Git-Endpoint"
+# Get endpoint by Type
+cs-cli get endpoint --type "git"
+
+```

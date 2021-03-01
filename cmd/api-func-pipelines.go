@@ -2,8 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
-	"log"
 	"os"
 
 	"github.com/go-resty/resty/v2"
@@ -85,27 +83,4 @@ func patchPipeline(id string, payload string) (*CodeStreamPipeline, error) {
 		return nil, err
 	}
 	return response.Result().(*CodeStreamPipeline), nil
-}
-
-// importPipeline import a yaml file
-func importPipeline(yamlPath, action string) bool {
-	var qParams = make(map[string]string)
-	qParams["action"] = action
-	yamlBytes, err := ioutil.ReadFile(yamlPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	yamlPayload := string(yamlBytes)
-	client := resty.New()
-	response, err := client.R().
-		SetQueryParams(qParams).
-		SetHeader("Content-Type", "application/x-yaml").
-		SetBody(yamlPayload).
-		SetAuthToken(accessToken).
-		Post("https://" + server + "/pipeline/api/import")
-	if response.IsError() {
-		fmt.Println("Import/Update Pipeline failed", response.StatusCode())
-		return false
-	}
-	return true
 }

@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -92,4 +94,27 @@ func exportYaml(name, project, path, object string) {
 		fmt.Println("Export failed", err)
 		os.Exit(1)
 	}
+}
+
+// importYaml import a yaml pipeline or endpoint
+func importYaml(yamlPath, action string) bool {
+	var qParams = make(map[string]string)
+	qParams["action"] = action
+	yamlBytes, err := ioutil.ReadFile(yamlPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	yamlPayload := string(yamlBytes)
+	client := resty.New()
+	response, err := client.R().
+		SetQueryParams(qParams).
+		SetHeader("Content-Type", "application/x-yaml").
+		SetBody(yamlPayload).
+		SetAuthToken(accessToken).
+		Post("https://" + server + "/pipeline/api/import")
+	if response.IsError() {
+		fmt.Println("Import/Update failed", response.StatusCode())
+		return false
+	}
+	return true
 }
