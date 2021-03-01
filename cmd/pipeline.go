@@ -163,12 +163,12 @@ func init() {
 
 	// Create
 	createCmd.AddCommand(createPipelineCmd)
-	createPipelineCmd.Flags().StringVarP(&importPath, "importPath", "c", "", "YAML configuration file to import")
+	createPipelineCmd.Flags().StringVarP(&importPath, "importPath", "", "", "YAML configuration file to import")
 	createPipelineCmd.MarkFlagRequired("importPath")
 	// Update
 	updateCmd.AddCommand(updatePipelineCmd)
 	updatePipelineCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the pipeline to list")
-	updatePipelineCmd.Flags().StringVarP(&importPath, "importPath", "c", "", "Configuration file to import")
+	updatePipelineCmd.Flags().StringVarP(&importPath, "importPath", "", "", "Configuration file to import")
 	updatePipelineCmd.Flags().StringVarP(&state, "state", "s", "", "Set the state of the pipeline (ENABLED|DISABLED|RELEASED")
 	// Delete
 	deleteCmd.AddCommand(deletePipelineCmd)

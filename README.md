@@ -59,6 +59,22 @@ cs-cli get pipeline --export
 cs-cli get pipeline --project "Field Demo" --export
 ```
 
+Import a pipeline:
+```bash
+# Import a yaml definition
+cs-cli create pipeline --importPath /my/yaml-pipeline.yaml
+# Update an existing pipeline
+# Note: You cannot change the pipeline name - this
+#       will result in a new Pipeline being created
+cs-cli update pipeline --importPath /my/updated-pipe.yaml
+```
+
+
+Delete a pipeline:
+```bash
+cs-cli delete pipeline --id 7a3b41af-0e49-4e3d-999b-6c4c5ec55956
+```
+
 ## Working with Variables
 
 ```bash
