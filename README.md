@@ -150,8 +150,8 @@ cs-cli get endpoint
 cs-cli get endpoint --project "Field Demo"
 # Get endpoint by Name
 cs-cli get endpoint --name "My-Git-Endpoint"
-# Get endpoint by Type
-cs-cli get endpoint --type "git"
+# Get endpoint by Project and Type
+cs-cli get endpoint --type "git" --project "Field Demo"
 ```
 
 Exporting endpoints:
