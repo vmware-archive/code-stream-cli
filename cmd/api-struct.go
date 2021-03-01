@@ -184,3 +184,20 @@ type CodeStreamException struct {
 	RequestID string `json:"requestId"`
 	Type      string `json:"@type"`
 }
+
+type CodeStreamEndpoint struct {
+	Name               string      `json:"name"`
+	Kind               string      `json:"kind"`
+	Tags               string      `json:"tags"`
+	Link               string      `json:"_link"`
+	CreatedBy          string      `json:"_createdBy"`
+	UpdatedBy          string      `json:"_updatedBy"`
+	UpdateTimeInMicros int64       `json:"_updateTimeInMicros"`
+	Project            string      `json:"project"`
+	Description        string      `json:"description"`
+	Type               string      `json:"type"`
+	Properties         interface{} `json:"properties"`
+	IsLocked           bool        `json:"isLocked"`
+	IsRestricted       bool        `json:"isRestricted"`
+	ValidationOutput   string      `json:"validationOutput"`
+}

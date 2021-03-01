@@ -17,26 +17,47 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 )
 
 // getEndpointCmd represents the endpoint command
 var getEndpointCmd = &cobra.Command{
 	Use:   "endpoint",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Get Code Stream Endpoint Configurations",
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("endpoint called")
+		ensureTargetConnection()
+
+		response, err := getEndpoint(id, name, project)
+		if err != nil {
+			fmt.Print("Unable to get endpoints: ", err)
+		}
+		var resultCount = len(response)
+		if resultCount == 0 {
+			// No results
+			fmt.Println("No results found")
+		} else if resultCount == 1 {
+			PrettyPrint(response[0])
+		} else {
+			// Print result table
+			table := tablewriter.NewWriter(os.Stdout)
+			table.SetHeader([]string{"Name", "Project", "Type", "Description"})
+			for _, c := range response {
+				table.Append([]string{c.Name, c.Project, c.Type, c.Description})
+			}
+			table.Render()
+		}
+
 	},
 }
 
 func init() {
 	getCmd.AddCommand(getEndpointCmd)
+	getEndpointCmd.Flags().StringVarP(&name, "name", "n", "", "Get Endpoint by Name")
+	getEndpointCmd.Flags().StringVarP(&id, "id", "i", "", "Get Endpoint by ID")
+	getEndpointCmd.Flags().StringVarP(&project, "project", "p", "", "Filter Endpoint by Project")
 
 }
