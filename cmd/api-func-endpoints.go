@@ -12,9 +12,13 @@ import (
 func getEndpoint(id, name, project, endpointtype string, export bool, exportPath string) ([]*CodeStreamEndpoint, error) {
 	var endpoints []*CodeStreamEndpoint
 	var qParams = make(map[string]string)
+	qParams["expand"] = "true"
 	client := resty.New()
 
 	var filters []string
+	if id != "" {
+		filters = append(filters, "(id eq '"+id+"')")
+	}
 	if name != "" {
 		filters = append(filters, "(name eq '"+name+"')")
 	}
@@ -52,4 +56,17 @@ func getEndpoint(id, name, project, endpointtype string, export bool, exportPath
 
 	}
 	return endpoints, err
+}
+
+func deleteEndpoint(id string) (*CodeStreamEndpoint, error) {
+	client := resty.New()
+	response, err := client.R().
+		SetHeader("Accept", "application/json").
+		SetResult(&CodeStreamEndpoint{}).
+		SetAuthToken(accessToken).
+		Delete("https://" + server + "/pipeline/api/endpoints/" + id)
+	if response.IsError() {
+		fmt.Println("DELETE Endpoint failed", err)
+	}
+	return response.Result().(*CodeStreamEndpoint), err
 }

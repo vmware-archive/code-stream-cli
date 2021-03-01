@@ -186,18 +186,22 @@ type CodeStreamException struct {
 }
 
 type CodeStreamEndpoint struct {
-	Name               string      `json:"name"`
-	Kind               string      `json:"kind"`
-	Tags               string      `json:"tags"`
-	Link               string      `json:"_link"`
-	CreatedBy          string      `json:"_createdBy"`
-	UpdatedBy          string      `json:"_updatedBy"`
-	UpdateTimeInMicros int64       `json:"_updateTimeInMicros"`
 	Project            string      `json:"project"`
+	Kind               string      `json:"kind"`
+	ID                 string      `json:"id"`
+	Name               string      `json:"name"`
 	Description        string      `json:"description"`
+	CreatedBy          string      `json:"createdBy"`
+	UpdatedBy          string      `json:"updatedBy"`
+	CreatedAt          string      `json:"createdAt"`
+	UpdatedAt          string      `json:"updatedAt"`
+	Link               string      `json:"_link"`
+	UpdateTimeInMicros int64       `json:"_updateTimeInMicros"`
+	CreateTimeInMicros int64       `json:"_createTimeInMicros"`
+	ProjectID          string      `json:"_projectId"`
 	Type               string      `json:"type"`
+	IsRestricted       bool        `json:"isRestricted"`
 	Properties         interface{} `json:"properties"`
 	IsLocked           bool        `json:"isLocked"`
-	IsRestricted       bool        `json:"isRestricted"`
 	ValidationOutput   string      `json:"validationOutput"`
 }

@@ -44,9 +44,9 @@ var getEndpointCmd = &cobra.Command{
 		} else {
 			// Print result table
 			table := tablewriter.NewWriter(os.Stdout)
-			table.SetHeader([]string{"Name", "Project", "Type", "Description"})
+			table.SetHeader([]string{"ID", "Name", "Project", "Type", "Description"})
 			for _, c := range response {
-				table.Append([]string{c.Name, c.Project, c.Type, c.Description})
+				table.Append([]string{c.ID, c.Name, c.Project, c.Type, c.Description})
 			}
 			table.Render()
 		}
@@ -95,6 +95,25 @@ var updateEndpointCmd = &cobra.Command{
 	},
 }
 
+// deleteEndpointCmd represents the executions command
+var deleteEndpointCmd = &cobra.Command{
+	Use:   "endpoint",
+	Short: "Delete an Endpoint",
+	Long: `Delete an Endpoint with a specific Endpoint ID
+	
+	`,
+	Run: func(cmd *cobra.Command, args []string) {
+		ensureTargetConnection()
+
+		response, err := deleteEndpoint(id)
+		if err != nil {
+			fmt.Print("Unable to delete Endpoint: ", err)
+		}
+		fmt.Println("Endpoint with id " + response.ID + " deleted")
+
+	},
+}
+
 func init() {
 	getCmd.AddCommand(getEndpointCmd)
 	getEndpointCmd.Flags().StringVarP(&name, "name", "n", "", "Get Endpoint by Name")
@@ -111,5 +130,9 @@ func init() {
 	updateCmd.AddCommand(updateEndpointCmd)
 	updateEndpointCmd.Flags().StringVarP(&importPath, "importPath", "c", "", "YAML configuration file to import")
 	updateEndpointCmd.MarkFlagRequired("importPath")
+	// Delete
+	deleteCmd.AddCommand(deleteEndpointCmd)
+	deleteEndpointCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the Endpoint to delete")
+	deleteEndpointCmd.MarkFlagRequired("id")
 
 }
