@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/mitchellh/mapstructure"
@@ -48,36 +47,13 @@ func getPipelines(id string, name string, project string, export bool, exportPat
 		c := CodeStreamPipeline{}
 		mapstructure.Decode(value, &c)
 		if export {
-			exportPipeline(c.Name, c.Project, exportPath)
+			exportYaml(c.Name, c.Project, exportPath, "piplines")
 			arrResults = append(arrResults, &c)
 		} else {
 			arrResults = append(arrResults, &c)
 		}
 	}
 	return arrResults, err
-}
-func exportPipeline(name, project, path string) {
-	var exportPath string
-	var qParams = make(map[string]string)
-	qParams["pipelines"] = name
-	qParams["project"] = project
-	if path != "" {
-		exportPath = path
-	} else {
-		exportPath, _ = os.Getwd()
-	}
-	client := resty.New()
-	queryResponse, err := client.R().
-		SetQueryParams(qParams).
-		SetHeader("Accept", "application/x-yaml;charset=UTF-8").
-		SetAuthToken(accessToken).
-		SetOutput(filepath.Join(exportPath, name+".yaml")).
-		Get("https://" + server + "/pipeline/api/export")
-
-	if queryResponse.IsError() {
-		fmt.Println("Export pipeline failed", err)
-		os.Exit(1)
-	}
 }
 
 // getPipelineByID - get Code Stream Pipeline by ID

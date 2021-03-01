@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/viper"
@@ -67,4 +68,28 @@ func testAccessToken() bool {
 		return false
 	}
 	return true
+}
+
+func exportYaml(name, project, path, object string) {
+	var exportPath string
+	var qParams = make(map[string]string)
+	qParams[object] = name
+	qParams["project"] = project
+	if path != "" {
+		exportPath = path
+	} else {
+		exportPath, _ = os.Getwd()
+	}
+	client := resty.New()
+	queryResponse, err := client.R().
+		SetQueryParams(qParams).
+		SetHeader("Accept", "application/x-yaml;charset=UTF-8").
+		SetAuthToken(accessToken).
+		SetOutput(filepath.Join(exportPath, name+".yaml")).
+		Get("https://" + server + "/pipeline/api/export")
+
+	if queryResponse.IsError() {
+		fmt.Println("Export failed", err)
+		os.Exit(1)
+	}
 }
