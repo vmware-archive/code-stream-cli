@@ -171,3 +171,9 @@ cs-cli create endpoint --importPath /path/to/my/endpoint.yaml
 #       will result in a new endpoint being created
 cs-cli update endpoint --importPath updated-endpoint.yaml
 ```
+
+Delete an endpoint
+```bash
+# Delete endpoint by ID
+cs-cli delete endpoint --id 8c36f59a-2fcf-4039-8b48-1026f601a4b0
+```
