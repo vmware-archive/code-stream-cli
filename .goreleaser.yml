@@ -37,7 +37,7 @@ dockers:
     goarch: amd64
     dockerfile: Dockerfile
     build_flag_templates:
-    - "--build-arg=PLATFORM=linux/amd64"
+    - "--platform=linux/amd64"
     - "--label=org.opencontainers.image.created={{.Date}}"
     - "--label=org.opencontainers.image.title={{.ProjectName}}"
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
@@ -51,7 +51,7 @@ dockers:
     goarch: arm64
     dockerfile: Dockerfile
     build_flag_templates:
-    - "--build-arg=PLATFORM=linux/arm64/v8"
+    - "--platform=linux/arm/v7"
     - "--label=org.opencontainers.image.created={{.Date}}"
     - "--label=org.opencontainers.image.title={{.ProjectName}}"
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
