@@ -12,44 +12,44 @@ import (
 )
 
 func ensureTargetConnection() {
-	// If the accessToken is not set or testAccesToken returns false
-	if accessToken == "" || testAccessToken() == false {
+	// If the targetConfig.accesstoken is not set or testAccesToken returns false
+	if targetConfig.accesstoken == "" || testAccessToken() == false {
 		var authError error
 		// Authenticate
-		if apiToken != "" {
-			accessToken, authError = authenticateCloud(viper.GetString("target."+currentTargetName+".server"), viper.GetString("target."+currentTargetName+".apiToken"))
+		if targetConfig.apitoken != "" {
+			targetConfig.accesstoken, authError = authenticateCloud(targetConfig)
 		} else {
-			accessToken, authError = authenticateOnPrem(viper.GetString("target."+currentTargetName+".server"), viper.GetString("target."+currentTargetName+".username"), viper.GetString("target."+currentTargetName+".password"), viper.GetString("target."+currentTargetName+".domain"))
+			targetConfig.accesstoken, authError = authenticateOnPrem(targetConfig)
 		}
 		if authError != nil {
 			fmt.Println("Authentication failed", authError.Error())
 			os.Exit(1)
 		}
-		viper.Set("target."+currentTargetName+".accessToken", accessToken)
+		viper.Set("target."+currentTargetName+".targetConfig.accesstoken", targetConfig.accesstoken)
 		viper.WriteConfig()
-		accessToken = viper.GetString("target." + currentTargetName + ".accessToken")
+		targetConfig.accesstoken = viper.GetString("target." + currentTargetName + ".targetConfig.accesstoken")
 	}
 }
 
-func authenticateOnPrem(server string, username string, password string, domain string) (string, error) {
+func authenticateOnPrem(target config) (string, error) {
 	client := resty.New()
 	response, err := client.R().
-		SetBody(AuthenticationRequest{username, password, domain}).
+		SetBody(AuthenticationRequest{target.username, target.password, target.domain}).
 		SetResult(&AuthenticationResponse{}).
 		SetError(&AuthenticationError{}).
-		Post("https://" + server + "/csp/gateway/am/idp/auth/login?access_token")
+		Post("https://" + target.server + "/csp/gateway/am/idp/auth/login?access_token")
 	if response.IsError() {
 		return "", err
 	}
 	return response.Result().(*AuthenticationResponse).AccessToken, err
 }
-func authenticateCloud(server string, apiToken string) (string, error) {
+func authenticateCloud(target config) (string, error) {
 	client := resty.New()
 	response, err := client.R().
-		SetBody(AuthenticationRequestCloud{apiToken}).
+		SetBody(AuthenticationRequestCloud{target.apitoken}).
 		SetResult(&AuthenticationResponseCloud{}).
 		SetError(&AuthenticationError{}).
-		Post("https://" + server + "/iaas/api/login")
+		Post("https://" + target.server + "/iaas/api/login")
 	if response.IsError() {
 		return "", err
 	}
@@ -60,8 +60,8 @@ func testAccessToken() bool {
 	client := resty.New()
 	response, err := client.R().
 		SetHeader("Accept", "application/json").
-		SetAuthToken(accessToken).
-		Get("https://" + server + "/iaas/api/projects")
+		SetAuthToken(targetConfig.accesstoken).
+		Get("https://" + targetConfig.server + "/iaas/api/projects")
 	if err != nil {
 		return false
 	}
@@ -86,9 +86,9 @@ func exportYaml(name, project, path, object string) {
 	queryResponse, err := client.R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/x-yaml;charset=UTF-8").
-		SetAuthToken(accessToken).
+		SetAuthToken(targetConfig.accesstoken).
 		SetOutput(filepath.Join(exportPath, name+".yaml")).
-		Get("https://" + server + "/pipeline/api/export")
+		Get("https://" + targetConfig.server + "/pipeline/api/export")
 
 	if queryResponse.IsError() {
 		fmt.Println("Export failed", err)
@@ -110,8 +110,8 @@ func importYaml(yamlPath, action string) bool {
 		SetQueryParams(qParams).
 		SetHeader("Content-Type", "application/x-yaml").
 		SetBody(yamlPayload).
-		SetAuthToken(accessToken).
-		Post("https://" + server + "/pipeline/api/import")
+		SetAuthToken(targetConfig.accesstoken).
+		Post("https://" + targetConfig.server + "/pipeline/api/import")
 	if response.IsError() {
 		fmt.Println("Import/Update failed", response.StatusCode())
 		return false

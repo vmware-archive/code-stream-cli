@@ -34,8 +34,8 @@ func getExecutions(id string, status string, name string, nested bool) ([]*Codes
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&documentsList{}).
-		SetAuthToken(accessToken).
-		Get("https://" + server + "/pipeline/api/executions")
+		SetAuthToken(targetConfig.accesstoken).
+		Get("https://" + targetConfig.server + "/pipeline/api/executions")
 	if response.IsError() {
 		fmt.Println("GET Executions failed", err)
 		os.Exit(1)
@@ -54,8 +54,8 @@ func getExecution(executionLink string) (*CodestreamAPIExecutions, error) {
 	response, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetResult(&CodestreamAPIExecutions{}).
-		SetAuthToken(accessToken).
-		Get("https://" + server + executionLink)
+		SetAuthToken(targetConfig.accesstoken).
+		Get("https://" + targetConfig.server + executionLink)
 	if response.IsError() {
 		fmt.Println("GET Execution failed", err)
 	}
@@ -67,8 +67,8 @@ func deleteExecution(id string) (*CodestreamAPIExecutions, error) {
 	response, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetResult(&CodestreamAPIExecutions{}).
-		SetAuthToken(accessToken).
-		Delete("https://" + server + "/pipeline/api/executions/" + id)
+		SetAuthToken(targetConfig.accesstoken).
+		Delete("https://" + targetConfig.server + "/pipeline/api/executions/" + id)
 	if response.IsError() {
 		fmt.Println("DELETE Execution failed", err)
 	}
@@ -98,8 +98,8 @@ func createExecution(id string, inputs string, comment string) (*CodeStreamCreat
 		SetHeader("Content-Type", "application/json").
 		SetBody(executionBytes).
 		SetResult(&CodeStreamCreateExecutionResponse{}).
-		SetAuthToken(accessToken).
-		Post("https://" + server + "/pipeline/api/pipelines/" + id + "/executions")
+		SetAuthToken(targetConfig.accesstoken).
+		Post("https://" + targetConfig.server + "/pipeline/api/pipelines/" + id + "/executions")
 	fmt.Println(response.StatusCode())
 	if response.IsError() {
 		return nil, response.Error().(error)

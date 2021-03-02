@@ -88,7 +88,14 @@ Examples:
 	},
 }
 
-var newServer string
+var (
+	newTargetName string
+	newServer     string
+	newUsername   string
+	newPassword   string
+	newDomain     string
+	newApiToken   string
+)
 
 // setTargetCmd represents the set-target command
 var setTargetCmd = &cobra.Command{
@@ -109,29 +116,32 @@ Examples:
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		if viper.IsSet("target." + name) {
-			fmt.Println("Updating", name)
+		if viper.IsSet("target." + newTargetName) {
+			fmt.Println("Updating", newTargetName)
 		} else {
-			fmt.Println("Creating new target", name)
+			fmt.Println("Creating new target", newTargetName)
 		}
-		fmt.Println("Use `cs-cli config use-target --name " + name + "` to use this target")
+		fmt.Println("Use `cs-cli config use-target --name " + newTargetName + "` to use this target")
 		if newServer != "" {
-			viper.Set("target."+name+".server", newServer)
+			viper.Set("target."+newTargetName+".server", newServer)
 		}
-		if username != "" {
-			viper.Set("target."+name+".username", username)
+		if newUsername != "" {
+			viper.Set("target."+newTargetName+".username", newUsername)
 		}
-		if password != "" {
-			viper.Set("target."+name+".password", password)
+		if newPassword != "" {
+			viper.Set("target."+newTargetName+".password", newPassword)
 		}
-		if domain != "" {
-			viper.Set("target."+name+".domain", domain)
+		if newDomain != "" {
+			viper.Set("target."+newTargetName+".domain", newDomain)
+		}
+		if newApiToken != "" {
+			viper.Set("target."+newTargetName+".apitoken", newApiToken)
 		}
 		err := viper.WriteConfig()
 		if err != nil {
 			fmt.Println(err)
 		}
-		var target = viper.Get("target." + name)
+		var target = viper.Get("target." + newTargetName)
 		PrettyPrint(target)
 	},
 }
@@ -168,12 +178,12 @@ func init() {
 	getConfigTargetCmd.Flags().StringVarP(&name, "name", "n", "", "Display the target with this name")
 	// set-target
 	configCmd.AddCommand(setTargetCmd)
-	setTargetCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the target configuration")
+	setTargetCmd.Flags().StringVarP(&newTargetName, "name", "n", "", "Name of the target configuration")
 	setTargetCmd.Flags().StringVarP(&newServer, "server", "s", "", "Server FQDN of the vRealize Automation instance")
-	setTargetCmd.Flags().StringVarP(&username, "username", "u", "", "Username to authenticate")
-	setTargetCmd.Flags().StringVarP(&password, "password", "p", "", "Password to authenticate")
-	setTargetCmd.Flags().StringVarP(&domain, "domain", "d", "", "Domain to authenticate (not required for System Domain)")
-	setTargetCmd.Flags().StringVarP(&apiToken, "apitoken", "a", "", "API token for vRealize Automation Cloud")
+	setTargetCmd.Flags().StringVarP(&newUsername, "username", "u", "", "Username to authenticate")
+	setTargetCmd.Flags().StringVarP(&newPassword, "password", "p", "", "Password to authenticate")
+	setTargetCmd.Flags().StringVarP(&newDomain, "domain", "d", "", "Domain to authenticate (not required for System Domain)")
+	setTargetCmd.Flags().StringVarP(&newApiToken, "apitoken", "a", "", "API token for vRealize Automation Cloud")
 	setTargetCmd.MarkFlagRequired("name")
 	// delete-target
 	// configCmd.AddCommand(deleteTargetCmd)

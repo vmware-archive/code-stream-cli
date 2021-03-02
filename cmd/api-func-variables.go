@@ -41,8 +41,8 @@ func getVariable(id, name, project string) ([]*CodeStreamVariableResponse, error
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&documentsList{}).
-		SetAuthToken(accessToken).
-		Get("https://" + server + "/pipeline/api/variables")
+		SetAuthToken(targetConfig.accesstoken).
+		Get("https://" + targetConfig.server + "/pipeline/api/variables")
 
 	if queryResponse.IsError() {
 		fmt.Println("GET Variables failed", err)
@@ -63,8 +63,8 @@ func getVariableByID(id string) (*CodeStreamVariableResponse, error) {
 	response, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamVariableResponse{}).
-		SetAuthToken(accessToken).
-		Get("https://" + server + "/pipeline/api/variables/" + id)
+		SetAuthToken(targetConfig.accesstoken).
+		Get("https://" + targetConfig.server + "/pipeline/api/variables/" + id)
 	if response.IsError() {
 		fmt.Println("GET Variable failed", err)
 	}
@@ -87,8 +87,8 @@ func createVariable(name string, description string, variableType string, projec
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamVariableResponse{}).
 		SetError(&CodeStreamException{}).
-		SetAuthToken(accessToken).
-		Post("https://" + server + "/pipeline/api/variables")
+		SetAuthToken(targetConfig.accesstoken).
+		Post("https://" + targetConfig.server + "/pipeline/api/variables")
 	if response.IsError() {
 		return nil, errors.New(response.Error().(*CodeStreamException).Message)
 	}
@@ -116,8 +116,8 @@ func updateVariable(id string, name string, description string, typename string,
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamVariableResponse{}).
 		SetError(&CodeStreamException{}).
-		SetAuthToken(accessToken).
-		Put("https://" + server + "/pipeline/api/variables/" + id)
+		SetAuthToken(targetConfig.accesstoken).
+		Put("https://" + targetConfig.server + "/pipeline/api/variables/" + id)
 	if response.IsError() {
 		return nil, errors.New(response.Error().(*CodeStreamException).Message)
 	}
@@ -130,8 +130,8 @@ func deleteVariable(id string) (*CodeStreamVariableResponse, error) {
 	response, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamVariableResponse{}).
-		SetAuthToken(accessToken).
-		Delete("https://" + server + "/pipeline/api/variables/" + id)
+		SetAuthToken(targetConfig.accesstoken).
+		Delete("https://" + targetConfig.server + "/pipeline/api/variables/" + id)
 	if response.IsError() {
 		fmt.Println("Create Variable failed", err)
 		os.Exit(1)

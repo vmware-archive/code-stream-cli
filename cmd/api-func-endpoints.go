@@ -36,8 +36,8 @@ func getEndpoint(id, name, project, endpointtype string, export bool, exportPath
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&documentsList{}).
-		SetAuthToken(accessToken).
-		Get("https://" + server + "/pipeline/api/endpoints")
+		SetAuthToken(targetConfig.accesstoken).
+		Get("https://" + targetConfig.server + "/pipeline/api/endpoints")
 
 	if queryResponse.IsError() {
 		fmt.Println("GET Variables failed", err)
@@ -63,8 +63,8 @@ func deleteEndpoint(id string) (*CodeStreamEndpoint, error) {
 	response, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamEndpoint{}).
-		SetAuthToken(accessToken).
-		Delete("https://" + server + "/pipeline/api/endpoints/" + id)
+		SetAuthToken(targetConfig.accesstoken).
+		Delete("https://" + targetConfig.server + "/pipeline/api/endpoints/" + id)
 	if response.IsError() {
 		fmt.Println("DELETE Endpoint failed", err)
 	}

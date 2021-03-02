@@ -32,8 +32,8 @@ func getPipelines(id string, name string, project string, export bool, exportPat
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&documentsList{}).
-		SetAuthToken(accessToken).
-		Get("https://" + server + "/pipeline/api/pipelines")
+		SetAuthToken(targetConfig.accesstoken).
+		Get("https://" + targetConfig.server + "/pipeline/api/pipelines")
 
 	if queryResponse.IsError() {
 		fmt.Println("GET Variables failed", err)
@@ -60,8 +60,8 @@ func patchPipeline(id string, payload string) (*CodeStreamPipeline, error) {
 		SetHeader("Content-Type", "application/json").
 		SetBody(payload).
 		SetResult(&CodeStreamPipeline{}).
-		SetAuthToken(accessToken).
-		Patch("https://" + server + "/pipeline/api/pipelines/" + id)
+		SetAuthToken(targetConfig.accesstoken).
+		Patch("https://" + targetConfig.server + "/pipeline/api/pipelines/" + id)
 	if response.IsError() {
 		fmt.Println("GET Pipeline failed", response.StatusCode())
 		return nil, err
@@ -74,8 +74,8 @@ func deletePipeline(id string) (*CodeStreamPipeline, error) {
 	response, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamPipeline{}).
-		SetAuthToken(accessToken).
-		Delete("https://" + server + "/pipeline/api/pipelines/" + id)
+		SetAuthToken(targetConfig.accesstoken).
+		Delete("https://" + targetConfig.server + "/pipeline/api/pipelines/" + id)
 	if response.IsError() {
 		return nil, errors.New(response.Status())
 	}
