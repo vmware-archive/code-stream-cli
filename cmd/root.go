@@ -94,13 +94,6 @@ func initConfig() {
 	viper.SetEnvPrefix("cs")
 	viper.AutomaticEnv()
 
-	if err := viper.ReadInConfig(); err != nil {
-		panic(fmt.Errorf("Fatal error config file: %s \n", err))
-	}
-	currentTargetName = viper.GetString("currentTargetName")
-	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalln("Unable to load configuration:", err)
-	}
 	// If we're using ENV variables
 	if viper.Get("server") != nil {
 		log.Println("Using ENV variables")
@@ -113,6 +106,13 @@ func initConfig() {
 			accesstoken: viper.GetString("accesstoken"),
 		}
 	} else {
+		if err := viper.ReadInConfig(); err != nil {
+			panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		}
+		currentTargetName = viper.GetString("currentTargetName")
+		if err := viper.ReadInConfig(); err != nil {
+			log.Fatalln("Unable to load configuration:", err)
+		}
 		log.Println("Using config file:", viper.ConfigFileUsed())
 		log.Println("Using config name:", currentTargetName)
 		configuration := viper.Sub("target." + currentTargetName)
