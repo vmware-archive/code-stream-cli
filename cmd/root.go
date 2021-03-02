@@ -75,6 +75,8 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cs-cli.yaml)")
+	rootCmd.PersistentFlags().StringVar(&targetConfig.server, "server", "", "vRealize Automation Server to target")
+
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -96,12 +98,12 @@ func initConfig() {
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
 	currentTargetName = viper.GetString("currentTargetName")
-	if err := viper.ReadInConfig(); err == nil {
-		log.Println("Using config file:", viper.ConfigFileUsed())
-		log.Println("Using config name:", currentTargetName)
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalln("Unable to load configuration:", err)
 	}
 	// If we're using ENV variables
 	if viper.Get("server") != nil {
+		log.Println("Using ENV variables")
 		targetConfig = config{
 			server:      sanitize.URL(viper.GetString("server")),
 			username:    viper.GetString("username"),
@@ -111,9 +113,11 @@ func initConfig() {
 			accesstoken: viper.GetString("accesstoken"),
 		}
 	} else {
+		log.Println("Using config file:", viper.ConfigFileUsed())
+		log.Println("Using config name:", currentTargetName)
 		configuration := viper.Sub("target." + currentTargetName)
 		if configuration == nil { // Sub returns nil if the key cannot be found
-			panic("Target configuration not found")
+			log.Fatalln("Target configuration not found")
 		}
 		targetConfig = config{
 			server:      sanitize.URL(configuration.GetString("server")),
@@ -124,5 +128,4 @@ func initConfig() {
 			accesstoken: configuration.GetString("accesstoken"),
 		}
 	}
-	log.Println(targetConfig.server)
 }
