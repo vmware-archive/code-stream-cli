@@ -5,25 +5,41 @@
 The configuration file stores the targets (vRA servers and credentials) that the CLI will use. By default cs-cli will use `$HOME/.cs-cli.yaml` as the config file. You can override this using the `--config` flag. The configuration file should be secured using file-level permissions to protect your credentials. 
 
 ```bash
+# Use the default configuration file - $HOME/.cs-cli.yaml
+cs-cli get variable
+# Specify the configuration file
 cs-cli --config /path/to/config.yaml get pipeline
+```
+
+Alternatively, you can use ENVIRONMENT variables to configure the CLI
+```bash
+CS_SERVER="vra8-test-ga.cmbu.local"
+CS_USERNAME="test-user"
+CS_PASSWORD="VMware1!"
+CS_DOMAIN="cmbu.local"
+
+cs-cli get execution
 ```
 
 ### Working with targets
 
 List available targets:
-`cs-cli config get-target`
+```
+cs-cli config get-target
+```
 
 Add an target configuration:
 ```bash
-❯ cs-cli config set-target --config test-config.yaml --name my-vra-server --password mypassword --username myuser --domain mydomain.com --server my-vra-server.mydomain.com
-Creating new target my-vra-server
-Use `cs-cli config use-target --name my-vra-server` to use this target
-{
-  "domain": "mydomain.com",
-  "password": "mypassword",
-  "server": "my-vra-server.mydomain.com",
-  "username": "myuser"
-}
+cs-cli config set-target --config test-config.yaml --name my-vra-server --password mypassword --username myuser --domain mydomain.com --server my-vra-server.mydomain.com
+# Outputs:
+# Creating new target my-vra-server
+# Use `cs-cli config use-target --name my-vra-server` to use this target
+# {
+#   "domain": "mydomain.com",
+#   "password": "mypassword",
+#   "server": "my-vra-server.mydomain.com",
+#   "username": "myuser"
+# }
 ```
 
 ```bash

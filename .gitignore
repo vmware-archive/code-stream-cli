@@ -2,3 +2,5 @@ cs-cli
 export/
 variables.yaml
 dist/
+set-env.sh
+unset-env.sh
