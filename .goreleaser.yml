@@ -1,15 +1,18 @@
 before:
   hooks:
     - go mod download
-# release:
-#   gitlab:
-#     owner: smcgeown
-#     name: cs-cli
-# gitlab_urls:
-#   api: https://gitlab.eng.vmware.com/api/v4
-#   download: https://gitlab.company.com
-#   # set to true if you use a self-signed certificate
-#   skip_tls_verify: false
+  
+release:
+  gitlab:
+    owner: smcgeown
+    name: cs-cli
+  
+
+gitlab_urls:
+  api: https://gitlab.eng.vmware.com/api/v4
+  download: https://gitlab.company.com
+  # set to true if you use a self-signed certificate
+  skip_tls_verify: false
 
 builds:
   - id: cs-cli
@@ -85,20 +88,23 @@ docker_manifests:
     - sammcgeown/cs-cli:latest-armv7
     - sammcgeown/cs-cli:latest-arm64v8
 
-# archives:
-#   - replacements:
-#       darwin: Darwin
-#       linux: Linux
-#       windows: Windows
-#       386: i386
-#       amd64: x86_64
-# checksum:
-#   name_template: 'checksums.txt'
-# snapshot:
-#   name_template: "{{ .Tag }}-next"
-# changelog:
-#   sort: asc
-#   filters:
-#     exclude:
-#       - '^docs:'
-#       - '^test:'
+archives:
+  - replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
