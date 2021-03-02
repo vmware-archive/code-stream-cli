@@ -1,41 +1,104 @@
-# This is an example .goreleaser.yml file with some sane defaults.
-# Make sure to check the documentation at http://goreleaser.com
 before:
   hooks:
-    # You may remove this if you don't use go modules.
     - go mod download
-    # you may remove this if you don't need go generate
-    - go generate ./...
-release:
-  gitlab:
-    owner: smcgeown
-    name: cs-cli
-gitlab_urls:
-  api: https://gitlab.eng.vmware.com/api/v4
-  download: https://gitlab.company.com
-  # set to true if you use a self-signed certificate
-  skip_tls_verify: false
+# release:
+#   gitlab:
+#     owner: smcgeown
+#     name: cs-cli
+# gitlab_urls:
+#   api: https://gitlab.eng.vmware.com/api/v4
+#   download: https://gitlab.company.com
+#   # set to true if you use a self-signed certificate
+#   skip_tls_verify: false
+
 builds:
-  - env:
+  - id: cs-cli
+    main: ./cs-cli.go
+    binary: cs-cli
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
       - windows
       - darwin
-archives:
-  - replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
-checksum:
-  name_template: 'checksums.txt'
-snapshot:
-  name_template: "{{ .Tag }}-next"
-changelog:
-  sort: asc
-  filters:
-    exclude:
-      - '^docs:'
-      - '^test:'
+    goarch:
+      - amd64
+      - arm
+      - arm64
+    goarm:
+      - 7
+
+dockers:
+  -
+    goos: linux
+    goarch: amd64
+    dockerfile: Dockerfile
+    build_flag_templates:
+    - "--build-arg=PLATFORM=linux/amd64"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.title={{.ProjectName}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    image_templates:
+    - "sammcgeown/cs-cli:latest-amd64"
+    - "sammcgeown/cs-cli:v{{ .Major }}.{{ .Minor }}-amd64"
+    use_buildx: true
+  -
+    goos: linux
+    goarch: arm64
+    dockerfile: Dockerfile
+    build_flag_templates:
+    - "--build-arg=PLATFORM=linux/arm64/v8"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.title={{.ProjectName}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    image_templates:
+    - "sammcgeown/cs-cli:latest-arm64v8"
+    - "sammcgeown/cs-cli:v{{ .Major }}.{{ .Minor }}-arm64v8"
+    use_buildx: true
+  -
+    goos: linux
+    goarch: arm
+    goarm: 7
+    dockerfile: Dockerfile
+    build_flag_templates:
+    - "--build-arg=PLATFORM=linux/arm/v7"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.title={{.ProjectName}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    image_templates:
+    - "sammcgeown/cs-cli:latest-armv7"
+    - "sammcgeown/cs-cli:v{{ .Major }}.{{ .Minor }}-armv7"
+    use_buildx: true
+
+docker_manifests:
+  - name_template: sammcgeown/cs-cli:v{{ .Major }}.{{ .Minor }}
+    image_templates:
+    - sammcgeown/cs-cli:v{{ .Major }}.{{ .Minor }}-amd64
+    - sammcgeown/cs-cli:v{{ .Major }}.{{ .Minor }}-armv7
+    - sammcgeown/cs-cli:v{{ .Major }}.{{ .Minor }}-arm64v8
+  - name_template: sammcgeown/cs-cli:latest
+    image_templates:
+    - sammcgeown/cs-cli:latest-amd64
+    - sammcgeown/cs-cli:latest-armv7
+    - sammcgeown/cs-cli:latest-arm64v8
+
+# archives:
+#   - replacements:
+#       darwin: Darwin
+#       linux: Linux
+#       windows: Windows
+#       386: i386
+#       amd64: x86_64
+# checksum:
+#   name_template: 'checksums.txt'
+# snapshot:
+#   name_template: "{{ .Tag }}-next"
+# changelog:
+#   sort: asc
+#   filters:
+#     exclude:
+#       - '^docs:'
+#       - '^test:'
