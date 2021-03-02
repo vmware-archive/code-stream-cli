@@ -22,12 +22,12 @@ func ensureTargetConnection() {
 			targetConfig.accesstoken, authError = authenticateOnPrem(targetConfig)
 		}
 		if authError != nil {
-			fmt.Println("Authentication failed", authError.Error())
-			os.Exit(1)
+			log.Fatalln("Authentication failed", authError.Error())
 		}
-		viper.Set("target."+currentTargetName+".targetConfig.accesstoken", targetConfig.accesstoken)
-		viper.WriteConfig()
-		targetConfig.accesstoken = viper.GetString("target." + currentTargetName + ".targetConfig.accesstoken")
+		if viper.ConfigFileUsed() != "" {
+			viper.Set("target."+currentTargetName+".accesstoken", targetConfig.accesstoken)
+			viper.WriteConfig()
+		}
 	}
 }
 
