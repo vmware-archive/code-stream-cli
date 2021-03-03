@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -33,46 +32,46 @@ func ensureTargetConnection() {
 
 func authenticateOnPrem(target config) (string, error) {
 	client := resty.New()
-	response, err := client.R().
+	queryResponse, err := client.R().
 		SetBody(AuthenticationRequest{target.username, target.password, target.domain}).
 		SetResult(&AuthenticationResponse{}).
 		SetError(&AuthenticationError{}).
 		Post("https://" + target.server + "/csp/gateway/am/idp/auth/login?access_token")
-	if response.IsError() {
-		return "", err
+	if queryResponse.IsError() {
+		return "", queryResponse.Error().(error)
 	}
-	return response.Result().(*AuthenticationResponse).AccessToken, err
+	return queryResponse.Result().(*AuthenticationResponse).AccessToken, err
 }
 func authenticateCloud(target config) (string, error) {
 	client := resty.New()
-	response, err := client.R().
+	queryResponse, err := client.R().
 		SetBody(AuthenticationRequestCloud{target.apitoken}).
 		SetResult(&AuthenticationResponseCloud{}).
 		SetError(&AuthenticationError{}).
 		Post("https://" + target.server + "/iaas/api/login")
-	if response.IsError() {
-		return "", err
+	if queryResponse.IsError() {
+		return "", queryResponse.Error().(error)
 	}
-	return response.Result().(*AuthenticationResponseCloud).Token, err
+	return queryResponse.Result().(*AuthenticationResponseCloud).Token, err
 }
 
 func testAccessToken() bool {
 	client := resty.New()
-	response, err := client.R().
+	queryResponse, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetAuthToken(targetConfig.accesstoken).
 		Get("https://" + targetConfig.server + "/iaas/api/projects")
 	if err != nil {
 		return false
 	}
-	if response.StatusCode() == 401 {
-		//fmt.Println("Token authentication failed: ", response.StatusCode())
+	if queryResponse.StatusCode() == 401 {
+		//log.Println("Token authentication failed: ", queryResponse.StatusCode())
 		return false
 	}
 	return true
 }
 
-func exportYaml(name, project, path, object string) {
+func exportYaml(name, project, path, object string) error {
 	var exportPath string
 	var qParams = make(map[string]string)
 	qParams[object] = name
@@ -83,7 +82,7 @@ func exportYaml(name, project, path, object string) {
 		exportPath, _ = os.Getwd()
 	}
 	client := resty.New()
-	queryResponse, err := client.R().
+	queryResponse, _ := client.R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/x-yaml;charset=UTF-8").
 		SetAuthToken(targetConfig.accesstoken).
@@ -91,13 +90,13 @@ func exportYaml(name, project, path, object string) {
 		Get("https://" + targetConfig.server + "/pipeline/api/export")
 
 	if queryResponse.IsError() {
-		fmt.Println("Export failed", err)
-		os.Exit(1)
+		return queryResponse.Error().(error)
 	}
+	return nil
 }
 
 // importYaml import a yaml pipeline or endpoint
-func importYaml(yamlPath, action string) bool {
+func importYaml(yamlPath, action string) error {
 	var qParams = make(map[string]string)
 	qParams["action"] = action
 	yamlBytes, err := ioutil.ReadFile(yamlPath)
@@ -106,15 +105,14 @@ func importYaml(yamlPath, action string) bool {
 	}
 	yamlPayload := string(yamlBytes)
 	client := resty.New()
-	response, err := client.R().
+	queryResponse, err := client.R().
 		SetQueryParams(qParams).
 		SetHeader("Content-Type", "application/x-yaml").
 		SetBody(yamlPayload).
 		SetAuthToken(targetConfig.accesstoken).
 		Post("https://" + targetConfig.server + "/pipeline/api/import")
-	if response.IsError() {
-		fmt.Println("Import/Update failed", response.StatusCode())
-		return false
+	if queryResponse.IsError() {
+		return queryResponse.Error().(error)
 	}
-	return true
+	return nil
 }

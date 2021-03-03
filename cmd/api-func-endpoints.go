@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
 	"strings"
 
 	"github.com/go-resty/resty/v2"
@@ -40,8 +38,7 @@ func getEndpoint(id, name, project, endpointtype string, export bool, exportPath
 		Get("https://" + targetConfig.server + "/pipeline/api/endpoints")
 
 	if queryResponse.IsError() {
-		fmt.Println("GET Variables failed", err)
-		os.Exit(1)
+		return nil, queryResponse.Error().(error)
 	}
 
 	for _, value := range queryResponse.Result().(*documentsList).Documents {
@@ -60,13 +57,13 @@ func getEndpoint(id, name, project, endpointtype string, export bool, exportPath
 
 func deleteEndpoint(id string) (*CodeStreamEndpoint, error) {
 	client := resty.New()
-	response, err := client.R().
+	queryResponse, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamEndpoint{}).
 		SetAuthToken(targetConfig.accesstoken).
 		Delete("https://" + targetConfig.server + "/pipeline/api/endpoints/" + id)
-	if response.IsError() {
-		fmt.Println("DELETE Endpoint failed", err)
+	if queryResponse.IsError() {
+		return nil, queryResponse.Error().(error)
 	}
-	return response.Result().(*CodeStreamEndpoint), err
+	return queryResponse.Result().(*CodeStreamEndpoint), err
 }

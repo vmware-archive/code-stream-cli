@@ -2,8 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
-	"fmt"
-	"os"
+	"log"
 	"strconv"
 	"strings"
 
@@ -16,7 +15,7 @@ func getExecutions(id string, status string, name string, nested bool) ([]*Codes
 	if id != "" {
 		x, err := getExecution("/codestream/api/executions/" + id)
 		if err != nil {
-			fmt.Print("Error: ", err.Error())
+			log.Println("Error: ", err.Error())
 		}
 		arrExecutions = append(arrExecutions, x)
 		return arrExecutions, err
@@ -30,18 +29,17 @@ func getExecutions(id string, status string, name string, nested bool) ([]*Codes
 	if name != "" {
 		qParams["$filter"] = "((name eq '" + name + "') and (_nested eq '" + strconv.FormatBool(nested) + "'))"
 	}
-	response, err := client.R().
+	queryResponse, err := client.R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&documentsList{}).
 		SetAuthToken(targetConfig.accesstoken).
 		Get("https://" + targetConfig.server + "/pipeline/api/executions")
-	if response.IsError() {
-		fmt.Println("GET Executions failed", err)
-		os.Exit(1)
+	if queryResponse.IsError() {
+		return nil, queryResponse.Error().(error)
 	}
 
-	for _, value := range response.Result().(*documentsList).Documents {
+	for _, value := range queryResponse.Result().(*documentsList).Documents {
 		c := CodestreamAPIExecutions{}
 		mapstructure.Decode(value, &c)
 		arrExecutions = append(arrExecutions, &c)
@@ -51,28 +49,28 @@ func getExecutions(id string, status string, name string, nested bool) ([]*Codes
 
 func getExecution(executionLink string) (*CodestreamAPIExecutions, error) {
 	client := resty.New()
-	response, err := client.R().
+	queryResponse, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetResult(&CodestreamAPIExecutions{}).
 		SetAuthToken(targetConfig.accesstoken).
 		Get("https://" + targetConfig.server + executionLink)
-	if response.IsError() {
-		fmt.Println("GET Execution failed", err)
+	if queryResponse.IsError() {
+		return nil, queryResponse.Error().(error)
 	}
-	return response.Result().(*CodestreamAPIExecutions), err
+	return queryResponse.Result().(*CodestreamAPIExecutions), err
 }
 
 func deleteExecution(id string) (*CodestreamAPIExecutions, error) {
 	client := resty.New()
-	response, err := client.R().
+	queryResponse, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetResult(&CodestreamAPIExecutions{}).
 		SetAuthToken(targetConfig.accesstoken).
 		Delete("https://" + targetConfig.server + "/pipeline/api/executions/" + id)
-	if response.IsError() {
-		fmt.Println("DELETE Execution failed", err)
+	if queryResponse.IsError() {
+		return nil, queryResponse.Error().(error)
 	}
-	return response.Result().(*CodestreamAPIExecutions), err
+	return queryResponse.Result().(*CodestreamAPIExecutions), err
 }
 
 func createExecution(id string, inputs string, comment string) (*CodeStreamCreateExecutionResponse, error) {
@@ -94,15 +92,15 @@ func createExecution(id string, inputs string, comment string) (*CodeStreamCreat
 		return nil, err
 	}
 	client := resty.New()
-	response, err := client.R().
+	queryResponse, err := client.R().
 		SetHeader("Content-Type", "application/json").
 		SetBody(executionBytes).
 		SetResult(&CodeStreamCreateExecutionResponse{}).
 		SetAuthToken(targetConfig.accesstoken).
 		Post("https://" + targetConfig.server + "/pipeline/api/pipelines/" + id + "/executions")
-	fmt.Println(response.StatusCode())
-	if response.IsError() {
-		return nil, response.Error().(error)
+	log.Println(queryResponse.StatusCode())
+	if queryResponse.IsError() {
+		return nil, queryResponse.Error().(error)
 	}
-	return response.Result().(*CodeStreamCreateExecutionResponse), nil
+	return queryResponse.Result().(*CodeStreamCreateExecutionResponse), nil
 }

@@ -16,7 +16,7 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -35,7 +35,7 @@ Examples:
 	Run: func(cmd *cobra.Command, args []string) {
 		var currentTargetName = viper.GetString("currentTargetName")
 		if currentTargetName != "" {
-			fmt.Println(currentTargetName)
+			log.Println(currentTargetName)
 		}
 	},
 }
@@ -53,12 +53,12 @@ Examples:
 	Run: func(cmd *cobra.Command, args []string) {
 		var target = viper.Get("target." + name)
 		if target == nil {
-			fmt.Println("Target not found! Current target is", viper.GetString("currentTargetName"))
+			log.Println("Target not found! Current target is", viper.GetString("currentTargetName"))
 			return
 		}
 		viper.Set("currentTargetName", name)
 		viper.WriteConfig()
-		fmt.Println("Current target: ", name)
+		log.Println("Current target: ", name)
 	},
 }
 
@@ -75,14 +75,14 @@ Examples:
 		if name != "" {
 			var target = viper.Get("target." + name)
 			if target == nil {
-				fmt.Println("Target not found.")
+				log.Println("Target not found.")
 			} else {
 				PrettyPrint(target)
 			}
 		} else {
 			var targets = viper.GetStringMapString("target")
 			for key := range targets {
-				fmt.Println(key)
+				log.Println(key)
 			}
 		}
 	},
@@ -117,11 +117,11 @@ Examples:
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		if viper.IsSet("target." + newTargetName) {
-			fmt.Println("Updating", newTargetName)
+			log.Println("Updating", newTargetName)
 		} else {
-			fmt.Println("Creating new target", newTargetName)
+			log.Println("Creating new target", newTargetName)
 		}
-		fmt.Println("Use `cs-cli config use-target --name " + newTargetName + "` to use this target")
+		log.Println("Use `cs-cli config use-target --name " + newTargetName + "` to use this target")
 		if newServer != "" {
 			viper.Set("target."+newTargetName+".server", newServer)
 		}
@@ -139,7 +139,7 @@ Examples:
 		}
 		err := viper.WriteConfig()
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		var target = viper.Get("target." + newTargetName)
 		PrettyPrint(target)
@@ -159,9 +159,9 @@ Examples:
 // 		if viper.IsSet("target." + name) {
 // 			err := Unset(name)
 // 			if err != nil {
-// 				fmt.Println(err)
+// 				log.Println(err)
 // 			}
-// 			fmt.Println("Target deleted.")
+// 			log.Println("Target deleted.")
 // 		}
 // 	},
 // }

@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"os"
 	"reflect"
 
@@ -13,7 +13,7 @@ import (
 func PrettyPrint(v interface{}) (err error) {
 	b, err := json.MarshalIndent(v, "", "  ")
 	if err == nil {
-		fmt.Println(string(b))
+		log.Println(string(b))
 	}
 	return
 }
@@ -25,7 +25,7 @@ func PrintTable(objects []interface{}, headers []string) {
 	table.SetHeader(headers)
 	for _, object := range objects {
 		t := reflect.TypeOf(object)
-		fmt.Println(t)
+		log.Println(t)
 		// var o t
 		// mapstructure.Decode(object, &t)
 		// var values []string

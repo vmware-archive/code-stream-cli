@@ -47,6 +47,10 @@ var (
 	// domain            string
 )
 
+var qParams = map[string]string{
+	"apiVersion": "2019-10-17",
+}
+
 type config struct {
 	domain      string
 	password    string
@@ -66,7 +70,7 @@ var rootCmd = &cobra.Command{
 // Execute is the main process
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		os.Exit(1)
 	}
 }

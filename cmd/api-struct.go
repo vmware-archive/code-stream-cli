@@ -205,3 +205,19 @@ type CodeStreamEndpoint struct {
 	IsLocked           bool        `json:"isLocked"`
 	ValidationOutput   string      `json:"validationOutput"`
 }
+
+type CodeStreamCustomIntegration struct {
+	ID                 string `json:"id"`
+	Name               string `json:"name"`
+	Description        string `json:"description"`
+	Version            string `json:"version"`
+	CreatedBy          string `json:"createdBy"`
+	UpdatedBy          string `json:"updatedBy"`
+	CreatedAt          string `json:"createdAt"`
+	UpdatedAt          string `json:"updatedAt"`
+	Link               string `json:"_link"`
+	UpdateTimeInMicros int64  `json:"_updateTimeInMicros"`
+	CreateTimeInMicros int64  `json:"_createTimeInMicros"`
+	Status             string `json:"status"`
+	Yaml               string `json:"yaml"`
+}

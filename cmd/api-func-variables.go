@@ -3,7 +3,6 @@ package cmd
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -45,8 +44,7 @@ func getVariable(id, name, project string) ([]*CodeStreamVariableResponse, error
 		Get("https://" + targetConfig.server + "/pipeline/api/variables")
 
 	if queryResponse.IsError() {
-		fmt.Println("GET Variables failed", err)
-		os.Exit(1)
+		return nil, queryResponse.Error().(error)
 	}
 
 	for _, value := range queryResponse.Result().(*documentsList).Documents {
@@ -60,21 +58,21 @@ func getVariable(id, name, project string) ([]*CodeStreamVariableResponse, error
 // getVariableByID - get Code Stream Variable by ID
 func getVariableByID(id string) (*CodeStreamVariableResponse, error) {
 	client := resty.New()
-	response, err := client.R().
+	queryResponse, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamVariableResponse{}).
 		SetAuthToken(targetConfig.accesstoken).
 		Get("https://" + targetConfig.server + "/pipeline/api/variables/" + id)
-	if response.IsError() {
-		fmt.Println("GET Variable failed", err)
+	if queryResponse.IsError() {
+		log.Println("GET Variable failed", err)
 	}
-	return response.Result().(*CodeStreamVariableResponse), err
+	return queryResponse.Result().(*CodeStreamVariableResponse), err
 }
 
 // createVariable - Create a new Code Stream Variable
 func createVariable(name string, description string, variableType string, project string, value string) (*CodeStreamVariableResponse, error) {
 	client := resty.New()
-	response, err := client.R().
+	queryResponse, err := client.R().
 		SetBody(
 			CodeStreamVariableRequest{
 				Project:     project,
@@ -89,10 +87,10 @@ func createVariable(name string, description string, variableType string, projec
 		SetError(&CodeStreamException{}).
 		SetAuthToken(targetConfig.accesstoken).
 		Post("https://" + targetConfig.server + "/pipeline/api/variables")
-	if response.IsError() {
-		return nil, errors.New(response.Error().(*CodeStreamException).Message)
+	if queryResponse.IsError() {
+		return nil, errors.New(queryResponse.Error().(*CodeStreamException).Message)
 	}
-	return response.Result().(*CodeStreamVariableResponse), err
+	return queryResponse.Result().(*CodeStreamVariableResponse), err
 }
 
 // updateVariable - Create a new Code Stream Variable
@@ -111,32 +109,31 @@ func updateVariable(id string, name string, description string, typename string,
 		variable.Value = value
 	}
 	client := resty.New()
-	response, err := client.R().
+	queryResponse, err := client.R().
 		SetBody(variable).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamVariableResponse{}).
 		SetError(&CodeStreamException{}).
 		SetAuthToken(targetConfig.accesstoken).
 		Put("https://" + targetConfig.server + "/pipeline/api/variables/" + id)
-	if response.IsError() {
-		return nil, errors.New(response.Error().(*CodeStreamException).Message)
+	if queryResponse.IsError() {
+		return nil, errors.New(queryResponse.Error().(*CodeStreamException).Message)
 	}
-	return response.Result().(*CodeStreamVariableResponse), err
+	return queryResponse.Result().(*CodeStreamVariableResponse), err
 }
 
 // deleteVariable - Delete a Code Stream Variable
 func deleteVariable(id string) (*CodeStreamVariableResponse, error) {
 	client := resty.New()
-	response, err := client.R().
+	queryResponse, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamVariableResponse{}).
 		SetAuthToken(targetConfig.accesstoken).
 		Delete("https://" + targetConfig.server + "/pipeline/api/variables/" + id)
-	if response.IsError() {
-		fmt.Println("Create Variable failed", err)
-		os.Exit(1)
+	if queryResponse.IsError() {
+		return nil, queryResponse.Error().(error)
 	}
-	return response.Result().(*CodeStreamVariableResponse), err
+	return queryResponse.Result().(*CodeStreamVariableResponse), err
 }
 
 // exportVariable - Export a variable to YAML
@@ -146,7 +143,7 @@ func exportVariable(variable interface{}, exportFile string) {
 	mapstructure.Decode(variable, &c)
 	yaml, err := yaml.Marshal(c)
 	if err != nil {
-		fmt.Println("Unable to export variable ", c.Name)
+		log.Println("Unable to export variable ", c.Name)
 	}
 	if exportFile == "" {
 		exportFile = "variables.yaml"

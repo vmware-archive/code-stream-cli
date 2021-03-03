@@ -41,12 +41,12 @@ var getPipelineCmd = &cobra.Command{
 		ensureTargetConnection()
 		response, err := getPipelines(id, name, project, export, exportPath)
 		if err != nil {
-			fmt.Print("Unable to get Code Stream Pipelines: ", err)
+			log.Println("Unable to get Code Stream Pipelines: ", err)
 		}
 		var resultCount = len(response)
 		if resultCount == 0 {
 			// No results
-			fmt.Println("No results found")
+			log.Println("No results found")
 		} else if resultCount == 1 {
 			if form {
 				// Get the input form
@@ -97,15 +97,17 @@ var updatePipelineCmd = &cobra.Command{
 		if state != "" {
 			response, err := patchPipeline(id, `{"state":"`+state+`"}`)
 			if err != nil {
-				fmt.Print("Unable to update Code Stream Pipeline: ", err)
+				log.Println("Unable to update Code Stream Pipeline: ", err)
 			}
-			fmt.Println("Setting pipeline " + response.Name + " to " + state)
+			log.Println("Setting pipeline " + response.Name + " to " + state)
 		}
 
 		if importPath != "" {
-			if importYaml(importPath, "apply") {
-				fmt.Println("Imported successfully, pipeline updated.")
+			err := importYaml(importPath, "apply")
+			if err != nil {
+				log.Fatalln("Failed to update Pipeline", err)
 			}
+			log.Println("Imported successfully, pipeline updated.")
 		}
 	},
 }
@@ -125,9 +127,11 @@ var createPipelineCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ensureTargetConnection()
 		if importPath != "" {
-			if importYaml(importPath, "create") {
-				fmt.Println("Imported successfully, pipeline created.")
+			err := importYaml(importPath, "create")
+			if err != nil {
+				log.Fatalln("Failed to import Pipeline", err)
 			}
+			fmt.Println("Imported successfully, Pipeline created.")
 		}
 	},
 }
@@ -146,7 +150,7 @@ var deletePipelineCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalln("Delete Pipeline failed:", err)
 		}
-		fmt.Println("Pipeline with id " + response.ID + " deleted")
+		log.Println("Pipeline with id " + response.ID + " deleted")
 
 	},
 }

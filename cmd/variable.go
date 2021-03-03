@@ -16,7 +16,7 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"log"
 	"os"
 
 	"github.com/olekukonko/tablewriter"
@@ -41,12 +41,12 @@ Get by Project
 		ensureTargetConnection()
 		response, err := getVariable(id, name, project)
 		if err != nil {
-			fmt.Print("Unable to get Code Stream Variables: ", err)
+			log.Println("Unable to get Code Stream Variables: ", err)
 		}
 		var resultCount = len(response)
 		if resultCount == 0 {
 			// No results
-			fmt.Println("No results found")
+			log.Println("No results found")
 		} else if resultCount == 1 {
 			// Print the single result
 			if export {
@@ -84,15 +84,15 @@ var createVariableCmd = &cobra.Command{
 				}
 				createResponse, err := createVariable(value.Name, value.Description, value.Type, value.Project, value.Value)
 				if err != nil {
-					fmt.Println("Unable to create Code Stream Variable: ", err)
+					log.Println("Unable to create Code Stream Variable: ", err)
 				} else {
-					fmt.Println("Created variable", createResponse.Name, "in", createResponse.Project)
+					log.Println("Created variable", createResponse.Name, "in", createResponse.Project)
 				}
 			}
 		} else {
 			createResponse, err := createVariable(name, description, typename, project, value)
 			if err != nil {
-				fmt.Print("Unable to create Code Stream Variable: ", err)
+				log.Println("Unable to create Code Stream Variable: ", err)
 			}
 			PrettyPrint(createResponse)
 		}
@@ -111,22 +111,22 @@ var updateVariableCmd = &cobra.Command{
 			for _, value := range variables {
 				exisitingVariable, err := getVariable("", value.Name, value.Project)
 				if err != nil {
-					fmt.Println("Update failed - unable to find existing Code Stream Variable", value.Name, "in", value.Project)
+					log.Println("Update failed - unable to find existing Code Stream Variable", value.Name, "in", value.Project)
 				} else {
 					_, err := updateVariable(exisitingVariable[0].ID, value.Name, value.Description, value.Type, value.Value)
 					if err != nil {
-						fmt.Println("Unable to update Code Stream Variable: ", err)
+						log.Println("Unable to update Code Stream Variable: ", err)
 					} else {
-						fmt.Println("Updated variable", value.Name)
+						log.Println("Updated variable", value.Name)
 					}
 				}
 			}
 		} else { // Else we are updating using flags
 			updateResponse, err := updateVariable(id, name, description, typename, value)
 			if err != nil {
-				fmt.Print("Unable to update Code Stream Variable: ", err)
+				log.Println("Unable to update Code Stream Variable: ", err)
 			}
-			fmt.Println("Updated variable", updateResponse.Name)
+			log.Println("Updated variable", updateResponse.Name)
 		}
 	},
 }
@@ -146,9 +146,9 @@ to quickly create a Cobra application.`,
 
 		response, err := deleteVariable(id)
 		if err != nil {
-			fmt.Print("Unable to delete variable: ", err)
+			log.Println("Unable to delete variable: ", err)
 		}
-		fmt.Println("Variable with id " + response.ID + " deleted")
+		log.Println("Variable with id " + response.ID + " deleted")
 	},
 }
 

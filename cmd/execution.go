@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/olekukonko/tablewriter"
@@ -31,12 +32,12 @@ var getExecutionCmd = &cobra.Command{
 
 		response, err := getExecutions(id, status, name, nested)
 		if err != nil {
-			fmt.Print("Unable to get executions: ", err)
+			log.Println("Unable to get executions: ", err)
 		}
 		var resultCount = len(response)
 		if resultCount == 0 {
 			// No results
-			fmt.Println("No results found")
+			log.Println("No results found")
 		} else if resultCount == 1 {
 			PrettyPrint(response[0])
 		} else {
@@ -64,9 +65,9 @@ var delExecutionCmd = &cobra.Command{
 
 		response, err := deleteExecution(id)
 		if err != nil {
-			fmt.Print("Unable to delete execution: ", err)
+			log.Println("Unable to delete execution: ", err)
 		}
-		fmt.Println("Execution with id " + response.ID + " deleted")
+		log.Println("Execution with id " + response.ID + " deleted")
 
 	},
 }
@@ -83,9 +84,9 @@ var createExecutionCmd = &cobra.Command{
 
 		response, err := createExecution(id, inputs, comments)
 		if err != nil {
-			fmt.Print("Unable to create execution: ", err)
+			log.Println("Unable to create execution: ", err)
 		}
-		fmt.Println("Execution " + response.ExecutionLink + " created")
+		log.Println("Execution " + response.ExecutionLink + " created")
 
 	},
 }

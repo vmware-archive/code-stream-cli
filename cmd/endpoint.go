@@ -16,7 +16,7 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"log"
 	"os"
 
 	"github.com/olekukonko/tablewriter"
@@ -33,12 +33,12 @@ var getEndpointCmd = &cobra.Command{
 
 		response, err := getEndpoint(id, name, project, typename, export, exportPath)
 		if err != nil {
-			fmt.Print("Unable to get endpoints: ", err)
+			log.Println("Unable to get endpoints: ", err)
 		}
 		var resultCount = len(response)
 		if resultCount == 0 {
 			// No results
-			fmt.Println("No results found")
+			log.Println("No results found")
 		} else if resultCount == 1 {
 			PrettyPrint(response[0])
 		} else {
@@ -69,9 +69,11 @@ var createEndpointCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ensureTargetConnection()
 		if importPath != "" {
-			if importYaml(importPath, "create") {
-				fmt.Println("Imported successfully, Endpoint created.")
+			err := importYaml(importPath, "create")
+			if err != nil {
+				log.Fatalln("Failed to import Endpoint", err)
 			}
+			log.Println("Imported successfully, Endpoint created.")
 		}
 	},
 }
@@ -88,9 +90,11 @@ var updateEndpointCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ensureTargetConnection()
 		if importPath != "" {
-			if importYaml(importPath, "apply") {
-				fmt.Println("Imported successfully, pipeline updated.")
+			err := importYaml(importPath, "update")
+			if err != nil {
+				log.Fatalln("Failed to import Endpoint", err)
 			}
+			log.Println("Imported successfully, Endpoint updated.")
 		}
 	},
 }
@@ -107,10 +111,9 @@ var deleteEndpointCmd = &cobra.Command{
 
 		response, err := deleteEndpoint(id)
 		if err != nil {
-			fmt.Print("Unable to delete Endpoint: ", err)
+			log.Println("Unable to delete Endpoint: ", err)
 		}
-		fmt.Println("Endpoint with id " + response.ID + " deleted")
-
+		log.Println("Endpoint with id " + response.ID + " deleted")
 	},
 }
 

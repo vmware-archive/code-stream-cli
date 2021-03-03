@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"errors"
-	"fmt"
-	"os"
 	"strings"
 
 	"github.com/go-resty/resty/v2"
@@ -36,8 +33,7 @@ func getPipelines(id string, name string, project string, export bool, exportPat
 		Get("https://" + targetConfig.server + "/pipeline/api/pipelines")
 
 	if queryResponse.IsError() {
-		fmt.Println("GET Variables failed", err)
-		os.Exit(1)
+		return nil, queryResponse.Error().(error)
 	}
 	for _, value := range queryResponse.Result().(*documentsList).Documents {
 		c := CodeStreamPipeline{}
@@ -55,29 +51,28 @@ func getPipelines(id string, name string, project string, export bool, exportPat
 // patchPipeline - Patch Code Stream Pipeline by ID
 func patchPipeline(id string, payload string) (*CodeStreamPipeline, error) {
 	client := resty.New()
-	response, err := client.R().
+	queryResponse, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetHeader("Content-Type", "application/json").
 		SetBody(payload).
 		SetResult(&CodeStreamPipeline{}).
 		SetAuthToken(targetConfig.accesstoken).
 		Patch("https://" + targetConfig.server + "/pipeline/api/pipelines/" + id)
-	if response.IsError() {
-		fmt.Println("GET Pipeline failed", response.StatusCode())
-		return nil, err
+	if queryResponse.IsError() {
+		return nil, queryResponse.Error().(error)
 	}
-	return response.Result().(*CodeStreamPipeline), nil
+	return queryResponse.Result().(*CodeStreamPipeline), err
 }
 
 func deletePipeline(id string) (*CodeStreamPipeline, error) {
 	client := resty.New()
-	response, err := client.R().
+	queryResponse, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamPipeline{}).
 		SetAuthToken(targetConfig.accesstoken).
 		Delete("https://" + targetConfig.server + "/pipeline/api/pipelines/" + id)
-	if response.IsError() {
-		return nil, errors.New(response.Status())
+	if queryResponse.IsError() {
+		return nil, queryResponse.Error().(error)
 	}
-	return response.Result().(*CodeStreamPipeline), err
+	return queryResponse.Result().(*CodeStreamPipeline), err
 }
