@@ -163,10 +163,13 @@ type CodeStreamPipeline struct {
 	State      string        `json:"state"`
 }
 
+// CodeStreamCreateExecutionRequest - Code Stream Create Execution Request
 type CodeStreamCreateExecutionRequest struct {
 	Comments string      `json:"comments"`
 	Input    interface{} `json:"input"`
 }
+
+// CodeStreamCreateExecutionResponse - Code Stream Create Execution Response
 type CodeStreamCreateExecutionResponse struct {
 	Comments      string      `json:"comments"`
 	Source        string      `json:"source"`
@@ -175,6 +178,7 @@ type CodeStreamCreateExecutionResponse struct {
 	Tags          []string    `json:"tags"`
 }
 
+// CodeStreamException - Generic exception struct
 type CodeStreamException struct {
 	Timestamp int64  `json:"timestamp"`
 	Path      string `json:"path"`
@@ -185,6 +189,7 @@ type CodeStreamException struct {
 	Type      string `json:"@type"`
 }
 
+// CodeStreamEndpoint - Code Stream Create Endpoint
 type CodeStreamEndpoint struct {
 	Project            string      `json:"project"`
 	Kind               string      `json:"kind"`
@@ -206,6 +211,7 @@ type CodeStreamEndpoint struct {
 	ValidationOutput   string      `json:"validationOutput"`
 }
 
+// CodeStreamCustomIntegration - Code Stream Custom Integration
 type CodeStreamCustomIntegration struct {
 	ID                 string `json:"id"`
 	Name               string `json:"name"`

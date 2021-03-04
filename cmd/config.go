@@ -94,7 +94,7 @@ var (
 	newUsername   string
 	newPassword   string
 	newDomain     string
-	newApiToken   string
+	newAPIToken   string
 )
 
 // setTargetCmd represents the set-target command
@@ -134,8 +134,8 @@ Examples:
 		if newDomain != "" {
 			viper.Set("target."+newTargetName+".domain", newDomain)
 		}
-		if newApiToken != "" {
-			viper.Set("target."+newTargetName+".apitoken", newApiToken)
+		if newAPIToken != "" {
+			viper.Set("target."+newTargetName+".apitoken", newAPIToken)
 		}
 		err := viper.WriteConfig()
 		if err != nil {
@@ -183,7 +183,7 @@ func init() {
 	setTargetCmd.Flags().StringVarP(&newUsername, "username", "u", "", "Username to authenticate")
 	setTargetCmd.Flags().StringVarP(&newPassword, "password", "p", "", "Password to authenticate")
 	setTargetCmd.Flags().StringVarP(&newDomain, "domain", "d", "", "Domain to authenticate (not required for System Domain)")
-	setTargetCmd.Flags().StringVarP(&newApiToken, "apitoken", "a", "", "API token for vRealize Automation Cloud")
+	setTargetCmd.Flags().StringVarP(&newAPIToken, "apitoken", "a", "", "API token for vRealize Automation Cloud")
 	setTargetCmd.MarkFlagRequired("name")
 	// delete-target
 	// configCmd.AddCommand(deleteTargetCmd)

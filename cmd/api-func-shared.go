@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"io/ioutil"
 	"log"
 	"os"
@@ -38,7 +39,7 @@ func authenticateOnPrem(target config) (string, error) {
 		SetError(&AuthenticationError{}).
 		Post("https://" + target.server + "/csp/gateway/am/idp/auth/login?access_token")
 	if queryResponse.IsError() {
-		return "", queryResponse.Error().(error)
+		return "", errors.New(queryResponse.Error().(*AuthenticationError).ServerMessage)
 	}
 	return queryResponse.Result().(*AuthenticationResponse).AccessToken, err
 }
@@ -50,7 +51,7 @@ func authenticateCloud(target config) (string, error) {
 		SetError(&AuthenticationError{}).
 		Post("https://" + target.server + "/iaas/api/login")
 	if queryResponse.IsError() {
-		return "", queryResponse.Error().(error)
+		return "", errors.New(queryResponse.Error().(*AuthenticationError).ServerMessage)
 	}
 	return queryResponse.Result().(*AuthenticationResponseCloud).Token, err
 }

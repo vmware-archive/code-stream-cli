@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -105,7 +104,7 @@ func initConfig() {
 		}
 	} else {
 		if err := viper.ReadInConfig(); err != nil {
-			panic(fmt.Errorf("Fatal error config file: %s \n", err))
+			log.Fatalln("Fatal error config file:", err)
 		}
 		currentTargetName = viper.GetString("currentTargetName")
 		if err := viper.ReadInConfig(); err != nil {
