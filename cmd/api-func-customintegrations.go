@@ -41,20 +41,6 @@ func getCustomIntegration(id, name string) ([]*CodeStreamCustomIntegration, erro
 	return arrCustomIntegrations, err
 }
 
-// // getCustomIntegrationByID - get Code Stream CustomIntegration by ID
-// func getCustomIntegrationByID(id string) (*CodeStreamCustomIntegrationResponse, error) {
-// 	client := resty.New()
-// 	response, err := client.R().
-// 		SetHeader("Accept", "application/json").
-// 		SetResult(&CodeStreamCustomIntegrationResponse{}).
-// 		SetAuthToken(targetConfig.accesstoken).
-// 		Get("https://" + targetConfig.server + "/pipeline/api/variables/" + id)
-// 	if response.IsError() {
-// 		log.Println("GET CustomIntegration failed", err)
-// 	}
-// 	return response.Result().(*CodeStreamCustomIntegrationResponse), err
-// }
-
 // // createCustomIntegration - Create a new Code Stream CustomIntegration
 // func createCustomIntegration(name string, description string, variableType string, project string, value string) (*CodeStreamCustomIntegrationResponse, error) {
 // 	client := resty.New()

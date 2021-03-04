@@ -39,12 +39,6 @@ var (
 	status            string
 	exportFile        string
 	importFile        string
-	// accessToken       string
-	// apiToken          string
-	// server            string
-	// username          string
-	// password          string
-	// domain            string
 )
 
 var qParams = map[string]string{
@@ -125,7 +119,7 @@ func initConfig() {
 		}
 		targetConfig = config{
 			server:      sanitize.URL(configuration.GetString("server")),
-			username:    configuration.GetString("server"),
+			username:    configuration.GetString("username"),
 			password:    configuration.GetString("password"),
 			domain:      configuration.GetString("domain"),
 			apitoken:    configuration.GetString("apitoken"),
