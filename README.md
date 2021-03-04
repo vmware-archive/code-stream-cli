@@ -1,4 +1,16 @@
-# cs-cli
+# Code Stream CLI (cs-cli)
+The Code Stream CLI is a command line tool written in Go to interact with the vRealize Automation Code Stream APIs. It is written to help automate Code Stream and provide a simple way to migrate content between Code Stream instances and projects.
+* Import and Export Code Stream artefacts such as Pipelines, Variables, Endpoints
+* Perform CRUD operations on Code Stream artefacts such as Pipelines, Variables, Endpoints
+* Trigger Executions of Pipelines
+
+Currently implemented commands:
+* [Configuration](##Configuration)
+* [Pipelines](##Working-with-Pipelines)
+* [Variables](##Working-with-Variables)
+* [Executions](##Working-with-Executions)
+* [Endpoints](##Working-with-Endpoints)
+* [Custom Integrations](##Working-with-Custom-Integrations)
 
 ## Configuration
 
@@ -118,7 +130,8 @@ cs-cli create variable --importfile variables.yaml --project TestProject
 cs-cli update variable --importfile variables.yaml
 ```
 *Note that SECRET variables will not export, so if you export your secrets, be sure to add the value data before re-importing them!*
-# Working with Executions
+
+## Working with Executions
 
 ```bash
 # List all executions
@@ -192,4 +205,14 @@ Delete an endpoint
 ```bash
 # Delete endpoint by ID
 cs-cli delete endpoint --id 8c36f59a-2fcf-4039-8b48-1026f601a4b0
+```
+## Working with Custom Integrations
+
+```bash
+# Get all custom integrations
+cs-cli get customintegration
+# Get custom integration by id
+cs-cli get customintegration --id c145b52e-c797-49d1-88a5-1d70e7788d03
+# Get custom integration by name
+cs-cli get customintegration --name base64Encode
 ```
