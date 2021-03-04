@@ -1,6 +1,3 @@
-/*
-Package cmd ...
-*/
 package cmd
 
 import (
