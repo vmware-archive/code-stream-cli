@@ -9,12 +9,12 @@ The Code Stream CLI is a command line tool written in Go to interact with the vR
 ![Code Stream CLI](images/cs-cli-screenshot.png)
 
 Currently implemented commands:
-* [Configuration](##Configuration)
-* [Pipelines](##Working-with-Pipelines)
-* [Variables](##Working-with-Variables)
-* [Executions](##Working-with-Executions)
-* [Endpoints](##Working-with-Endpoints)
-* [Custom Integrations](##Working-with-Custom-Integrations)
+* [Configuration](#Configuration)
+* [Pipelines](#Working-with-Pipelines)
+* [Variables](#Working-with-Variables)
+* [Executions](#Working-with-Executions)
+* [Endpoints](#Working-with-Endpoints)
+* [Custom Integrations](#Working-with-Custom-Integrations)
 
 ## Configuration
 
