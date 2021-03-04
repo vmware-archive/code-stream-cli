@@ -50,6 +50,7 @@ func getExecutions(id string, status string, name string, nested bool) ([]*Codes
 func getExecution(executionLink string) (*CodestreamAPIExecutions, error) {
 	client := resty.New()
 	queryResponse, err := client.R().
+		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodestreamAPIExecutions{}).
 		SetAuthToken(targetConfig.accesstoken).
@@ -63,6 +64,7 @@ func getExecution(executionLink string) (*CodestreamAPIExecutions, error) {
 func deleteExecution(id string) (*CodestreamAPIExecutions, error) {
 	client := resty.New()
 	queryResponse, err := client.R().
+		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodestreamAPIExecutions{}).
 		SetAuthToken(targetConfig.accesstoken).
@@ -93,6 +95,7 @@ func createExecution(id string, inputs string, comment string) (*CodeStreamCreat
 	}
 	client := resty.New()
 	queryResponse, err := client.R().
+		SetQueryParams(qParams).
 		SetHeader("Content-Type", "application/json").
 		SetBody(executionBytes).
 		SetResult(&CodeStreamCreateExecutionResponse{}).

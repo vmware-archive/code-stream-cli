@@ -58,6 +58,7 @@ func getEndpoint(id, name, project, endpointtype string, export bool, exportPath
 func deleteEndpoint(id string) (*CodeStreamEndpoint, error) {
 	client := resty.New()
 	queryResponse, err := client.R().
+		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamEndpoint{}).
 		SetAuthToken(targetConfig.accesstoken).

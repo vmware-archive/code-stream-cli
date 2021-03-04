@@ -15,7 +15,7 @@ import (
 
 func getVariable(id, name, project string) ([]*CodeStreamVariableResponse, error) {
 	var arrVariables []*CodeStreamVariableResponse
-	var qParams = make(map[string]string)
+	//var qParams = make(map[string]string)
 	client := resty.New()
 
 	// Get by ID
@@ -47,6 +47,8 @@ func getVariable(id, name, project string) ([]*CodeStreamVariableResponse, error
 		return nil, queryResponse.Error().(error)
 	}
 
+	log.Println(queryResponse.Request.URL)
+
 	for _, value := range queryResponse.Result().(*documentsList).Documents {
 		c := CodeStreamVariableResponse{}
 		mapstructure.Decode(value, &c)
@@ -59,6 +61,7 @@ func getVariable(id, name, project string) ([]*CodeStreamVariableResponse, error
 func getVariableByID(id string) (*CodeStreamVariableResponse, error) {
 	client := resty.New()
 	queryResponse, err := client.R().
+		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamVariableResponse{}).
 		SetAuthToken(targetConfig.accesstoken).
@@ -73,6 +76,7 @@ func getVariableByID(id string) (*CodeStreamVariableResponse, error) {
 func createVariable(name string, description string, variableType string, project string, value string) (*CodeStreamVariableResponse, error) {
 	client := resty.New()
 	queryResponse, err := client.R().
+		SetQueryParams(qParams).
 		SetBody(
 			CodeStreamVariableRequest{
 				Project:     project,
@@ -110,6 +114,7 @@ func updateVariable(id string, name string, description string, typename string,
 	}
 	client := resty.New()
 	queryResponse, err := client.R().
+		SetQueryParams(qParams).
 		SetBody(variable).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamVariableResponse{}).
@@ -126,6 +131,7 @@ func updateVariable(id string, name string, description string, typename string,
 func deleteVariable(id string) (*CodeStreamVariableResponse, error) {
 	client := resty.New()
 	queryResponse, err := client.R().
+		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamVariableResponse{}).
 		SetAuthToken(targetConfig.accesstoken).

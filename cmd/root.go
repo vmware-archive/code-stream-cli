@@ -11,9 +11,11 @@ import (
 )
 
 var (
+	// Configuration
 	cfgFile           string
 	currentTargetName string
 	targetConfig      config
+	// Flags
 	id                string
 	name              string
 	project           string

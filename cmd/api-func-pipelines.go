@@ -52,6 +52,7 @@ func getPipelines(id string, name string, project string, export bool, exportPat
 func patchPipeline(id string, payload string) (*CodeStreamPipeline, error) {
 	client := resty.New()
 	queryResponse, err := client.R().
+		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetHeader("Content-Type", "application/json").
 		SetBody(payload).
@@ -67,6 +68,7 @@ func patchPipeline(id string, payload string) (*CodeStreamPipeline, error) {
 func deletePipeline(id string) (*CodeStreamPipeline, error) {
 	client := resty.New()
 	queryResponse, err := client.R().
+		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamPipeline{}).
 		SetAuthToken(targetConfig.accesstoken).

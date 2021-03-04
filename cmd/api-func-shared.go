@@ -74,7 +74,6 @@ func testAccessToken() bool {
 
 func exportYaml(name, project, path, object string) error {
 	var exportPath string
-	var qParams = make(map[string]string)
 	qParams[object] = name
 	qParams["project"] = project
 	if path != "" {
@@ -98,7 +97,6 @@ func exportYaml(name, project, path, object string) error {
 
 // importYaml import a yaml pipeline or endpoint
 func importYaml(yamlPath, action string) error {
-	var qParams = make(map[string]string)
 	qParams["action"] = action
 	yamlBytes, err := ioutil.ReadFile(yamlPath)
 	if err != nil {
