@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"log"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -122,12 +123,12 @@ Examples:
 		if newAPIToken != "" {
 			viper.Set("target."+newTargetName+".apitoken", newAPIToken)
 		}
-		err := viper.WriteConfig()
-		if err != nil {
-			log.Println(err)
+		viper.SetConfigType("yaml")
+		if err := viper.SafeWriteConfig(); err != nil {
+			if os.IsNotExist(err) {
+				err = viper.WriteConfig()
+			}
 		}
-		var target = viper.Get("target." + newTargetName)
-		PrettyPrint(target)
 	},
 }
 

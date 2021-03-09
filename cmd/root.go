@@ -3,6 +3,7 @@ package cmd
 import (
 	"log"
 	"os"
+	"path/filepath"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/mrz1836/go-sanitize"
@@ -16,15 +17,15 @@ var (
 	currentTargetName string
 	targetConfig      config
 	// Flags
-	id                string
-	name              string
-	project           string
-	typename          string
-	value             string
-	description       string
-	status            string
-	exportFile        string
-	importFile        string
+	id          string
+	name        string
+	project     string
+	typename    string
+	value       string
+	description string
+	status      string
+	exportFile  string
+	importFile  string
 )
 
 var qParams = map[string]string{
@@ -59,7 +60,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cs-cli.yaml)")
-	rootCmd.PersistentFlags().StringVar(&targetConfig.server, "server", "", "vRealize Automation Server to target")
+	//rootCmd.PersistentFlags().StringVar(&targetConfig.server, "server", "", "vRealize Automation Server to target")
 
 }
 
@@ -69,10 +70,9 @@ func initConfig() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	viper.AddConfigPath(home)
-	viper.AddConfigPath(".")
 	viper.SetConfigName(".cs-cli")
 	viper.SetConfigType("yaml")
+	viper.AddConfigPath(home)
 
 	// Bind ENV variables
 	viper.SetEnvPrefix("cs")
@@ -91,25 +91,27 @@ func initConfig() {
 		}
 	} else {
 		if err := viper.ReadInConfig(); err != nil {
-			log.Fatalln("Fatal error config file:", err)
+			log.Println(err)
+			viper.SetConfigType("yaml")
+			viper.WriteConfigAs(filepath.Join(home, ".cs-cli"))
+			viper.ReadInConfig()
 		}
 		currentTargetName = viper.GetString("currentTargetName")
-		if err := viper.ReadInConfig(); err != nil {
-			log.Fatalln("Unable to load configuration:", err)
-		}
-		log.Println("Using config file:", viper.ConfigFileUsed())
-		log.Println("Using config name:", currentTargetName)
-		configuration := viper.Sub("target." + currentTargetName)
-		if configuration == nil { // Sub returns nil if the key cannot be found
-			log.Fatalln("Target configuration not found")
-		}
-		targetConfig = config{
-			server:      sanitize.URL(configuration.GetString("server")),
-			username:    configuration.GetString("username"),
-			password:    configuration.GetString("password"),
-			domain:      configuration.GetString("domain"),
-			apitoken:    configuration.GetString("apitoken"),
-			accesstoken: configuration.GetString("accesstoken"),
+		if currentTargetName != "" {
+			log.Println("Using config file:", viper.ConfigFileUsed())
+			log.Println("Using config name:", currentTargetName)
+			configuration := viper.Sub("target." + currentTargetName)
+			if configuration == nil { // Sub returns nil if the key cannot be found
+				log.Fatalln("Target configuration not found")
+			}
+			targetConfig = config{
+				server:      sanitize.URL(configuration.GetString("server")),
+				username:    configuration.GetString("username"),
+				password:    configuration.GetString("password"),
+				domain:      configuration.GetString("domain"),
+				apitoken:    configuration.GetString("apitoken"),
+				accesstoken: configuration.GetString("accesstoken"),
+			}
 		}
 	}
 }
