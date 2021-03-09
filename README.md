@@ -16,6 +16,28 @@ Currently implemented commands:
 * [Endpoints](#Working-with-Endpoints)
 * [Custom Integrations](#Working-with-Custom-Integrations)
 
+## Installation
+
+There are a few ways you can run `cs-cli` - download a pre-compiled binary (easy), run the Docker container image (easier), or build from Go source (hardest).
+
+### Install the pre-compiled binary
+1) Download the gzipped tar package from the [releases](https://gitlab.eng.vmware.com/smcgeown/cs-cli/-/releases) page.
+2) Extract the cs-cli binary, license and readme files
+3) Move the cs-cli binary into the PATH for your OS
+
+### Run the Docker image
+1) Export environment variables (see below) for your repository
+2) Pull the image `docker pull sammcgeown/cs-cli`
+3) Run the container passing the environment variables to the image
+`docker run -e CS_SERVER="$CS_SERVER" -e CS_USERNAME="$CS_USERNAME" -e CS_PASSWORD="$CS_PASSWORD" -e CS_DOMAIN="$CS_DOMAIN" sammcgeown/cs-cli get variable`
+
+
+### Build from source
+1) Clone the respository
+2) Download the repository
+3) Run `go install cs-cli` from the respository root
+
+
 ## Configuration
 
 The configuration file stores the targets (vRA servers and credentials) that the CLI will use. By default cs-cli will use `$HOME/.cs-cli.yaml` as the config file. You can override this using the `--config` flag. The configuration file should be secured using file-level permissions to protect your credentials. 
