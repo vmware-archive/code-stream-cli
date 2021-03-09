@@ -3,16 +3,18 @@ before:
     - go mod download
   
 release:
-  gitlab:
-    owner: smcgeown
+  # gitlab:
+  #   owner: smcgeown
+  #   name: cs-cli
+  github:
+    owner: sammcgeown
     name: cs-cli
-  
 
-gitlab_urls:
-  api: https://gitlab.eng.vmware.com/api/v4
-  download: https://gitlab.eng.vmware.com/
-  # set to true if you use a self-signed certificate
-  skip_tls_verify: false
+# gitlab_urls:
+#   api: https://gitlab.eng.vmware.com/api/v4
+#   download: https://gitlab.eng.vmware.com/
+#   # set to true if you use a self-signed certificate
+#   skip_tls_verify: false
 
 builds:
   - id: cs-cli
@@ -87,6 +89,18 @@ docker_manifests:
     - sammcgeown/cs-cli:latest-amd64
     - sammcgeown/cs-cli:latest-armv7
     - sammcgeown/cs-cli:latest-arm64v8
+
+brews:
+  -
+    name: cs-cli
+    tap:
+      owner: sammcgeown
+      name: homebrew-cs-cli
+      token:  "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    commit_author:
+      name: sammcgeown
+      email: smcgeown@vmware.com
+    license: "BSD-2"
 
 archives:
   - replacements:
