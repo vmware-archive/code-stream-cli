@@ -60,7 +60,6 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cs-cli.yaml)")
-	//rootCmd.PersistentFlags().StringVar(&targetConfig.server, "server", "", "vRealize Automation Server to target")
 
 }
 
@@ -79,7 +78,7 @@ func initConfig() {
 	viper.AutomaticEnv()
 
 	// If we're using ENV variables
-	if viper.Get("server") != nil {
+	if viper.Get("server") != nil { // CS_SERVER environment variable is set
 		log.Println("Using ENV variables")
 		targetConfig = config{
 			server:      sanitize.URL(viper.GetString("server")),
@@ -90,16 +89,26 @@ func initConfig() {
 			accesstoken: viper.GetString("accesstoken"),
 		}
 	} else {
+		if cfgFile != "" { // If the user has specified a config file
+			if file, err := os.Stat(cfgFile); err == nil { // Check if it exists
+				viper.SetConfigFile(file.Name())
+			} else {
+				log.Fatalln("File specified with --config does not exist")
+			}
+		}
+		// Attempt to read the configuration file
 		if err := viper.ReadInConfig(); err != nil {
-			log.Println(err)
-			viper.SetConfigType("yaml")
-			viper.WriteConfigAs(filepath.Join(home, ".cs-cli"))
-			viper.ReadInConfig()
+			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+				viper.SetConfigType("yaml")
+				viper.WriteConfigAs(filepath.Join(home, ".cs-cli"))
+				viper.ReadInConfig()
+			} else {
+				log.Fatalln(err)
+			}
 		}
 		currentTargetName = viper.GetString("currentTargetName")
 		if currentTargetName != "" {
-			log.Println("Using config file:", viper.ConfigFileUsed())
-			log.Println("Using config name:", currentTargetName)
+			log.Println("Using config:", viper.ConfigFileUsed(), "Target:", currentTargetName)
 			configuration := viper.Sub("target." + currentTargetName)
 			if configuration == nil { // Sub returns nil if the key cannot be found
 				log.Fatalln("Target configuration not found")
