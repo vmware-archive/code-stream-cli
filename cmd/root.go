@@ -16,6 +16,10 @@ var (
 	cfgFile           string
 	currentTargetName string
 	targetConfig      config
+	version           = "dev"
+	commit            = "none"
+	date              = "unknown"
+	builtBy           = "unknown"
 	// Flags
 	id          string
 	name        string

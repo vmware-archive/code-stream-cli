@@ -32,7 +32,9 @@ builds:
       - arm64
     goarm:
       - 7
-
+    # Default is `-s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}} -X main.builtBy=goreleaser`.
+    ldflags:
+     - -s -w -X cs-cli/cmd.version={{.Version}} -X cs-cli/cmd.commit={{.Commit}} -X cs-cli/cmd.date={{.Date}} -X cs-cli/cmd.builtBy=goreleaser
 dockers:
   -
     goos: linux

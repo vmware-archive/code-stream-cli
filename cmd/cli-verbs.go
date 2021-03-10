@@ -16,6 +16,8 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -89,11 +91,25 @@ to quickly create a Cobra application.`,
 	Run:  func(cmd *cobra.Command, args []string) {},
 }
 
+// versionCmd represents the version command
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Print the current version information",
+	Long:  `Print the current version information`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("*** cs-cli ***")
+		fmt.Println("Build version :", version)
+		fmt.Println("Build date    :", date)
+		fmt.Println("Build commit  :", commit)
+		fmt.Println("Built by      :", builtBy)
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(getCmd)
 	rootCmd.AddCommand(updateCmd)
 	rootCmd.AddCommand(createCmd)
 	rootCmd.AddCommand(deleteCmd)
 	rootCmd.AddCommand(configCmd)
-
+	rootCmd.AddCommand(versionCmd)
 }
