@@ -24,7 +24,10 @@ var getPipelineCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Long:  `A longer description that spans multiple lines`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureTargetConnection()
+		if err := ensureTargetConnection(); err != nil {
+			log.Fatalln(err)
+		}
+
 		response, err := getPipelines(id, name, project, export, exportPath)
 		if err != nil {
 			log.Println("Unable to get Code Stream Pipelines: ", err)
@@ -79,7 +82,10 @@ var updatePipelineCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureTargetConnection()
+		if err := ensureTargetConnection(); err != nil {
+			log.Fatalln(err)
+		}
+
 		if state != "" {
 			response, err := patchPipeline(id, `{"state":"`+state+`"}`)
 			if err != nil {
@@ -111,7 +117,10 @@ var createPipelineCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureTargetConnection()
+		if err := ensureTargetConnection(); err != nil {
+			log.Fatalln(err)
+		}
+
 		if importPath != "" {
 			err := importYaml(importPath, "create")
 			if err != nil {
@@ -130,7 +139,9 @@ var deletePipelineCmd = &cobra.Command{
 	
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureTargetConnection()
+		if err := ensureTargetConnection(); err != nil {
+			log.Fatalln(err)
+		}
 
 		response, err := deletePipeline(id)
 		if err != nil {

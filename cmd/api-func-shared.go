@@ -6,13 +6,11 @@ import (
 	"os"
 	"path/filepath"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/viper"
 )
 
-func ensureTargetConnection() {
+func ensureTargetConnection() error {
 	// If the targetConfig.accesstoken is not set or testAccesToken returns false
 	if targetConfig.accesstoken == "" || testAccessToken() == false {
 		var authError error
@@ -23,13 +21,14 @@ func ensureTargetConnection() {
 			targetConfig.accesstoken, authError = authenticateOnPrem(targetConfig)
 		}
 		if authError != nil {
-			log.Fatalln("Authentication failed", authError.Error())
+			return authError
 		}
 		if viper.ConfigFileUsed() != "" {
 			viper.Set("target."+currentTargetName+".accesstoken", targetConfig.accesstoken)
 			viper.WriteConfig()
 		}
 	}
+	return nil
 }
 
 func authenticateOnPrem(target config) (string, error) {
@@ -67,7 +66,6 @@ func testAccessToken() bool {
 		return false
 	}
 	if queryResponse.StatusCode() == 401 {
-		//log.Println("Token authentication failed: ", queryResponse.StatusCode())
 		return false
 	}
 	return true
@@ -101,7 +99,7 @@ func importYaml(yamlPath, action string) error {
 	qParams["action"] = action
 	yamlBytes, err := ioutil.ReadFile(yamlPath)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	yamlPayload := string(yamlBytes)
 	client := resty.New()

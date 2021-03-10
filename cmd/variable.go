@@ -23,7 +23,10 @@ Get by Name
 Get by Project
 	cs-cli get variable --project production`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureTargetConnection()
+		if err := ensureTargetConnection(); err != nil {
+			log.Fatalln(err)
+		}
+
 		response, err := getVariable(id, name, project)
 		if err != nil {
 			log.Println("Unable to get Code Stream Variables: ", err)
@@ -59,7 +62,9 @@ var createVariableCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureTargetConnection()
+		if err := ensureTargetConnection(); err != nil {
+			log.Fatalln(err)
+		}
 
 		if importFile != "" { // If we are importing a file
 			variables := importVariables(importFile)
@@ -90,7 +95,10 @@ var updateVariableCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureTargetConnection()
+		if err := ensureTargetConnection(); err != nil {
+			log.Fatalln(err)
+		}
+
 		if importFile != "" { // If we are importing a file
 			variables := importVariables(importFile)
 			for _, value := range variables {
@@ -127,7 +135,9 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureTargetConnection()
+		if err := ensureTargetConnection(); err != nil {
+			log.Fatalln(err)
+		}
 
 		response, err := deleteVariable(id)
 		if err != nil {

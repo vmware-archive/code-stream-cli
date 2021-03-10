@@ -15,7 +15,9 @@ var getEndpointCmd = &cobra.Command{
 	Short: "Get Code Stream Endpoint Configurations",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureTargetConnection()
+		if err := ensureTargetConnection(); err != nil {
+			log.Fatalln(err)
+		}
 
 		response, err := getEndpoint(id, name, project, typename, export, exportPath)
 		if err != nil {
@@ -53,7 +55,10 @@ var createEndpointCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureTargetConnection()
+		if err := ensureTargetConnection(); err != nil {
+			log.Fatalln(err)
+		}
+
 		if importPath != "" {
 			err := importYaml(importPath, "create")
 			if err != nil {
@@ -74,7 +79,10 @@ var updateEndpointCmd = &cobra.Command{
 	cs-cli update endpoint --importPath "/Users/sammcgeown/Desktop/updated-endpoint.yaml"
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureTargetConnection()
+		if err := ensureTargetConnection(); err != nil {
+			log.Fatalln(err)
+		}
+
 		if importPath != "" {
 			err := importYaml(importPath, "update")
 			if err != nil {
@@ -93,7 +101,9 @@ var deleteEndpointCmd = &cobra.Command{
 	
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureTargetConnection()
+		if err := ensureTargetConnection(); err != nil {
+			log.Fatalln(err)
+		}
 
 		response, err := deleteEndpoint(id)
 		if err != nil {

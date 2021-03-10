@@ -24,7 +24,9 @@ Get by Name
 Get by Project
 	cs-cli get customintegration --project production`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ensureTargetConnection()
+		if err := ensureTargetConnection(); err != nil {
+			log.Fatalln(err)
+		}
 		response, err := getCustomIntegration(id, name)
 		if err != nil {
 			log.Println("Unable to get Code Stream CustomIntegrations: ", err)
@@ -60,7 +62,9 @@ Get by Project
 // 	Short: "A brief description of your command",
 // 	Long:  ``,
 // 	Run: func(cmd *cobra.Command, args []string) {
-// 		ensureTargetConnection()
+// 				if err := ensureTargetConnection(); err != nil {
+// 	log.Fatalln(err)
+// }
 
 // 		if importFile != "" { // If we are importing a file
 // 			customintegrations := importCustomIntegrations(importFile)
@@ -91,7 +95,10 @@ Get by Project
 // 	Short: "A brief description of your command",
 // 	Long:  ``,
 // 	Run: func(cmd *cobra.Command, args []string) {
-// 		ensureTargetConnection()
+// 				if err := ensureTargetConnection(); err != nil {
+// 	log.Fatalln(err)
+// }
+
 // 		if importFile != "" { // If we are importing a file
 // 			customintegrations := importCustomIntegrations(importFile)
 // 			for _, value := range customintegrations {
@@ -128,7 +135,9 @@ Get by Project
 // This application is a tool to generate the needed files
 // to quickly create a Cobra application.`,
 // 	Run: func(cmd *cobra.Command, args []string) {
-// 		ensureTargetConnection()
+// 				if err := ensureTargetConnection(); err != nil {
+// 	log.Fatalln(err)
+// }
 
 // 		response, err := deleteCustomIntegration(id)
 // 		if err != nil {

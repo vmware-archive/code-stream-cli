@@ -5,8 +5,6 @@ import (
 	"strconv"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/go-resty/resty/v2"
 	"github.com/mitchellh/mapstructure"
 )
@@ -16,7 +14,7 @@ func getExecutions(id string, status string, name string, nested bool) ([]*Codes
 	if id != "" {
 		x, err := getExecution("/codestream/api/executions/" + id)
 		if err != nil {
-			log.Println("Error: ", err.Error())
+			return nil, err
 		}
 		arrExecutions = append(arrExecutions, x)
 		return arrExecutions, err
@@ -102,7 +100,6 @@ func createExecution(id string, inputs string, comment string) (*CodeStreamCreat
 		SetResult(&CodeStreamCreateExecutionResponse{}).
 		SetAuthToken(targetConfig.accesstoken).
 		Post("https://" + targetConfig.server + "/pipeline/api/pipelines/" + id + "/executions")
-	log.Println(queryResponse.StatusCode())
 	if queryResponse.IsError() {
 		return nil, queryResponse.Error().(error)
 	}
