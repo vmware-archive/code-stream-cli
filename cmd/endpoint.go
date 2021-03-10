@@ -12,8 +12,8 @@ import (
 // getEndpointCmd represents the endpoint command
 var getEndpointCmd = &cobra.Command{
 	Use:   "endpoint",
-	Short: "Get Code Stream Endpoint Configurations",
-	Long:  ``,
+	Short: "Get Endpoint Configurations",
+	Long:  `Get Code Stream Endpoint Configurations`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := ensureTargetConnection(); err != nil {
 			log.Fatalln(err)

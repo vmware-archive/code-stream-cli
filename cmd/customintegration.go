@@ -12,8 +12,8 @@ import (
 // getCustomIntegrationCmd represents the customintegration command
 var getCustomIntegrationCmd = &cobra.Command{
 	Use:   "customintegration",
-	Short: "Get vRealize Code Stream Custom Integrations",
-	Long: `Get vRealize Code Stream Custom Integrations by name, project or by id - e.g:
+	Short: "Get Custom Integrations",
+	Long: `Get Code Stream Custom Integrations by name, project or by id - e.g:
 
 Get by ID
 	cs-cli get customintegration --id 6b7936d3-a19d-4298-897a-65e9dc6620c8

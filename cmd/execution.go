@@ -18,8 +18,8 @@ var inputPath string
 // getExecutionCmd represents the executions command
 var getExecutionCmd = &cobra.Command{
 	Use:   "execution",
-	Short: "Get executions of Code Stream Pipelines",
-	Long: `List executions of Code Stream Pipelines by ID, Pipeline name, Project and Status
+	Short: "Get Pipeline Executions",
+	Long: `Get Code Stream Pipeline Executions by ID, Pipeline name, Project and Status
 	Get only failed executions:
 	  cs-cli get execution --status FAILED
 	Get an execution by ID:
@@ -56,8 +56,8 @@ var getExecutionCmd = &cobra.Command{
 // delExecutionCmd represents the executions command
 var delExecutionCmd = &cobra.Command{
 	Use:   "execution",
-	Short: "Delete an execution",
-	Long: `Delete an execution with a specific execution ID
+	Short: "Delete an Execution",
+	Long: `Delete an Execution with a specific Execution ID
 	
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -77,8 +77,8 @@ var delExecutionCmd = &cobra.Command{
 // createExecutionCmd represents the executions command
 var createExecutionCmd = &cobra.Command{
 	Use:   "execution",
-	Short: "Create an execution",
-	Long: `Create an execution with a specific pipeline ID and form payload.
+	Short: "Create an Execution",
+	Long: `Create an Execution with a specific pipeline ID and form payload.
 	
 	`,
 	Run: func(cmd *cobra.Command, args []string) {

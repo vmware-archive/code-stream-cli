@@ -21,8 +21,16 @@ var form bool
 // getPipelineCmd represents the pipeline command
 var getPipelineCmd = &cobra.Command{
 	Use:   "pipeline",
-	Short: "A brief description of your command",
-	Long:  `A longer description that spans multiple lines`,
+	Short: "Get Pipelines",
+	Long: `Get Code Stream Pipelines by ID, name or status
+# List all executions
+cs-cli get execution
+# View an execution by ID
+cs-cli get execution --id 9cc5aedc-db48-4c02-a5e4-086de3160dc0
+# View executions of a specific pipeline
+get execution --name vra-authenticateUser
+# View executions by status
+cs-cli get execution --status Failed`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := ensureTargetConnection(); err != nil {
 			log.Fatalln(err)
@@ -60,8 +68,8 @@ var getPipelineCmd = &cobra.Command{
 // updatePipelineCmd represents the pipeline update command
 var updatePipelineCmd = &cobra.Command{
 	Use:   "pipeline",
-	Short: "Update a pipeline",
-	Long: `A longer description that spans multiple lines
+	Short: "Update a Pipeline",
+	Long: `Update a Pipeline
 	Enable/Disable/Release:
 	cs-cli update pipeline --id d0185f04-2e87-4f3c-b6d7-ee58abba3e92 --state enabled/disabled/released
 	Update from YAML
@@ -107,8 +115,8 @@ var updatePipelineCmd = &cobra.Command{
 // createPipelineCmd represents the pipeline create command
 var createPipelineCmd = &cobra.Command{
 	Use:   "pipeline",
-	Short: "Create a pipeline",
-	Long: `Create a pipeline by importing a YAML specification.
+	Short: "Create a Pipeline",
+	Long: `Create a Pipeline by importing a YAML specification.
 	
 	Create from YAML
 	  cs-cli create pipeline --importPath "/Users/sammcgeown/Desktop/pipelines/SSH Exports.yaml"

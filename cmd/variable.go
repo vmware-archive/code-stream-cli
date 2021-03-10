@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"log"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
@@ -11,8 +12,8 @@ import (
 // getVariableCmd represents the variable command
 var getVariableCmd = &cobra.Command{
 	Use:   "variable",
-	Short: "Get vRealize Code Stream Variables",
-	Long: `Get vRealize Code Stream Variables by name, project or by id - e.g:
+	Short: "Get Variables",
+	Long: `Get Code Stream Variables by name, project or by id - e.g:
 
 Get by ID
 	cs-cli get variable --id 6b7936d3-a19d-4298-897a-65e9dc6620c8
@@ -29,12 +30,12 @@ Get by Project
 
 		response, err := getVariable(id, name, project)
 		if err != nil {
-			log.Println("Unable to get Code Stream Variables: ", err)
+			log.Fatalln("Unable to get Code Stream Variables: ", err)
 		}
 		var resultCount = len(response)
 		if resultCount == 0 {
 			// No results
-			log.Println("No results found")
+			log.Warnln("No results found")
 		} else if resultCount == 1 {
 			// Print the single result
 			if export {
@@ -59,8 +60,8 @@ Get by Project
 // getVariableCmd represents the variable command
 var createVariableCmd = &cobra.Command{
 	Use:   "variable",
-	Short: "A brief description of your command",
-	Long:  ``,
+	Short: "Create a Variable",
+	Long:  `Create a Variable`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := ensureTargetConnection(); err != nil {
 			log.Fatalln(err)
@@ -92,8 +93,8 @@ var createVariableCmd = &cobra.Command{
 // updateVariableCmd represents the variable command
 var updateVariableCmd = &cobra.Command{
 	Use:   "variable",
-	Short: "A brief description of your command",
-	Long:  ``,
+	Short: "Update a Variable",
+	Long:  `Update a Variable`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := ensureTargetConnection(); err != nil {
 			log.Fatalln(err)
@@ -127,13 +128,8 @@ var updateVariableCmd = &cobra.Command{
 // deleteVariableCmd represents the executions command
 var deleteVariableCmd = &cobra.Command{
 	Use:   "variable",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Delete a Variable",
+	Long:  `Delete a Variable.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := ensureTargetConnection(); err != nil {
 			log.Fatalln(err)
@@ -141,7 +137,7 @@ to quickly create a Cobra application.`,
 
 		response, err := deleteVariable(id)
 		if err != nil {
-			log.Println("Unable to delete variable: ", err)
+			log.Fatalln("Unable to delete variable: ", err)
 		}
 		log.Println("Variable with id " + response.ID + " deleted")
 	},
