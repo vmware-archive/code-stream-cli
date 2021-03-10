@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"errors"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/mitchellh/mapstructure"

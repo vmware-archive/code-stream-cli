@@ -3,9 +3,10 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"

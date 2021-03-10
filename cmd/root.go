@@ -1,9 +1,10 @@
 package cmd
 
 import (
-	"log"
 	"os"
 	"path/filepath"
+
+	log "github.com/sirupsen/logrus"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/mrz1836/go-sanitize"
@@ -20,7 +21,9 @@ var (
 	commit            = "none"
 	date              = "unknown"
 	builtBy           = "unknown"
-	// Flags
+	// Global Flags
+	debug bool
+	// Command Flags
 	id          string
 	name        string
 	project     string
@@ -62,13 +65,20 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cs-cli.yaml)")
-
+	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Enable debug logging")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	// Debug logging
+	if debug {
+		log.Println("Debug logging enabled")
+		log.SetLevel(log.DebugLevel)
+	} else {
+		log.SetLevel(log.WarnLevel)
+	}
+	// Home directory
 	home, err := homedir.Dir()
 	if err != nil {
 		log.Fatalln(err)

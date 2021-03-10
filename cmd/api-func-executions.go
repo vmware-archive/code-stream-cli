@@ -2,9 +2,10 @@ package cmd
 
 import (
 	"encoding/json"
-	"log"
 	"strconv"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/mitchellh/mapstructure"

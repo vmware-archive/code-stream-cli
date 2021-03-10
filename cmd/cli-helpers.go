@@ -2,9 +2,10 @@ package cmd
 
 import (
 	"encoding/json"
-	"log"
 	"os"
 	"reflect"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/olekukonko/tablewriter"
 )
