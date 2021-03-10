@@ -86,7 +86,7 @@ docker_manifests:
     - ghcr.io/sammcgeown/cs-cli:v{{ .Major }}.{{ .Minor }}-amd64
     - ghcr.io/sammcgeown/cs-cli:v{{ .Major }}.{{ .Minor }}-armv7
     - ghcr.io/sammcgeown/cs-cli:v{{ .Major }}.{{ .Minor }}-arm64v8
-  - name_template: sammcgeown/cs-cli:latest
+  - name_template: ghcr.io/sammcgeown/cs-cli:latest
     image_templates:
     - ghcr.io/sammcgeown/cs-cli:latest-amd64
     - ghcr.io/sammcgeown/cs-cli:latest-armv7
