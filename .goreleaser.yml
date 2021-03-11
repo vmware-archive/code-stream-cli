@@ -104,7 +104,10 @@ brews:
       name: sammcgeown
       email: smcgeown@vmware.com
     license: "BSD-2"
-
+    homepage: "https://github.com/vmware/code-stream-cli"
+    description: "Code Stream CLI is a command line tool written in Go to interact with the vRealize Automation Code Stream APIs"
+    install: |
+      bin.install "cs-cli"
 archives:
   - replacements:
       darwin: Darwin
