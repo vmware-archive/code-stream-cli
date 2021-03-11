@@ -1,7 +1,10 @@
 <img src="images/cs-cli-logo.png" alt="cs-cli logo" width="200px" />
 
 # Code Stream CLI (cs-cli)
-[![Go Report Card](https://goreportcard.com/badge/github.com/vmware/code-stream-cli)](https://goreportcard.com/report/github.com/vmware/code-stream-cli)
+
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/vmware/code-stream-cli/release) [![Go Report Card](https://goreportcard.com/badge/github.com/vmware/code-stream-cli)](https://goreportcard.com/report/github.com/vmware/code-stream-cli) ![GitHub issues](https://img.shields.io/github/issues/vmware/code-stream-cli)
+
+
 The Code Stream CLI is a command line tool written in Go to interact with the vRealize Automation Code Stream APIs. It is written to help automate Code Stream and provide a simple way to migrate content between Code Stream instances and projects.
 * Import and Export Code Stream artefacts such as Pipelines, Variables, Endpoints
 * Perform CRUD operations on Code Stream artefacts such as Pipelines, Variables, Endpoints
