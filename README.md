@@ -32,9 +32,9 @@ MacOs and Linux users can install using homebrew
 
 ### Run the Docker image
 1) Export environment variables (see below) for your repository
-2) Pull the image `docker pull ghcr.io/vmware/code-stream-cli`
+2) Pull the image `docker pull sammcgeown/cs-cli`
 3) Run the container passing the environment variables to the image
-`docker run -e CS_SERVER="$CS_SERVER" -e CS_USERNAME="$CS_USERNAME" -e CS_PASSWORD="$CS_PASSWORD" -e CS_DOMAIN="$CS_DOMAIN" ghcr.io/vmware/code-stream-cli get variable`
+`docker run -e CS_SERVER="$CS_SERVER" -e CS_USERNAME="$CS_USERNAME" -e CS_PASSWORD="$CS_PASSWORD" -e CS_DOMAIN="$CS_DOMAIN" sammcgeown/cs-cli get variable`
 
 
 ### Build from source
