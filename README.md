@@ -18,18 +18,23 @@ Currently implemented commands:
 
 ## Installation
 
-There are a few ways you can run `cs-cli` - download a pre-compiled binary (easy), run the Docker container image (easier), or build from Go source (hardest).
+There are a few ways you can run `cs-cli` - install with [homebrew](https://brew.sh), download a pre-compiled binary, run the Docker container image, or build from Go source.
+
+### Install using homebrew
+MacOs and Linux users can install using homebrew
+1) `brew tap sammcgeown/cs-cli`
+2) `brew install cs-cli`
 
 ### Install the pre-compiled binary
-1) Download the gzipped tar package from the [releases](https://gitlab.eng.vmware.com/smcgeown/cs-cli/-/releases) page.
+1) Download the gzipped tar package from the [releases](https://github.com/vmware/code-stream-cli/releases/) page.
 2) Extract the cs-cli binary, license and readme files
 3) Move the cs-cli binary into the PATH for your OS
 
 ### Run the Docker image
 1) Export environment variables (see below) for your repository
-2) Pull the image `docker pull ghcr.io/sammcgeown/cs-cli`
+2) Pull the image `docker pull ghcr.io/vmware/code-stream-cli`
 3) Run the container passing the environment variables to the image
-`docker run -e CS_SERVER="$CS_SERVER" -e CS_USERNAME="$CS_USERNAME" -e CS_PASSWORD="$CS_PASSWORD" -e CS_DOMAIN="$CS_DOMAIN" ghcr.io/sammcgeown/cs-cli get variable`
+`docker run -e CS_SERVER="$CS_SERVER" -e CS_USERNAME="$CS_USERNAME" -e CS_PASSWORD="$CS_PASSWORD" -e CS_DOMAIN="$CS_DOMAIN" ghcr.io/vmware/code-stream-cli get variable`
 
 
 ### Build from source
