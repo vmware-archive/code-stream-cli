@@ -27,9 +27,9 @@ There are a few ways you can run `cs-cli` - download a pre-compiled binary (easy
 
 ### Run the Docker image
 1) Export environment variables (see below) for your repository
-2) Pull the image `docker pull sammcgeown/cs-cli`
+2) Pull the image `docker pull ghcr.io/sammcgeown/cs-cli`
 3) Run the container passing the environment variables to the image
-`docker run -e CS_SERVER="$CS_SERVER" -e CS_USERNAME="$CS_USERNAME" -e CS_PASSWORD="$CS_PASSWORD" -e CS_DOMAIN="$CS_DOMAIN" sammcgeown/cs-cli get variable`
+`docker run -e CS_SERVER="$CS_SERVER" -e CS_USERNAME="$CS_USERNAME" -e CS_PASSWORD="$CS_PASSWORD" -e CS_DOMAIN="$CS_DOMAIN" ghcr.io/sammcgeown/cs-cli get variable`
 
 
 ### Build from source
