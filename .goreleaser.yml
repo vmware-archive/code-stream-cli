@@ -35,62 +35,63 @@ builds:
     # Default is `-s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}} -X main.builtBy=goreleaser`.
     ldflags:
      - -s -w -X cs-cli/cmd.version={{.Version}} -X cs-cli/cmd.commit={{.Commit}} -X cs-cli/cmd.date={{.Date}} -X cs-cli/cmd.builtBy=goreleaser
-dockers:
-  -
-    goos: linux
-    goarch: amd64
-    dockerfile: Dockerfile
-    build_flag_templates:
-    - "--platform=linux/amd64"
-    - "--label=org.opencontainers.image.created={{.Date}}"
-    - "--label=org.opencontainers.image.title={{.ProjectName}}"
-    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-    - "--label=org.opencontainers.image.version={{.Version}}"
-    image_templates:
-    - "ghcr.io/vmware/code-stream-cli:latest-amd64"
-    - "ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}-amd64"
-    use_buildx: true
-  -
-    goos: linux
-    goarch: arm64
-    dockerfile: Dockerfile
-    build_flag_templates:
-    - "--platform=linux/arm64/v8"
-    - "--label=org.opencontainers.image.created={{.Date}}"
-    - "--label=org.opencontainers.image.title={{.ProjectName}}"
-    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-    - "--label=org.opencontainers.image.version={{.Version}}"
-    image_templates:
-    - "ghcr.io/vmware/code-stream-cli:latest-arm64v8"
-    - "ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}-arm64v8"
-    use_buildx: true
-  -
-    goos: linux
-    goarch: arm
-    goarm: 7
-    dockerfile: Dockerfile
-    build_flag_templates:
-    - "--platform=linux/arm/v7"
-    - "--label=org.opencontainers.image.created={{.Date}}"
-    - "--label=org.opencontainers.image.title={{.ProjectName}}"
-    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-    - "--label=org.opencontainers.image.version={{.Version}}"
-    image_templates:
-    - "ghcr.io/vmware/code-stream-cli:latest-armv7"
-    - "ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}-armv7"
-    use_buildx: true
 
-docker_manifests:
-  - name_template: ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}
-    image_templates:
-    - ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}-amd64
-    - ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}-armv7
-    - ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}-arm64v8
-  - name_template: ghcr.io/vmware/code-stream-cli:latest
-    image_templates:
-    - ghcr.io/vmware/code-stream-cli:latest-amd64
-    - ghcr.io/vmware/code-stream-cli:latest-armv7
-    - ghcr.io/vmware/code-stream-cli:latest-arm64v8
+# dockers:
+#   -
+#     goos: linux
+#     goarch: amd64
+#     dockerfile: Dockerfile
+#     build_flag_templates:
+#     - "--platform=linux/amd64"
+#     - "--label=org.opencontainers.image.created={{.Date}}"
+#     - "--label=org.opencontainers.image.title={{.ProjectName}}"
+#     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+#     - "--label=org.opencontainers.image.version={{.Version}}"
+#     image_templates:
+#     - "ghcr.io/vmware/code-stream-cli:latest-amd64"
+#     - "ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}-amd64"
+#     use_buildx: true
+#   -
+#     goos: linux
+#     goarch: arm64
+#     dockerfile: Dockerfile
+#     build_flag_templates:
+#     - "--platform=linux/arm64/v8"
+#     - "--label=org.opencontainers.image.created={{.Date}}"
+#     - "--label=org.opencontainers.image.title={{.ProjectName}}"
+#     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+#     - "--label=org.opencontainers.image.version={{.Version}}"
+#     image_templates:
+#     - "ghcr.io/vmware/code-stream-cli:latest-arm64v8"
+#     - "ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}-arm64v8"
+#     use_buildx: true
+#   -
+#     goos: linux
+#     goarch: arm
+#     goarm: 7
+#     dockerfile: Dockerfile
+#     build_flag_templates:
+#     - "--platform=linux/arm/v7"
+#     - "--label=org.opencontainers.image.created={{.Date}}"
+#     - "--label=org.opencontainers.image.title={{.ProjectName}}"
+#     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+#     - "--label=org.opencontainers.image.version={{.Version}}"
+#     image_templates:
+#     - "ghcr.io/vmware/code-stream-cli:latest-armv7"
+#     - "ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}-armv7"
+#     use_buildx: true
+
+# docker_manifests:
+#   - name_template: ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}
+#     image_templates:
+#     - ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}-amd64
+#     - ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}-armv7
+#     - ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}-arm64v8
+#   - name_template: ghcr.io/vmware/code-stream-cli:latest
+#     image_templates:
+#     - ghcr.io/vmware/code-stream-cli:latest-amd64
+#     - ghcr.io/vmware/code-stream-cli:latest-armv7
+#     - ghcr.io/vmware/code-stream-cli:latest-arm64v8
 
 brews:
   -
