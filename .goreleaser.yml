@@ -34,7 +34,7 @@ builds:
       - 7
     # Default is `-s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}} -X main.builtBy=goreleaser`.
     ldflags:
-     - -s -w -X cs-cli/cmd.version={{.Version}} -X cs-cli/cmd.commit={{.Commit}} -X cs-cli/cmd.date={{.Date}} -X cs-cli/cmd.builtBy=goreleaser
+      - -s -w -X cs-cli/cmd.version={{.Version}} -X cs-cli/cmd.commit={{.Commit}} -X cs-cli/cmd.date={{.Date}} -X cs-cli/cmd.builtBy=goreleaser
 
 dockers:
   -
@@ -48,8 +48,8 @@ dockers:
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
     - "--label=org.opencontainers.image.version={{.Version}}"
     image_templates:
-    - "ghcr.io/vmware/code-stream-cli:latest-amd64"
-    - "ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}-amd64"
+    - "sammcgeown/cs-cli:latest-amd64"
+    - "sammcgeown/cs-cli:v{{ .Major }}.{{ .Minor }}-amd64"
     use_buildx: true
   -
     goos: linux
@@ -62,8 +62,8 @@ dockers:
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
     - "--label=org.opencontainers.image.version={{.Version}}"
     image_templates:
-    - "ghcr.io/vmware/code-stream-cli:latest-arm64v8"
-    - "ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}-arm64v8"
+    - "sammcgeown/cs-cli:latest-arm64v8"
+    - "sammcgeown/cs-cli:v{{ .Major }}.{{ .Minor }}-arm64v8"
     use_buildx: true
   -
     goos: linux
@@ -77,21 +77,21 @@ dockers:
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
     - "--label=org.opencontainers.image.version={{.Version}}"
     image_templates:
-    - "ghcr.io/vmware/code-stream-cli:latest-armv7"
-    - "ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}-armv7"
+    - "sammcgeown/cs-cli:latest-armv7"
+    - "sammcgeown/cs-cli:v{{ .Major }}.{{ .Minor }}-armv7"
     use_buildx: true
 
 docker_manifests:
-  - name_template: ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}
+  - name_template: sammcgeown/cs-cli:v{{ .Major }}.{{ .Minor }}
     image_templates:
-    - ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}-amd64
-    - ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}-armv7
-    - ghcr.io/vmware/code-stream-cli:v{{ .Major }}.{{ .Minor }}-arm64v8
-  - name_template: ghcr.io/vmware/code-stream-cli:latest
+    - sammcgeown/cs-cli:v{{ .Major }}.{{ .Minor }}-amd64
+    - sammcgeown/cs-cli:v{{ .Major }}.{{ .Minor }}-armv7
+    - sammcgeown/cs-cli:v{{ .Major }}.{{ .Minor }}-arm64v8
+  - name_template: sammcgeown/cs-cli:latest
     image_templates:
-    - ghcr.io/vmware/code-stream-cli:latest-amd64
-    - ghcr.io/vmware/code-stream-cli:latest-armv7
-    - ghcr.io/vmware/code-stream-cli:latest-arm64v8
+    - sammcgeown/cs-cli:latest-amd64
+    - sammcgeown/cs-cli:latest-armv7
+    - sammcgeown/cs-cli:latest-arm64v8
 
 brews:
   -
