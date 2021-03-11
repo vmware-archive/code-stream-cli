@@ -97,7 +97,7 @@ func createExecution(id string, inputs string, comment string) (*CodeStreamCreat
 		return nil, err
 	}
 	client := resty.New()
-	queryResponse, err := client.R().
+	queryResponse, _ := client.R().
 		SetQueryParams(qParams).
 		SetHeader("Content-Type", "application/json").
 		SetBody(executionBytes).

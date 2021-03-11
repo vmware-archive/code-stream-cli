@@ -107,7 +107,7 @@ func importYaml(yamlPath, action string) error {
 	}
 	yamlPayload := string(yamlBytes)
 	client := resty.New()
-	queryResponse, err := client.R().
+	queryResponse, _ := client.R().
 		SetQueryParams(qParams).
 		SetHeader("Content-Type", "application/x-yaml").
 		SetBody(yamlPayload).
