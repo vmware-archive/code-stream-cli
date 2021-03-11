@@ -1,6 +1,6 @@
 # Contributing to code-stream-cli
 
-Welcome! We gladly accept contributions from the community. If you wish to contribute code and you have not signed our contributor license agreement (CLA), our bot will update the issue when you open a pull request. For any questions about the CLA process, please [refer to our FAQ](https://cla.vmware.com/faq).
+Welcome! The code-stream-cli project team welcomes contributions from the community. Before you start working with code-stream-cli, please read our Developer Certificate of Origin. All contributions to this repository must be signed as described on that page. Your signature certifies that you wrote the patch or have the right to pass it on as an open-source patch.
 
 # Logging Bugs
 

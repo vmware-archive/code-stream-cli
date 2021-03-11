@@ -1,4 +1,4 @@
-module cs-cli
+module github.com/vmware/code-stream-cli
 
 go 1.15
 
