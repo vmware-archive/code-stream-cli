@@ -48,24 +48,19 @@ cs-cli get execution --status Failed`,
 		if resultCount == 0 {
 			// No results
 			log.Println("No results found")
-		} else if resultCount == 1 {
-			if form {
-				// Get the input form
-				var inputs = response[0].Input
-				PrettyPrint(inputs)
-			} else {
-				// Print the single result
-				PrettyPrint(response[0])
-			}
-		} else {
-			// Print result table
-			table := tablewriter.NewWriter(os.Stdout)
-			table.SetHeader([]string{"Id", "Name", "Project"})
-			for _, c := range response {
-				table.Append([]string{c.ID, c.Name, c.Project})
-			}
-			table.Render()
 		}
+		if form {
+			// Get the input form
+			var inputs = response[0].Input
+			PrettyPrint(inputs)
+		}
+		// Print result table
+		table := tablewriter.NewWriter(os.Stdout)
+		table.SetHeader([]string{"Id", "Name", "Project"})
+		for _, c := range response {
+			table.Append([]string{c.ID, c.Name, c.Project})
+		}
+		table.Render()
 	},
 }
 

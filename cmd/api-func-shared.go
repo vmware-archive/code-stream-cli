@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 
 	"github.com/go-resty/resty/v2"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -65,6 +66,7 @@ func testAccessToken() bool {
 	queryResponse, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetAuthToken(targetConfig.accesstoken).
+		SetError(&CodeStreamException{}).
 		Get("https://" + targetConfig.server + "/iaas/api/projects")
 	if err != nil {
 		return false
@@ -77,6 +79,7 @@ func testAccessToken() bool {
 
 func exportYaml(name, project, path, object string) error {
 	var exportPath string
+	var qParams = make(map[string]string)
 	qParams[object] = name
 	qParams["project"] = project
 	if path != "" {
@@ -90,10 +93,12 @@ func exportYaml(name, project, path, object string) error {
 		SetHeader("Accept", "application/x-yaml;charset=UTF-8").
 		SetAuthToken(targetConfig.accesstoken).
 		SetOutput(filepath.Join(exportPath, name+".yaml")).
+		SetError(&CodeStreamException{}).
 		Get("https://" + targetConfig.server + "/pipeline/api/export")
+	log.Debugln(queryResponse.Request.RawRequest.URL)
 
 	if queryResponse.IsError() {
-		return queryResponse.Error().(error)
+		return errors.New(queryResponse.Status())
 	}
 	return nil
 }
@@ -112,6 +117,7 @@ func importYaml(yamlPath, action string) error {
 		SetHeader("Content-Type", "application/x-yaml").
 		SetBody(yamlPayload).
 		SetAuthToken(targetConfig.accesstoken).
+		SetError(&CodeStreamException{}).
 		Post("https://" + targetConfig.server + "/pipeline/api/import")
 	if queryResponse.IsError() {
 		return queryResponse.Error().(error)

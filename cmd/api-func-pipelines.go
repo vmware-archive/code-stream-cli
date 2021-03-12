@@ -5,15 +5,16 @@ SPDX-License-Identifier: BSD-2-Clause
 package cmd
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/mitchellh/mapstructure"
+	log "github.com/sirupsen/logrus"
 )
 
 func getPipelines(id string, name string, project string, export bool, exportPath string) ([]*CodeStreamPipeline, error) {
 	var arrResults []*CodeStreamPipeline
-	var qParams = make(map[string]string)
 	client := resty.New()
 
 	var filters []string
@@ -34,16 +35,24 @@ func getPipelines(id string, name string, project string, export bool, exportPat
 		SetHeader("Accept", "application/json").
 		SetResult(&documentsList{}).
 		SetAuthToken(targetConfig.accesstoken).
+		SetError(&CodeStreamException{}).
 		Get("https://" + targetConfig.server + "/pipeline/api/pipelines")
 
+	log.Debugln(queryResponse.Request.RawRequest.URL)
+	log.Debugln(queryResponse.String())
+
 	if queryResponse.IsError() {
-		return nil, queryResponse.Error().(error)
+		return nil, errors.New(queryResponse.Error().(*CodeStreamException).Message)
+
 	}
 	for _, value := range queryResponse.Result().(*documentsList).Documents {
+		log.Debugln(value)
 		c := CodeStreamPipeline{}
 		mapstructure.Decode(value, &c)
 		if export {
-			exportYaml(c.Name, c.Project, exportPath, "piplines")
+			if err := exportYaml(c.Name, c.Project, exportPath, "pipelines"); err != nil {
+				log.Warnln(err)
+			}
 			arrResults = append(arrResults, &c)
 		} else {
 			arrResults = append(arrResults, &c)
