@@ -5,7 +5,7 @@ SPDX-License-Identifier: BSD-2-Clause
 package cmd
 
 import (
-	"os"
+	"fmt"
 
 	log "github.com/sirupsen/logrus"
 
@@ -26,7 +26,7 @@ Examples:
 	Run: func(cmd *cobra.Command, args []string) {
 		var currentTargetName = viper.GetString("currentTargetName")
 		if currentTargetName != "" {
-			log.Println(currentTargetName)
+			fmt.Println(currentTargetName)
 		}
 	},
 }
@@ -44,12 +44,12 @@ Examples:
 	Run: func(cmd *cobra.Command, args []string) {
 		var target = viper.Get("target." + name)
 		if target == nil {
-			log.Println("Target not found! Current target is", viper.GetString("currentTargetName"))
+			log.Warningln("Target not found! Current target is", viper.GetString("currentTargetName"))
 			return
 		}
 		viper.Set("currentTargetName", name)
 		viper.WriteConfig()
-		log.Println("Current target: ", name)
+		fmt.Println("Current target: ", name)
 	},
 }
 
@@ -66,14 +66,14 @@ Examples:
 		if name != "" {
 			var target = viper.Get("target." + name)
 			if target == nil {
-				log.Println("Target not found.")
+				log.Warningln("Target not found.")
 			} else {
 				PrettyPrint(target)
 			}
 		} else {
 			var targets = viper.GetStringMapString("target")
 			for key := range targets {
-				log.Println(key)
+				fmt.Println(key)
 			}
 		}
 	},
@@ -108,11 +108,11 @@ Examples:
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		if viper.IsSet("target." + newTargetName) {
-			log.Println("Updating", newTargetName)
+			fmt.Println("Updating", newTargetName)
 		} else {
-			log.Println("Creating new target", newTargetName)
+			fmt.Println("Creating new target", newTargetName)
 		}
-		log.Println("Use `cs-cli config use-target --name " + newTargetName + "` to use this target")
+		fmt.Println("Use `cs-cli config use-target --name " + newTargetName + "` to use this target")
 		if newServer != "" {
 			viper.Set("target."+newTargetName+".server", newServer)
 		}
@@ -129,10 +129,10 @@ Examples:
 			viper.Set("target."+newTargetName+".apitoken", newAPIToken)
 		}
 		viper.SetConfigType("yaml")
-		if err := viper.SafeWriteConfig(); err != nil {
-			if os.IsNotExist(err) {
-				viper.WriteConfig()
-			}
+		err := viper.SafeWriteConfig()
+		if err != nil {
+			log.Info(err)
+			viper.WriteConfig()
 		}
 	},
 }
