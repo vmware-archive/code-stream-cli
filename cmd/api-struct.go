@@ -123,6 +123,7 @@ type CodeStreamPipeline struct {
 	Kind               string `json:"kind"`
 	ID                 string `json:"id"`
 	Name               string `json:"name"`
+	Description        string `json:"description"`
 	CreatedBy          string `json:"createdBy"`
 	UpdatedBy          string `json:"updatedBy"`
 	CreatedAt          string `json:"createdAt"`

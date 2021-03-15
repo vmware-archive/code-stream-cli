@@ -41,18 +41,18 @@ Get by Project
 			log.Println("No results found")
 		} else if resultCount == 1 {
 			// Print the single result
-			if export {
-				//exportCustomIntegration(response[0], exportFile)
-			}
+			//if export {
+			//exportCustomIntegration(response[0], exportFile)
+			//}
 			PrettyPrint(response[0])
 		} else {
 			// Print result table
 			table := tablewriter.NewWriter(os.Stdout)
 			table.SetHeader([]string{"Id", "Name", "Status", "Description"})
 			for _, c := range response {
-				if export {
+				//if export {
 					//exportCustomIntegration(c, exportFile)
-				}
+				//}
 				table.Append([]string{c.ID, c.Name, c.Status, c.Description})
 			}
 			table.Render()

@@ -20,7 +20,7 @@ var state string
 var exportPath string
 var importPath string
 var export bool
-var form bool
+var printForm bool
 
 // getPipelineCmd represents the pipeline command
 var getPipelineCmd = &cobra.Command{
@@ -47,20 +47,27 @@ cs-cli get execution --status Failed`,
 		var resultCount = len(response)
 		if resultCount == 0 {
 			// No results
-			log.Println("No results found")
+			log.Warnln("No results found")
 		}
-		if form {
+
+		if printJson {
+			for _, c := range response {
+				PrettyPrint(c)
+			}
+		} else if printForm {
 			// Get the input form
-			var inputs = response[0].Input
-			PrettyPrint(inputs)
+			for _, c := range response {
+				PrettyPrint(c.Input)
+			}
+		} else {
+			// Print result table
+			table := tablewriter.NewWriter(os.Stdout)
+			table.SetHeader([]string{"Id", "Name", "Project", "Description"})
+			for _, c := range response {
+				table.Append([]string{c.ID, c.Name, c.Project, c.Description})
+			}
+			table.Render()
 		}
-		// Print result table
-		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"Id", "Name", "Project"})
-		for _, c := range response {
-			table.Append([]string{c.ID, c.Name, c.Project})
-		}
-		table.Render()
 	},
 }
 
@@ -82,9 +89,6 @@ var updatePipelineCmd = &cobra.Command{
 				return nil
 			}
 			return errors.New("--state is not valid, must be ENABLED, DISABLED or RELEASED")
-		}
-		if export {
-
 		}
 		return nil
 	},
@@ -167,7 +171,8 @@ func init() {
 	getPipelineCmd.Flags().StringVarP(&project, "project", "p", "", "List pipeline in project")
 	getPipelineCmd.Flags().StringVarP(&exportPath, "exportPath", "", "", "Path to export objects - relative or absolute location")
 	getPipelineCmd.Flags().BoolVarP(&export, "export", "e", false, "Export pipeline")
-	getPipelineCmd.Flags().BoolVarP(&form, "form", "f", false, "Get pipeline inputs")
+	getPipelineCmd.Flags().BoolVarP(&printForm, "form", "f", false, "Return pipeline inputs form(s)")
+	getPipelineCmd.Flags().BoolVarP(&printJson, "json", "", false, "Return JSON formatted Pipeline(s)")
 
 	// Create
 	createCmd.AddCommand(createPipelineCmd)

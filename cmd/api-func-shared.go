@@ -18,7 +18,7 @@ import (
 
 func ensureTargetConnection() error {
 	// If the targetConfig.accesstoken is not set or testAccesToken returns false
-	if targetConfig.accesstoken == "" || testAccessToken() == false {
+	if targetConfig.accesstoken == "" || testAccessToken() {
 		var authError error
 		// Authenticate
 		if targetConfig.apitoken != "" {
@@ -125,7 +125,10 @@ func importYaml(yamlPath, action string) error {
 		return queryResponse.Error().(error)
 	}
 	var importResponse CodeStreamPipelineImportResponse
-	err = yaml.Unmarshal(queryResponse.Body(), &importResponse)
+	if err = yaml.Unmarshal(queryResponse.Body(), &importResponse); err != nil {
+		return err
+	}
+
 	if importResponse.Status != "CREATED" && action == "create" {
 		return errors.New(importResponse.Status + " - " + importResponse.StatusMessage)
 	}

@@ -37,6 +37,7 @@ var (
 	status      string
 	exportFile  string
 	importFile  string
+	printJson   bool
 )
 
 var qParams = map[string]string{
