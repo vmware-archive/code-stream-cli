@@ -13,6 +13,7 @@ import (
 	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
 
 func ensureTargetConnection() error {
@@ -119,8 +120,17 @@ func importYaml(yamlPath, action string) error {
 		SetAuthToken(targetConfig.accesstoken).
 		SetError(&CodeStreamException{}).
 		Post("https://" + targetConfig.server + "/pipeline/api/import")
+	log.Debugln(queryResponse.Request.RawRequest.URL)
 	if queryResponse.IsError() {
 		return queryResponse.Error().(error)
+	}
+	var importResponse CodeStreamPipelineImportResponse
+	err = yaml.Unmarshal(queryResponse.Body(), &importResponse)
+	if importResponse.Status != "CREATED" && action == "create" {
+		return errors.New(importResponse.Status + " - " + importResponse.StatusMessage)
+	}
+	if importResponse.Status != "UPDATED" && action == "apply" {
+		return errors.New(importResponse.Status + " - " + importResponse.StatusMessage)
 	}
 	return nil
 }

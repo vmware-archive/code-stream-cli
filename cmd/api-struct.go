@@ -231,3 +231,10 @@ type CodeStreamCustomIntegration struct {
 	Status             string `json:"status"`
 	Yaml               string `json:"yaml"`
 }
+
+// CodeStreamException - Generic exception struct
+type CodeStreamPipelineImportResponse struct {
+	Name          string `yaml:"name"`
+	Status        string `yaml:"status"`
+	StatusMessage string `yaml:"statusMessage"`
+}
