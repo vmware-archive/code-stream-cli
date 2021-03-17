@@ -6,8 +6,10 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
@@ -105,13 +107,40 @@ var updatePipelineCmd = &cobra.Command{
 			log.Println("Setting pipeline " + response.Name + " to " + state)
 		}
 
-		if importPath != "" {
+		// Read importPath
+		stat, err := os.Stat(importPath)
+		if err == nil && stat.IsDir() {
+			log.Debugln("importPath is a directory")
+			files, err := ioutil.ReadDir(importPath)
+			if err != nil {
+				log.Fatal(err)
+			}
+			for _, f := range files {
+				if strings.Contains(f.Name(), ".yaml") || strings.Contains(f.Name(), ".yml") {
+					filePath := filepath.Join(importPath, f.Name())
+					err := importYaml(filePath, "apply")
+					if err != nil {
+						log.Fatalln("Failed to import Pipeline", err)
+					}
+					fmt.Println("Imported", f.Name(), "successfully - Pipeline updated.")
+				}
+			}
+		} else {
+			log.Debugln("importPath is a file")
 			err := importYaml(importPath, "apply")
 			if err != nil {
-				log.Fatalln("Failed to update Pipeline", err)
+				log.Fatalln("Failed to import Pipeline", err)
 			}
-			log.Println("Imported successfully, pipeline updated.")
+			fmt.Println("Imported successfully, Pipeline updated.")
 		}
+
+		// if importPath != "" {
+		// 	err := importYaml(importPath, "apply")
+		// 	if err != nil {
+		// 		log.Fatalln("Failed to update Pipeline", err)
+		// 	}
+		// 	log.Println("Imported successfully, pipeline updated.")
+		// }
 	},
 }
 
@@ -141,20 +170,23 @@ var createPipelineCmd = &cobra.Command{
 			}
 			for _, f := range files {
 				if strings.Contains(f.Name(), ".yaml") || strings.Contains(f.Name(), ".yml") {
-					log.Println(f.Name())
+					filePath := filepath.Join(importPath, f.Name())
+					err := importYaml(filePath, "create")
+					if err != nil {
+						log.Fatalln("Failed to import Pipeline", err)
+					}
+					fmt.Println("Imported", f.Name(), "successfully - Pipeline created.")
 				}
 			}
 		} else {
 			log.Debugln("importPath is a file")
+			err := importYaml(importPath, "create")
+			if err != nil {
+				log.Fatalln("Failed to import Pipeline", err)
+			}
+			fmt.Println("Imported successfully, Pipeline created.")
 		}
 
-		// if importPath != "" {
-		// 	err := importYaml(importPath, "create")
-		// 	if err != nil {
-		// 		log.Fatalln("Failed to import Pipeline", err)
-		// 	}
-		// 	fmt.Println("Imported successfully, Pipeline created.")
-		// }
 	},
 }
 
