@@ -39,14 +39,13 @@ func getPipelines(id string, name string, project string, export bool, exportPat
 		Get("https://" + targetConfig.server + "/pipeline/api/pipelines")
 
 	log.Debugln(queryResponse.Request.RawRequest.URL)
-	log.Debugln(queryResponse.String())
+	// log.Debugln(queryResponse.String())
 
 	if queryResponse.IsError() {
 		return nil, errors.New(queryResponse.Error().(*CodeStreamException).Message)
 
 	}
 	for _, value := range queryResponse.Result().(*documentsList).Documents {
-		log.Debugln(value)
 		c := CodeStreamPipeline{}
 		mapstructure.Decode(value, &c)
 		if export {

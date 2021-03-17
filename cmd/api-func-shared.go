@@ -18,7 +18,7 @@ import (
 
 func ensureTargetConnection() error {
 	// If the targetConfig.accesstoken is not set or testAccesToken returns false
-	if targetConfig.accesstoken == "" || testAccessToken() {
+	if !testAccessToken() {
 		var authError error
 		// Authenticate
 		if targetConfig.apitoken != "" {
@@ -38,6 +38,7 @@ func ensureTargetConnection() error {
 }
 
 func authenticateOnPrem(target config) (string, error) {
+	log.Debugln("Authenticating vRA")
 	client := resty.New()
 	queryResponse, err := client.R().
 		SetBody(AuthenticationRequest{target.username, target.password, target.domain}).
@@ -50,6 +51,7 @@ func authenticateOnPrem(target config) (string, error) {
 	return queryResponse.Result().(*AuthenticationResponse).AccessToken, err
 }
 func authenticateCloud(target config) (string, error) {
+	log.Debugln("Authenticating vRA Cloud")
 	client := resty.New()
 	queryResponse, err := client.R().
 		SetBody(AuthenticationRequestCloud{target.apitoken}).
@@ -57,6 +59,7 @@ func authenticateCloud(target config) (string, error) {
 		SetError(&AuthenticationError{}).
 		Post("https://" + target.server + "/iaas/api/login")
 	if queryResponse.IsError() {
+		log.Debugln("Authentication failed!", queryResponse.RawResponse)
 		return "", errors.New(queryResponse.Error().(*AuthenticationError).ServerMessage)
 	}
 	return queryResponse.Result().(*AuthenticationResponseCloud).Token, err
@@ -67,14 +70,19 @@ func testAccessToken() bool {
 	queryResponse, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetAuthToken(targetConfig.accesstoken).
+		SetResult(&UserPreferences{}).
 		SetError(&CodeStreamException{}).
-		Get("https://" + targetConfig.server + "/iaas/api/projects")
+		Get("https://" + targetConfig.server + "/pipeline/api/user-preferences")
 	if err != nil {
+		log.Warnln(err)
 		return false
 	}
+	log.Debugln(queryResponse.RawResponse)
 	if queryResponse.StatusCode() == 401 {
+		log.Debugln("Access Token Expired")
 		return false
 	}
+	log.Debugln("Access Token OK", queryResponse.Result().(*UserPreferences).UserName)
 	return true
 }
 

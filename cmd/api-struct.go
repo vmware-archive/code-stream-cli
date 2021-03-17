@@ -4,6 +4,15 @@ SPDX-License-Identifier: BSD-2-Clause
 */
 package cmd
 
+// UserPreferences -
+type UserPreferences struct {
+	Link               string      `json:"_link"`
+	UpdateTimeInMicros int         `json:"_updateTimeInMicros"`
+	CreateTimeInMicros int         `json:"_createTimeInMicros"`
+	Preferences        interface{} `json:"preferences"`
+	UserName           string      `json:"userName"`
+}
+
 // AuthenticationRequest - vRA Authentication request structure
 type AuthenticationRequest struct {
 	Username string `json:"username"`
