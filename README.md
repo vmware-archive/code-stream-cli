@@ -122,14 +122,18 @@ cs-cli get pipeline --export
 cs-cli get pipeline --project "Field Demo" --export
 ```
 
-Import a pipeline:
+Importing pipelines:
 ```bash
 # Import a yaml definition
 cs-cli create pipeline --importPath /my/yaml-pipeline.yaml
+# Import a folder of YAML files (will attempt to import all YAML files in the folder - .yml/.yaml)
+cs-cli create pipeline --importPath /Users/sammcgeown/Desktop/cs-cli/pipelines
 # Update an existing pipeline
 # Note: You cannot change the pipeline name - this
 #       will result in a new Pipeline being created
 cs-cli update pipeline --importPath /my/updated-pipe.yaml
+# Update existing pipelines from folder
+cs-cli update pipeline --importPath /Users/sammcgeown/Desktop/cs-cli/pipelines
 ```
 
 
