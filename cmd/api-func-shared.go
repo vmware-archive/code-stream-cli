@@ -77,7 +77,7 @@ func testAccessToken() bool {
 		log.Warnln(err)
 		return false
 	}
-	log.Debugln(queryResponse.RawResponse)
+	// log.Debugln(queryResponse.RawResponse)
 	if queryResponse.StatusCode() == 401 {
 		log.Debugln("Access Token Expired")
 		return false

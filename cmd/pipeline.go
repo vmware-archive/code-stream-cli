@@ -6,7 +6,7 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 
@@ -131,14 +131,30 @@ var createPipelineCmd = &cobra.Command{
 		if err := ensureTargetConnection(); err != nil {
 			log.Fatalln(err)
 		}
-
-		if importPath != "" {
-			err := importYaml(importPath, "create")
+		// Read importPath
+		stat, err := os.Stat(importPath)
+		if err == nil && stat.IsDir() {
+			log.Debugln("importPath is a directory")
+			files, err := ioutil.ReadDir(importPath)
 			if err != nil {
-				log.Fatalln("Failed to import Pipeline", err)
+				log.Fatal(err)
 			}
-			fmt.Println("Imported successfully, Pipeline created.")
+			for _, f := range files {
+				if strings.Contains(f.Name(), ".yaml") || strings.Contains(f.Name(), ".yml") {
+					log.Println(f.Name())
+				}
+			}
+		} else {
+			log.Debugln("importPath is a file")
 		}
+
+		// if importPath != "" {
+		// 	err := importYaml(importPath, "create")
+		// 	if err != nil {
+		// 		log.Fatalln("Failed to import Pipeline", err)
+		// 	}
+		// 	fmt.Println("Imported successfully, Pipeline created.")
+		// }
 	},
 }
 
