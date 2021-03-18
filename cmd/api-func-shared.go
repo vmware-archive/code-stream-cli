@@ -82,7 +82,7 @@ func testAccessToken() bool {
 		log.Debugln("Access Token Expired")
 		return false
 	}
-	log.Debugln("Access Token OK", queryResponse.Result().(*UserPreferences).UserName)
+	log.Debugln("Access Token OK (Username:", queryResponse.Result().(*UserPreferences).UserName, ")")
 	return true
 }
 

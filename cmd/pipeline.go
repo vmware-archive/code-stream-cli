@@ -7,7 +7,6 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -107,40 +106,18 @@ var updatePipelineCmd = &cobra.Command{
 			log.Println("Setting pipeline " + response.Name + " to " + state)
 		}
 
-		// Read importPath
-		stat, err := os.Stat(importPath)
-		if err == nil && stat.IsDir() {
-			log.Debugln("importPath is a directory")
-			files, err := ioutil.ReadDir(importPath)
-			if err != nil {
-				log.Fatal(err)
-			}
-			for _, f := range files {
-				if strings.Contains(f.Name(), ".yaml") || strings.Contains(f.Name(), ".yml") {
-					filePath := filepath.Join(importPath, f.Name())
-					err := importYaml(filePath, "apply")
-					if err != nil {
-						log.Fatalln("Failed to import Pipeline", err)
-					}
-					fmt.Println("Imported", f.Name(), "successfully - Pipeline updated.")
-				}
-			}
-		} else {
-			log.Debugln("importPath is a file")
-			err := importYaml(importPath, "apply")
-			if err != nil {
-				log.Fatalln("Failed to import Pipeline", err)
-			}
-			fmt.Println("Imported successfully, Pipeline updated.")
+		yamlFilePaths := getYamlFilePaths(importPath)
+		if len(yamlFilePaths) == 0 {
+			log.Warnln("No YAML files were found in", importPath)
 		}
-
-		// if importPath != "" {
-		// 	err := importYaml(importPath, "apply")
-		// 	if err != nil {
-		// 		log.Fatalln("Failed to update Pipeline", err)
-		// 	}
-		// 	log.Println("Imported successfully, pipeline updated.")
-		// }
+		for _, yamlFilePath := range yamlFilePaths {
+			yamlFileName := filepath.Base(yamlFilePath)
+			err := importYaml(yamlFilePath, "apply")
+			if err != nil {
+				log.Warnln("Failed to import", yamlFilePath, "as Pipeline", err)
+			}
+			fmt.Println("Imported", yamlFileName, "successfully - Pipeline updated.")
+		}
 	},
 }
 
@@ -160,33 +137,19 @@ var createPipelineCmd = &cobra.Command{
 		if err := ensureTargetConnection(); err != nil {
 			log.Fatalln(err)
 		}
-		// Read importPath
-		stat, err := os.Stat(importPath)
-		if err == nil && stat.IsDir() {
-			log.Debugln("importPath is a directory")
-			files, err := ioutil.ReadDir(importPath)
-			if err != nil {
-				log.Fatal(err)
-			}
-			for _, f := range files {
-				if strings.Contains(f.Name(), ".yaml") || strings.Contains(f.Name(), ".yml") {
-					filePath := filepath.Join(importPath, f.Name())
-					err := importYaml(filePath, "create")
-					if err != nil {
-						log.Fatalln("Failed to import Pipeline", err)
-					}
-					fmt.Println("Imported", f.Name(), "successfully - Pipeline created.")
-				}
-			}
-		} else {
-			log.Debugln("importPath is a file")
-			err := importYaml(importPath, "create")
-			if err != nil {
-				log.Fatalln("Failed to import Pipeline", err)
-			}
-			fmt.Println("Imported successfully, Pipeline created.")
+		yamlFilePaths := getYamlFilePaths(importPath)
+		if len(yamlFilePaths) == 0 {
+			log.Warnln("No YAML files were found in", importPath)
 		}
-
+		for _, yamlFilePath := range yamlFilePaths {
+			yamlFileName := filepath.Base(yamlFilePath)
+			err := importYaml(yamlFilePath, "create")
+			if err != nil {
+				log.Warnln("Failed to import", yamlFilePath, "as Pipeline", err)
+			} else {
+				fmt.Println("Imported", yamlFileName, "successfully - Pipeline created.")
+			}
+		}
 	},
 }
 
