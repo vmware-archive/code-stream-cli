@@ -96,7 +96,7 @@ cs-cli config use-target --name my-vra-server --config test-config.yaml
 cs-cli config current-target --config test-config.yaml
 ```
 
-<a href="https://asciinema.org/a/JLRJOYU2w0uSSlsBxYVB5GkqP" target="_blank"><img src="https://asciinema.org/a/JLRJOYU2w0uSSlsBxYVB5GkqP.svg" /></a>
+[![asciicast](https://asciinema.org/a/JLRJOYU2w0uSSlsBxYVB5GkqP.svg)](https://asciinema.org/a/JLRJOYU2w0uSSlsBxYVB5GkqP)
 
 ## Working with Pipelines
 
