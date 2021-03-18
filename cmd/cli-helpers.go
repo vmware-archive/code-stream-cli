@@ -50,7 +50,7 @@ func getYamlFilePaths(importPath string) []string {
 	// Read importPath
 	stat, err := os.Stat(importPath)
 	if err == nil && stat.IsDir() {
-		log.Debugln("importPath is a directory")
+		// log.Debugln("importPath is a directory")
 		files, err := ioutil.ReadDir(importPath)
 		if err != nil {
 			log.Fatal(err)
@@ -61,7 +61,7 @@ func getYamlFilePaths(importPath string) []string {
 			}
 		}
 	} else {
-		log.Debugln("importPath is a file")
+		// log.Debugln("importPath is a file")
 		yamlFiles = append(yamlFiles, importPath)
 	}
 	return yamlFiles

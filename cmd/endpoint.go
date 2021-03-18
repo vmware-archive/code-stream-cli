@@ -5,7 +5,10 @@ SPDX-License-Identifier: BSD-2-Clause
 package cmd
 
 import (
+	"errors"
+	"fmt"
 	"os"
+	"path/filepath"
 
 	log "github.com/sirupsen/logrus"
 
@@ -64,11 +67,19 @@ var createEndpointCmd = &cobra.Command{
 		}
 
 		if importPath != "" {
-			err := importYaml(importPath, "create")
-			if err != nil {
-				log.Fatalln("Failed to import Endpoint", err)
+			yamlFilePaths := getYamlFilePaths(importPath)
+			if len(yamlFilePaths) == 0 {
+				log.Warnln("No YAML files were found in", importPath)
 			}
-			log.Println("Imported successfully, Endpoint created.")
+			for _, yamlFilePath := range yamlFilePaths {
+				yamlFileName := filepath.Base(yamlFilePath)
+				err := importYaml(yamlFilePath, "create")
+				if err != nil {
+					log.Warnln("Failed to import", yamlFilePath, "as Endpoint", err)
+				} else {
+					fmt.Println("Imported", yamlFileName, "successfully - Endpoint created.")
+				}
+			}
 		}
 	},
 }
@@ -79,8 +90,10 @@ var updateEndpointCmd = &cobra.Command{
 	Short: "Update an Endpoint",
 	Long: `Update an Endpoint by importing the YAML specification
 
-	Update from YAML
-	cs-cli update endpoint --importPath "/Users/sammcgeown/Desktop/updated-endpoint.yaml"
+	Update from a YAML file
+	cs-cli update endpoint --importPath "/Users/sammcgeown/cs-cli/endpoints/updated-endpoint.yaml"
+	Update from a folder of YAML files
+	cs-cli update endpoint --importPath "/Users/sammcgeown/cs-cli/endpoints"
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := ensureTargetConnection(); err != nil {
@@ -88,11 +101,19 @@ var updateEndpointCmd = &cobra.Command{
 		}
 
 		if importPath != "" {
-			err := importYaml(importPath, "update")
-			if err != nil {
-				log.Fatalln("Failed to import Endpoint", err)
+			yamlFilePaths := getYamlFilePaths(importPath)
+			if len(yamlFilePaths) == 0 {
+				log.Warnln("No YAML files were found in", importPath)
 			}
-			log.Println("Imported successfully, Endpoint updated.")
+			for _, yamlFilePath := range yamlFilePaths {
+				yamlFileName := filepath.Base(yamlFilePath)
+				err := importYaml(yamlFilePath, "apply")
+				if err != nil {
+					log.Warnln("Failed to import", yamlFilePath, "as Endpoint", err)
+				} else {
+					fmt.Println("Imported", yamlFileName, "successfully - Endpoint updated.")
+				}
+			}
 		}
 	},
 }
@@ -101,19 +122,36 @@ var updateEndpointCmd = &cobra.Command{
 var deleteEndpointCmd = &cobra.Command{
 	Use:   "endpoint",
 	Short: "Delete an Endpoint",
-	Long: `Delete an Endpoint with a specific Endpoint ID
+	Long: `Delete an Endpoint with a specific Endpoint ID or Name
 	
 	`,
+	Args: func(cmd *cobra.Command, args []string) error {
+		if id != "" && name != "" {
+			return errors.New("please specify either endpoint name or endpoint id")
+		}
+		if id == "" && name == "" {
+			return errors.New("please specify endpoint name or endpoint id")
+		}
+
+		return nil
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := ensureTargetConnection(); err != nil {
 			log.Fatalln(err)
+		}
+		if name != "" {
+			response, err := getEndpoint(id, name, project, typename, export, exportPath)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			id = response[0].ID
 		}
 
 		response, err := deleteEndpoint(id)
 		if err != nil {
 			log.Println("Unable to delete Endpoint: ", err)
 		}
-		log.Println("Endpoint with id " + response.ID + " deleted")
+		fmt.Println("Endpoint with id " + response.ID + " deleted")
 	},
 }
 
@@ -136,6 +174,6 @@ func init() {
 	// Delete
 	deleteCmd.AddCommand(deleteEndpointCmd)
 	deleteEndpointCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the Endpoint to delete")
-	deleteEndpointCmd.MarkFlagRequired("id")
+	deleteEndpointCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the Endpoint to delete")
 
 }
