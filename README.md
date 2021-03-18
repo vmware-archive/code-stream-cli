@@ -44,7 +44,7 @@ MacOs and Linux users can install using homebrew
 ### Build from source
 1) Clone the respository
 2) Download the repository
-3) Run `go install cs-cli` from the respository root
+3) Build the cs-cli binary using `go build -o cs-cli`
 
 
 ## Configuration
@@ -95,6 +95,8 @@ cs-cli config use-target --name my-vra-server --config test-config.yaml
 #View the current active target
 cs-cli config current-target --config test-config.yaml
 ```
+
+[![asciicast](https://asciinema.org/a/JLRJOYU2w0uSSlsBxYVB5GkqP.svg)](https://asciinema.org/a/JLRJOYU2w0uSSlsBxYVB5GkqP)
 
 ## Working with Pipelines
 
