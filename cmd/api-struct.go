@@ -248,3 +248,64 @@ type CodeStreamPipelineImportResponse struct {
 	Status        string `yaml:"status"`
 	StatusMessage string `yaml:"statusMessage"`
 }
+
+// CodeStreamProject - Project-Service struct
+type CodeStreamProject struct {
+	ID             string `json:"id"`
+	Name           string `json:"name"`
+	Description    string `json:"description"`
+	OrgID          string `json:"orgId"`
+	Administrators []struct {
+		Email string `json:"email"`
+		Type  string `json:"type"`
+	} `json:"administrators"`
+	Members     []interface{} `json:"members"`
+	Viewers     []interface{} `json:"viewers"`
+	Constraints struct {
+	} `json:"constraints"`
+	Properties struct {
+		NamingTemplate string `json:"__namingTemplate"`
+	} `json:"properties"`
+	OperationTimeout int  `json:"operationTimeout"`
+	SharedResources  bool `json:"sharedResources"`
+}
+
+type CodeStreamProjectList struct {
+	Content  []CodeStreamProject `json:"content"`
+	Pageable struct {
+		Offset int `json:"offset"`
+		Sort   struct {
+			Sorted   bool `json:"sorted"`
+			Unsorted bool `json:"unsorted"`
+			Empty    bool `json:"empty"`
+		} `json:"sort"`
+		QueryInfo struct {
+			CustomOptions struct {
+			} `json:"customOptions"`
+			Expand []interface{} `json:"expand"`
+			Select []interface{} `json:"select"`
+			Sort   struct {
+				Sorted   bool `json:"sorted"`
+				Unsorted bool `json:"unsorted"`
+				Empty    bool `json:"empty"`
+			} `json:"sort"`
+		} `json:"queryInfo"`
+		PageNumber int  `json:"pageNumber"`
+		PageSize   int  `json:"pageSize"`
+		Paged      bool `json:"paged"`
+		Unpaged    bool `json:"unpaged"`
+	} `json:"pageable"`
+	Last          bool `json:"last"`
+	TotalPages    int  `json:"totalPages"`
+	TotalElements int  `json:"totalElements"`
+	Sort          struct {
+		Sorted   bool `json:"sorted"`
+		Unsorted bool `json:"unsorted"`
+		Empty    bool `json:"empty"`
+	} `json:"sort"`
+	Number           int  `json:"number"`
+	First            bool `json:"first"`
+	NumberOfElements int  `json:"numberOfElements"`
+	Size             int  `json:"size"`
+	Empty            bool `json:"empty"`
+}
