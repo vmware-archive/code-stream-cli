@@ -43,7 +43,7 @@ Get by Project
 		} else if resultCount == 1 {
 			// Print the single result
 			if exportPath != "" {
-				exportVariable(response[0], exportFile)
+				exportVariable(response[0], exportPath)
 			}
 			PrettyPrint(response[0])
 		} else {
@@ -52,7 +52,7 @@ Get by Project
 			table.SetHeader([]string{"Id", "Name", "Project", "Type", "Description"})
 			for _, c := range response {
 				if exportPath != "" {
-					exportVariable(c, exportFile)
+					exportVariable(c, exportPath)
 				}
 				table.Append([]string{c.ID, c.Name, c.Project, c.Type, c.Description})
 			}
@@ -71,8 +71,8 @@ var createVariableCmd = &cobra.Command{
 			log.Fatalln(err)
 		}
 
-		if importFile != "" { // If we are importing a file
-			variables := importVariables(importFile)
+		if importPath != "" { // If we are importing a file
+			variables := importVariables(importPath)
 			for _, value := range variables {
 				if project != "" { // If the project is specified update the object
 					value.Project = project
@@ -104,8 +104,8 @@ var updateVariableCmd = &cobra.Command{
 			log.Fatalln(err)
 		}
 
-		if importFile != "" { // If we are importing a file
-			variables := importVariables(importFile)
+		if importPath != "" { // If we are importing a file
+			variables := importVariables(importPath)
 			for _, value := range variables {
 				exisitingVariable, err := getVariable("", value.Name, value.Project)
 				if err != nil {
@@ -161,7 +161,7 @@ func init() {
 	createVariableCmd.Flags().StringVarP(&project, "project", "p", "", "The project in which to create the variable")
 	createVariableCmd.Flags().StringVarP(&value, "value", "v", "", "The value of the variable to create")
 	createVariableCmd.Flags().StringVarP(&description, "description", "d", "", "The description of the variable to create")
-	createVariableCmd.Flags().StringVarP(&importFile, "importfile", "i", "", "Path to a YAML file with the variables to import")
+	createVariableCmd.Flags().StringVarP(&importPath, "importpath", "i", "", "Path to a YAML file with the variables to import")
 
 	// Update Variable
 	updateCmd.AddCommand(updateVariableCmd)
@@ -170,7 +170,7 @@ func init() {
 	updateVariableCmd.Flags().StringVarP(&typename, "type", "t", "", "Update the type of the variable REGULAR|SECRET|RESTRICTED")
 	updateVariableCmd.Flags().StringVarP(&value, "value", "v", "", "Update the value of the variable ")
 	updateVariableCmd.Flags().StringVarP(&description, "description", "d", "", "Update the description of the variable")
-	updateVariableCmd.Flags().StringVarP(&importFile, "importfile", "", "", "Path to a YAML file with the variables to import")
+	updateVariableCmd.Flags().StringVarP(&importPath, "importpath", "", "", "Path to a YAML file with the variables to import")
 	//updateVariableCmd.MarkFlagRequired("id")
 	// Delete Variable
 	deleteCmd.AddCommand(deleteVariableCmd)

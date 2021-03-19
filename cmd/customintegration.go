@@ -156,7 +156,7 @@ func init() {
 	getCmd.AddCommand(getCustomIntegrationCmd)
 	getCustomIntegrationCmd.Flags().StringVarP(&name, "name", "n", "", "List customintegration with name")
 	getCustomIntegrationCmd.Flags().StringVarP(&id, "id", "i", "", "List customintegrations by id")
-	getCustomIntegrationCmd.Flags().StringVarP(&exportFile, "exportFile", "", "", "Path to export objects - relative or absolute location")
+	getCustomIntegrationCmd.Flags().StringVarP(&exportPath, "exportPath", "", "", "Path to export objects - relative or absolute location")
 	// // Create CustomIntegration
 	// createCmd.AddCommand(createCustomIntegrationCmd)
 	// createCustomIntegrationCmd.Flags().StringVarP(&name, "name", "n", "", "The name of the customintegration to create")

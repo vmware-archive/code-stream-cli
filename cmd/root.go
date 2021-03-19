@@ -35,11 +35,11 @@ var (
 	value       string
 	description string
 	status      string
-	exportFile  string
-	importFile  string
-	printJson   bool
-	exportPath  string
-	importPath  string
+	// exportFile  string
+	// importFile  string
+	printJson  bool
+	exportPath string
+	importPath string
 )
 
 var qParams = map[string]string{
