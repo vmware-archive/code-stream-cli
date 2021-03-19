@@ -115,13 +115,13 @@ cs-cli get pipeline --name "vra-CreateVariable"
 Exporting pipelines:
 ```bash
 # Export a specific pipeline to current location
-cs-cli get pipeline --name "vra-CreateVariable" --export
+cs-cli get pipeline --name "vra-CreateVariable"
 # Export a specific pipeline to a specific location
-cs-cli get pipeline --name "vra-CreateVariable" --export --exportPath /path/to/my/folder
+cs-cli get pipeline --name "vra-CreateVariable" --exportPath /path/to/my/folder
 # Export all pipelines
-cs-cli get pipeline --export
+cs-cli get pipeline
 # Export all pipelines in a project
-cs-cli get pipeline --project "Field Demo" --export
+cs-cli get pipeline --project "Field Demo"
 ```
 
 Importing pipelines:
@@ -158,9 +158,9 @@ cs-cli get variable --name cs-cli
 cs-cli create variable --name cli-demo --project "Field Demo"  --type REGULAR --value "New variable..." --description "Now from the CLI\!"
 
 # Export all variables to variables.yaml
-cs-cli get variable --export
+cs-cli get variable
 # Export all variables to /your/own/filename.yaml
-cs-cli get variable --export --exportFile /your/own/filename.yaml
+cs-cli get variable --exportPath /your/own/filename.yaml
 
 # Create new variables from file
 cs-cli create variable --importfile variables.yaml
@@ -227,9 +227,9 @@ cs-cli get endpoint --type "git" --project "Field Demo"
 Exporting endpoints:
 ```bash
 # Export all endpoints
-cs-cli get endpoint --export --exportPath my-endpoints/
+cs-cli get endpoint --exportPath my-endpoints/
 # Export endpoint by Name
-cs-cli get endpoint --name "My-Git-Endpoint" --export
+cs-cli get endpoint --name "My-Git-Endpoint"
 ```
 
 Importing endpoints
