@@ -18,9 +18,6 @@ import (
 )
 
 var state string
-var exportPath string
-var importPath string
-var export bool
 var printForm bool
 
 // getPipelineCmd represents the pipeline command
@@ -41,7 +38,7 @@ cs-cli get execution --status Failed`,
 			log.Fatalln(err)
 		}
 
-		response, err := getPipelines(id, name, project, export, exportPath)
+		response, err := getPipelines(id, name, project, exportPath)
 		if err != nil {
 			log.Println("Unable to get Code Stream Pipelines: ", err)
 		}
@@ -181,7 +178,6 @@ func init() {
 	getPipelineCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the pipeline to list")
 	getPipelineCmd.Flags().StringVarP(&project, "project", "p", "", "List pipeline in project")
 	getPipelineCmd.Flags().StringVarP(&exportPath, "exportPath", "", "", "Path to export objects - relative or absolute location")
-	getPipelineCmd.Flags().BoolVarP(&export, "export", "e", false, "Export pipeline")
 	getPipelineCmd.Flags().BoolVarP(&printForm, "form", "f", false, "Return pipeline inputs form(s)")
 	getPipelineCmd.Flags().BoolVarP(&printJson, "json", "", false, "Return JSON formatted Pipeline(s)")
 

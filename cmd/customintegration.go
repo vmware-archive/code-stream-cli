@@ -51,7 +51,7 @@ Get by Project
 			table.SetHeader([]string{"Id", "Name", "Status", "Description"})
 			for _, c := range response {
 				//if export {
-					//exportCustomIntegration(c, exportFile)
+				//exportCustomIntegration(c, exportFile)
 				//}
 				table.Append([]string{c.ID, c.Name, c.Status, c.Description})
 			}
@@ -157,7 +157,6 @@ func init() {
 	getCustomIntegrationCmd.Flags().StringVarP(&name, "name", "n", "", "List customintegration with name")
 	getCustomIntegrationCmd.Flags().StringVarP(&id, "id", "i", "", "List customintegrations by id")
 	getCustomIntegrationCmd.Flags().StringVarP(&exportFile, "exportFile", "", "", "Path to export objects - relative or absolute location")
-	getCustomIntegrationCmd.Flags().BoolVarP(&export, "export", "e", false, "Export customintegrations, uses ./customintegrations.yaml or the file specified by --exportFile")
 	// // Create CustomIntegration
 	// createCmd.AddCommand(createCustomIntegrationCmd)
 	// createCustomIntegrationCmd.Flags().StringVarP(&name, "name", "n", "", "The name of the customintegration to create")

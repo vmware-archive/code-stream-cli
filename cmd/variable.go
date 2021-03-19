@@ -42,7 +42,7 @@ Get by Project
 			log.Warnln("No results found")
 		} else if resultCount == 1 {
 			// Print the single result
-			if export {
+			if exportPath != "" {
 				exportVariable(response[0], exportFile)
 			}
 			PrettyPrint(response[0])
@@ -51,7 +51,7 @@ Get by Project
 			table := tablewriter.NewWriter(os.Stdout)
 			table.SetHeader([]string{"Id", "Name", "Project", "Type", "Description"})
 			for _, c := range response {
-				if export {
+				if exportPath != "" {
 					exportVariable(c, exportFile)
 				}
 				table.Append([]string{c.ID, c.Name, c.Project, c.Type, c.Description})
@@ -153,8 +153,7 @@ func init() {
 	getVariableCmd.Flags().StringVarP(&name, "name", "n", "", "List variable with name")
 	getVariableCmd.Flags().StringVarP(&project, "project", "p", "", "List variables in project")
 	getVariableCmd.Flags().StringVarP(&id, "id", "i", "", "List variables by id")
-	getVariableCmd.Flags().StringVarP(&exportFile, "exportFile", "", "", "Path to export objects - relative or absolute location")
-	getVariableCmd.Flags().BoolVarP(&export, "export", "e", false, "Export variables, uses ./variables.yaml or the file specified by --exportFile")
+	getVariableCmd.Flags().StringVarP(&exportPath, "exportPath", "", "", "Path to export objects - relative or absolute location")
 	// Create Variable
 	createCmd.AddCommand(createVariableCmd)
 	createVariableCmd.Flags().StringVarP(&name, "name", "n", "", "The name of the variable to create")

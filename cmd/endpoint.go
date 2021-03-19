@@ -26,7 +26,7 @@ var getEndpointCmd = &cobra.Command{
 			log.Fatalln(err)
 		}
 
-		response, err := getEndpoint(id, name, project, typename, export, exportPath)
+		response, err := getEndpoint(id, name, project, typename, exportPath)
 		if err != nil {
 			log.Println("Unable to get endpoints: ", err)
 		}
@@ -140,7 +140,7 @@ var deleteEndpointCmd = &cobra.Command{
 			log.Fatalln(err)
 		}
 		if name != "" {
-			response, err := getEndpoint(id, name, project, typename, export, exportPath)
+			response, err := getEndpoint(id, name, project, typename, exportPath)
 			if err != nil {
 				log.Fatalln(err)
 			}
@@ -162,7 +162,6 @@ func init() {
 	getEndpointCmd.Flags().StringVarP(&project, "project", "p", "", "Filter Endpoint by Project")
 	getEndpointCmd.Flags().StringVarP(&typename, "type", "t", "", "Filter Endpoint by Type")
 	getEndpointCmd.Flags().StringVarP(&exportPath, "exportPath", "", "", "Path to export objects - relative or absolute location")
-	getEndpointCmd.Flags().BoolVarP(&export, "export", "e", false, "Export Endpoint")
 	// Create
 	createCmd.AddCommand(createEndpointCmd)
 	createEndpointCmd.Flags().StringVarP(&importPath, "importPath", "c", "", "YAML configuration file to import")

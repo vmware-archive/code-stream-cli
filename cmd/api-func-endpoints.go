@@ -11,7 +11,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-func getEndpoint(id, name, project, endpointtype string, export bool, exportPath string) ([]*CodeStreamEndpoint, error) {
+func getEndpoint(id, name, project, endpointtype string, exportPath string) ([]*CodeStreamEndpoint, error) {
 	var endpoints []*CodeStreamEndpoint
 	var qParams = make(map[string]string)
 	qParams["expand"] = "true"
@@ -48,7 +48,7 @@ func getEndpoint(id, name, project, endpointtype string, export bool, exportPath
 	for _, value := range queryResponse.Result().(*documentsList).Documents {
 		c := CodeStreamEndpoint{}
 		mapstructure.Decode(value, &c)
-		if export {
+		if exportPath != "" {
 			exportYaml(c.Name, c.Project, exportPath, "endpoints")
 			endpoints = append(endpoints, &c)
 		} else {

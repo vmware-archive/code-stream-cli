@@ -38,6 +38,8 @@ var (
 	exportFile  string
 	importFile  string
 	printJson   bool
+	exportPath  string
+	importPath  string
 )
 
 var qParams = map[string]string{

@@ -13,7 +13,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func getPipelines(id string, name string, project string, export bool, exportPath string) ([]*CodeStreamPipeline, error) {
+func getPipelines(id string, name string, project string, exportPath string) ([]*CodeStreamPipeline, error) {
 	var arrResults []*CodeStreamPipeline
 	client := resty.New()
 
@@ -48,7 +48,7 @@ func getPipelines(id string, name string, project string, export bool, exportPat
 	for _, value := range queryResponse.Result().(*documentsList).Documents {
 		c := CodeStreamPipeline{}
 		mapstructure.Decode(value, &c)
-		if export {
+		if exportPath != "" {
 			if err := exportYaml(c.Name, c.Project, exportPath, "pipelines"); err != nil {
 				log.Warnln(err)
 			}
