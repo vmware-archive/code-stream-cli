@@ -5,6 +5,7 @@ SPDX-License-Identifier: BSD-2-Clause
 package cmd
 
 import (
+	"crypto/tls"
 	"errors"
 	"io/ioutil"
 	"os"
@@ -40,7 +41,7 @@ func ensureTargetConnection() error {
 func authenticateOnPrem(target config) (string, error) {
 	log.Debugln("Authenticating vRA")
 	client := resty.New()
-	queryResponse, err := client.R().
+	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetBody(AuthenticationRequest{target.username, target.password, target.domain}).
 		SetResult(&AuthenticationResponse{}).
 		SetError(&AuthenticationError{}).
@@ -53,7 +54,7 @@ func authenticateOnPrem(target config) (string, error) {
 func authenticateCloud(target config) (string, error) {
 	log.Debugln("Authenticating vRA Cloud")
 	client := resty.New()
-	queryResponse, err := client.R().
+	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetBody(AuthenticationRequestCloud{target.apitoken}).
 		SetResult(&AuthenticationResponseCloud{}).
 		SetError(&AuthenticationError{}).
@@ -67,7 +68,7 @@ func authenticateCloud(target config) (string, error) {
 
 func testAccessToken() bool {
 	client := resty.New()
-	queryResponse, err := client.R().
+	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetHeader("Accept", "application/json").
 		SetAuthToken(targetConfig.accesstoken).
 		SetResult(&UserPreferences{}).
@@ -97,7 +98,7 @@ func exportYaml(name, project, path, object string) error {
 		exportPath, _ = os.Getwd()
 	}
 	client := resty.New()
-	queryResponse, _ := client.R().
+	queryResponse, _ := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/x-yaml;charset=UTF-8").
 		SetAuthToken(targetConfig.accesstoken).
@@ -121,7 +122,7 @@ func importYaml(yamlPath, action string) error {
 	}
 	yamlPayload := string(yamlBytes)
 	client := resty.New()
-	queryResponse, _ := client.R().
+	queryResponse, _ := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetHeader("Content-Type", "application/x-yaml").
 		SetBody(yamlPayload).

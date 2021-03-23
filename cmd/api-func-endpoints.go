@@ -5,6 +5,7 @@ SPDX-License-Identifier: BSD-2-Clause
 package cmd
 
 import (
+	"crypto/tls"
 	"strings"
 
 	"github.com/go-resty/resty/v2"
@@ -34,7 +35,7 @@ func getEndpoint(id, name, project, endpointtype string, exportPath string) ([]*
 		qParams["$filter"] = "(" + strings.Join(filters, " and ") + ")"
 	}
 
-	queryResponse, err := client.R().
+	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&documentsList{}).
@@ -61,7 +62,7 @@ func getEndpoint(id, name, project, endpointtype string, exportPath string) ([]*
 
 func deleteEndpoint(id string) (*CodeStreamEndpoint, error) {
 	client := resty.New()
-	queryResponse, err := client.R().
+	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamEndpoint{}).

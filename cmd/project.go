@@ -5,6 +5,8 @@ SPDX-License-Identifier: BSD-2-Clause
 package cmd
 
 import (
+	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -42,26 +44,36 @@ var getProjectCommand = &cobra.Command{
 		for _, p := range response {
 			table.Append([]string{p.ID, p.Name, p.Description})
 			if exportPath != "" {
-				pipelines, _ := getPipelines("", "", p.Name, filepath.Join(exportPath, p.Name, "pipelines"))
+				tmpDir, err := ioutil.TempDir(os.TempDir(), "cs-cli-*")
+				if err != nil {
+					log.Fatalln(err)
+				}
+				zipFile := filepath.Join(exportPath, p.Name+".zip")
+				log.Println(zipFile)
+				pipelines, _ := getPipelines("", "", p.Name, filepath.Join(tmpDir, p.Name, "pipelines"))
 				pipelineTable.SetHeader([]string{"Id", "Name", "Project", "Description"})
 				for _, c := range pipelines {
 					pipelineTable.Append([]string{c.ID, c.Name, c.Project, c.Description})
 				}
-				variables, _ := getVariable("", "", p.Name, filepath.Join(exportPath, p.Name, ""))
+				variables, _ := getVariable("", "", p.Name, filepath.Join(tmpDir, p.Name, ""))
 				variableTable.SetHeader([]string{"Id", "Name", "Project", "Description"})
 				for _, c := range variables {
 					variableTable.Append([]string{c.ID, c.Name, c.Project, c.Description})
 				}
-				endpoints, _ := getEndpoint("", "", p.Name, "", filepath.Join(exportPath, p.Name, "endpoints"))
+				endpoints, _ := getEndpoint("", "", p.Name, "", filepath.Join(tmpDir, p.Name, "endpoints"))
 				endpointTable.SetHeader([]string{"ID", "Name", "Project", "Type", "Description"})
 				for _, c := range endpoints {
 					endpointTable.Append([]string{c.ID, c.Name, c.Project, c.Type, c.Description})
 				}
 			}
 		}
+		fmt.Println("Project")
 		table.Render()
+		fmt.Println("Pipelines")
 		pipelineTable.Render()
+		fmt.Println("Variables")
 		variableTable.Render()
+		fmt.Println("Endpoints")
 		endpointTable.Render()
 	},
 }

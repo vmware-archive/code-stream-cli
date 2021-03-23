@@ -5,6 +5,7 @@ SPDX-License-Identifier: BSD-2-Clause
 package cmd
 
 import (
+	"crypto/tls"
 	"errors"
 	"strings"
 
@@ -30,7 +31,7 @@ func getPipelines(id string, name string, project string, exportPath string) ([]
 	if len(filters) > 0 {
 		qParams["$filter"] = "(" + strings.Join(filters, " and ") + ")"
 	}
-	queryResponse, err := client.R().
+	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&documentsList{}).
@@ -63,7 +64,7 @@ func getPipelines(id string, name string, project string, exportPath string) ([]
 // patchPipeline - Patch Code Stream Pipeline by ID
 func patchPipeline(id string, payload string) (*CodeStreamPipeline, error) {
 	client := resty.New()
-	queryResponse, err := client.R().
+	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetHeader("Content-Type", "application/json").
@@ -79,7 +80,7 @@ func patchPipeline(id string, payload string) (*CodeStreamPipeline, error) {
 
 func deletePipeline(id string) (*CodeStreamPipeline, error) {
 	client := resty.New()
-	queryResponse, err := client.R().
+	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamPipeline{}).

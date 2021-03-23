@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"bytes"
+	"crypto/tls"
 	"errors"
 	"io/ioutil"
 	"os"
@@ -41,7 +42,7 @@ func getVariable(id, name, project, exportPath string) ([]*CodeStreamVariableRes
 			qParams["$filter"] = "(project eq '" + project + "')"
 		}
 	}
-	queryResponse, err := client.R().
+	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&documentsList{}).
@@ -68,7 +69,7 @@ func getVariable(id, name, project, exportPath string) ([]*CodeStreamVariableRes
 // getVariableByID - get Code Stream Variable by ID
 func getVariableByID(id string) (*CodeStreamVariableResponse, error) {
 	client := resty.New()
-	queryResponse, err := client.R().
+	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamVariableResponse{}).
@@ -83,7 +84,7 @@ func getVariableByID(id string) (*CodeStreamVariableResponse, error) {
 // createVariable - Create a new Code Stream Variable
 func createVariable(name string, description string, variableType string, project string, value string) (*CodeStreamVariableResponse, error) {
 	client := resty.New()
-	queryResponse, err := client.R().
+	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetBody(
 			CodeStreamVariableRequest{
@@ -121,7 +122,7 @@ func updateVariable(id string, name string, description string, typename string,
 		variable.Value = value
 	}
 	client := resty.New()
-	queryResponse, err := client.R().
+	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetBody(variable).
 		SetHeader("Accept", "application/json").
@@ -138,7 +139,7 @@ func updateVariable(id string, name string, description string, typename string,
 // deleteVariable - Delete a Code Stream Variable
 func deleteVariable(id string) (*CodeStreamVariableResponse, error) {
 	client := resty.New()
-	queryResponse, err := client.R().
+	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamVariableResponse{}).

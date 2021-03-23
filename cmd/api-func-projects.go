@@ -5,6 +5,7 @@ SPDX-License-Identifier: BSD-2-Clause
 package cmd
 
 import (
+	"crypto/tls"
 	"strings"
 
 	"github.com/go-resty/resty/v2"
@@ -27,7 +28,7 @@ func getProject(id, name string) ([]*CodeStreamProject, error) {
 		qParams["$filter"] = "(" + strings.Join(filters, " and ") + ")"
 	}
 
-	queryResponse, err := client.R().
+	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamProjectList{}).

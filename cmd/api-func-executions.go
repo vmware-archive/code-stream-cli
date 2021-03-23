@@ -5,6 +5,7 @@ SPDX-License-Identifier: BSD-2-Clause
 package cmd
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"strconv"
 	"strings"
@@ -32,7 +33,7 @@ func getExecutions(id string, status string, name string, nested bool) ([]*Codes
 	if name != "" {
 		qParams["$filter"] = "((name eq '" + name + "') and (_nested eq '" + strconv.FormatBool(nested) + "'))"
 	}
-	queryResponse, err := client.R().
+	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&documentsList{}).
@@ -52,7 +53,7 @@ func getExecutions(id string, status string, name string, nested bool) ([]*Codes
 
 func getExecution(executionLink string) (*CodestreamAPIExecutions, error) {
 	client := resty.New()
-	queryResponse, err := client.R().
+	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodestreamAPIExecutions{}).
@@ -66,7 +67,7 @@ func getExecution(executionLink string) (*CodestreamAPIExecutions, error) {
 
 func deleteExecution(id string) (*CodestreamAPIExecutions, error) {
 	client := resty.New()
-	queryResponse, err := client.R().
+	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&CodestreamAPIExecutions{}).
@@ -97,7 +98,7 @@ func createExecution(id string, inputs string, comment string) (*CodeStreamCreat
 		return nil, err
 	}
 	client := resty.New()
-	queryResponse, _ := client.R().
+	queryResponse, _ := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetHeader("Content-Type", "application/json").
 		SetBody(executionBytes).

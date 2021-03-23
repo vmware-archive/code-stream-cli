@@ -26,7 +26,8 @@ var (
 	date              = "unknown"
 	builtBy           = "unknown"
 	// Global Flags
-	debug bool
+	debug      bool
+	ignoreCert bool
 	// Command Flags
 	id          string
 	name        string
@@ -74,6 +75,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cs-cli.yaml)")
 	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Enable debug logging")
+	rootCmd.PersistentFlags().BoolVar(&ignoreCert, "ignoreCertificateWarnings", false, "Disable HTTPS Certificate Validation")
 }
 
 // initConfig reads in config file and ENV variables if set.

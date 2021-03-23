@@ -5,6 +5,7 @@ SPDX-License-Identifier: BSD-2-Clause
 package cmd
 
 import (
+	"crypto/tls"
 	"strings"
 
 	"github.com/go-resty/resty/v2"
@@ -26,7 +27,7 @@ func getCustomIntegration(id, name string) ([]*CodeStreamCustomIntegration, erro
 		qParams["$filter"] = "(" + strings.Join(filters, " and ") + ")"
 	}
 
-	queryResponse, err := client.R().
+	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&documentsList{}).
@@ -48,7 +49,7 @@ func getCustomIntegration(id, name string) ([]*CodeStreamCustomIntegration, erro
 // // createCustomIntegration - Create a new Code Stream CustomIntegration
 // func createCustomIntegration(name string, description string, variableType string, project string, value string) (*CodeStreamCustomIntegrationResponse, error) {
 // 	client := resty.New()
-// 	response, err := client.R().
+// 	response, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 // 		SetBody(
 // 			CodeStreamCustomIntegrationRequest{
 // 				Project:     project,
@@ -85,7 +86,7 @@ func getCustomIntegration(id, name string) ([]*CodeStreamCustomIntegration, erro
 // 		variable.Value = value
 // 	}
 // 	client := resty.New()
-// 	response, err := client.R().
+// 	response, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 // 		SetBody(variable).
 // 		SetHeader("Accept", "application/json").
 // 		SetResult(&CodeStreamCustomIntegrationResponse{}).
@@ -101,7 +102,7 @@ func getCustomIntegration(id, name string) ([]*CodeStreamCustomIntegration, erro
 // // deleteCustomIntegration - Delete a Code Stream CustomIntegration
 // func deleteCustomIntegration(id string) (*CodeStreamCustomIntegrationResponse, error) {
 // 	client := resty.New()
-// 	response, err := client.R().
+// 	response, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 // 		SetHeader("Accept", "application/json").
 // 		SetResult(&CodeStreamCustomIntegrationResponse{}).
 // 		SetAuthToken(targetConfig.accesstoken).
