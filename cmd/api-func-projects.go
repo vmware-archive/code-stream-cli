@@ -5,14 +5,27 @@ SPDX-License-Identifier: BSD-2-Clause
 package cmd
 
 import (
+	"strings"
+
 	"github.com/go-resty/resty/v2"
 	"github.com/mitchellh/mapstructure"
 	log "github.com/sirupsen/logrus"
 )
 
-func getProject(id, name, project string) ([]*CodeStreamProject, error) {
+func getProject(id, name string) ([]*CodeStreamProject, error) {
 	var projects []*CodeStreamProject
 	client := resty.New()
+
+	var filters []string
+	if id != "" {
+		filters = append(filters, "(id eq '"+id+"')")
+	}
+	if name != "" {
+		filters = append(filters, "(name eq '"+name+"')")
+	}
+	if len(filters) > 0 {
+		qParams["$filter"] = "(" + strings.Join(filters, " and ") + ")"
+	}
 
 	queryResponse, err := client.R().
 		SetQueryParams(qParams).
