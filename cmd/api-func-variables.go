@@ -18,7 +18,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func getVariable(id, name, project string) ([]*CodeStreamVariableResponse, error) {
+func getVariable(id, name, project, exportPath string) ([]*CodeStreamVariableResponse, error) {
 	var arrVariables []*CodeStreamVariableResponse
 	//var qParams = make(map[string]string)
 	client := resty.New()
@@ -58,6 +58,9 @@ func getVariable(id, name, project string) ([]*CodeStreamVariableResponse, error
 		c := CodeStreamVariableResponse{}
 		mapstructure.Decode(value, &c)
 		arrVariables = append(arrVariables, &c)
+		if exportPath != "" {
+			exportVariable(c, exportPath)
+		}
 	}
 	return arrVariables, err
 }
@@ -148,7 +151,8 @@ func deleteVariable(id string) (*CodeStreamVariableResponse, error) {
 }
 
 // exportVariable - Export a variable to YAML
-func exportVariable(variable interface{}, exportFile string) {
+func exportVariable(variable interface{}, exportPath string) {
+	var exportFile string
 	// variable will be a CodeStreamVariableResponse, so lets remap to CodeStreamVariableRequest
 	c := CodeStreamVariableRequest{}
 	mapstructure.Decode(variable, &c)
@@ -156,9 +160,13 @@ func exportVariable(variable interface{}, exportFile string) {
 	if err != nil {
 		log.Println("Unable to export variable ", c.Name)
 	}
-	if exportFile == "" {
-		exportFile = "variables.yaml"
+
+	if filepath.Ext(exportPath) != ".yaml" {
+		exportFile = filepath.Join(exportPath, "variables.yaml")
+	} else {
+		exportFile = exportPath
 	}
+
 	file, err := os.OpenFile(exportFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		log.Fatal(err)
