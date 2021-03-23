@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
@@ -22,7 +23,7 @@ var getProjectCommand = &cobra.Command{
 			log.Fatalln(err)
 		}
 
-		response, err := getProject("", "", "")
+		response, err := getProject(id, name)
 		if err != nil {
 			log.Println("Unable to get Code Stream Projects: ", err)
 		}
@@ -32,24 +33,44 @@ var getProjectCommand = &cobra.Command{
 			log.Warnln("No results found")
 		}
 
-		if printJson {
-			for _, c := range response {
-				PrettyPrint(c)
+		// Print result table
+		table := tablewriter.NewWriter(os.Stdout)
+		pipelineTable := tablewriter.NewWriter(os.Stdout)
+		variableTable := tablewriter.NewWriter(os.Stdout)
+		endpointTable := tablewriter.NewWriter(os.Stdout)
+		table.SetHeader([]string{"Id", "Name", "Description"})
+		for _, p := range response {
+			table.Append([]string{p.ID, p.Name, p.Description})
+			if exportPath != "" {
+				pipelines, _ := getPipelines("", "", p.Name, filepath.Join(exportPath, p.Name, "pipelines"))
+				pipelineTable.SetHeader([]string{"Id", "Name", "Project", "Description"})
+				for _, c := range pipelines {
+					pipelineTable.Append([]string{c.ID, c.Name, c.Project, c.Description})
+				}
+				variables, _ := getVariable("", "", p.Name, filepath.Join(exportPath, p.Name, ""))
+				variableTable.SetHeader([]string{"Id", "Name", "Project", "Description"})
+				for _, c := range variables {
+					variableTable.Append([]string{c.ID, c.Name, c.Project, c.Description})
+				}
+				endpoints, _ := getEndpoint("", "", p.Name, "", filepath.Join(exportPath, p.Name, "endpoints"))
+				endpointTable.SetHeader([]string{"ID", "Name", "Project", "Type", "Description"})
+				for _, c := range endpoints {
+					endpointTable.Append([]string{c.ID, c.Name, c.Project, c.Type, c.Description})
+				}
 			}
-		} else {
-			// Print result table
-			table := tablewriter.NewWriter(os.Stdout)
-			table.SetHeader([]string{"Id", "Name", "Description"})
-			for _, c := range response {
-				table.Append([]string{c.ID, c.Name, c.Description})
-			}
-			table.Render()
 		}
+		table.Render()
+		pipelineTable.Render()
+		variableTable.Render()
+		endpointTable.Render()
 	},
 }
 
 func init() {
 	// Get
 	getCmd.AddCommand(getProjectCommand)
+	getProjectCommand.Flags().StringVarP(&name, "name", "n", "", "Name of the pipeline to list executions for")
+	getProjectCommand.Flags().StringVarP(&id, "id", "i", "", "ID of the pipeline to list")
+	getProjectCommand.Flags().StringVarP(&exportPath, "exportpath", "", "", "Path to export projects and contents")
 
 }

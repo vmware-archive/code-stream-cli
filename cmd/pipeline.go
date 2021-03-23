@@ -9,16 +9,20 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
+	"sort"
 	"strings"
 
+	"github.com/mitchellh/mapstructure"
+	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 )
 
 var state string
 var printForm bool
+var dependencies bool
 
 // getPipelineCmd represents the pipeline command
 var getPipelineCmd = &cobra.Command{
@@ -58,11 +62,82 @@ cs-cli get execution --status Failed`,
 				PrettyPrint(c.Input)
 			}
 		} else {
+			var endpoints []string
+			var variables []string
+			var pipelines []string
+			var customintegrations []string
+
 			// Print result table
 			table := tablewriter.NewWriter(os.Stdout)
 			table.SetHeader([]string{"Id", "Name", "Project", "Description"})
 			for _, c := range response {
+				if c.Workspace.Endpoint != "" {
+					endpoints = append(endpoints, c.Workspace.Endpoint)
+				}
+
 				table.Append([]string{c.ID, c.Name, c.Project, c.Description})
+				for _, s := range c.Stages {
+					stage := CodeStreamPipelineStage{}
+					mapstructure.Decode(s, &stage)
+					// Loop through the Stage Tasks
+					for n, t := range stage.Tasks {
+						taskString := fmt.Sprintf("%v", t)
+						rxp := regexp.MustCompile(`\$\{var\.(.*?)\}`) // Match ${var.name}
+						variableMatches := rxp.FindAllStringSubmatch(taskString, -1)
+						for _, v := range variableMatches {
+							variables = append(variables, v[1])
+						}
+						task := CodeStreamPipelineTask{}
+						mapstructure.Decode(t, &task)
+						if len(task.Endpoints) > 0 {
+							for _, e := range task.Endpoints {
+								endpoints = append(endpoints, e)
+							}
+						}
+						//PrettyPrint(task)
+						if task.Type == "Pipeline" {
+							pipelines = append(pipelines, task.Input.Pipeline)
+						}
+						if task.Type == "Custom" {
+							customintegrations = append(customintegrations, task.Input.Name)
+						}
+						log.Println("-- [Task]", n, "(", task.Type, ")")
+					}
+				}
+				if dependencies {
+					variables = removeDuplicateStrings(variables)
+					sort.Strings(variables)
+					if len(variables) > 0 {
+						log.Println(c.Name, "depends on Variables:", strings.Join(variables, ", "))
+						for _, v := range variables {
+							getVariable("", v, c.Project, exportPath)
+						}
+					}
+					pipelines = removeDuplicateStrings(pipelines)
+					sort.Strings(pipelines)
+					if len(pipelines) > 0 {
+						log.Println(c.Name, "depends on Pipelines:", strings.Join(pipelines, ", "))
+						for _, p := range pipelines {
+							getPipelines("", p, c.Project, filepath.Join(exportPath, "pipelines"))
+						}
+					}
+					endpoints = removeDuplicateStrings(endpoints)
+					sort.Strings(endpoints)
+					if len(endpoints) > 0 {
+						log.Println(c.Name, "depends on Endpoints:", strings.Join(endpoints, ", "))
+						for _, e := range endpoints {
+							getEndpoint("", e, c.Project, "", filepath.Join(exportPath, "endpoints"))
+						}
+					}
+					customintegrations = removeDuplicateStrings(customintegrations)
+					sort.Strings(customintegrations)
+					if len(customintegrations) > 0 {
+						log.Println(c.Name, "depends on Custom Integrations:", strings.Join(customintegrations, ", "))
+						for _, ci := range customintegrations {
+							getCustomIntegration("", ci)
+						}
+					}
+				}
 			}
 			table.Render()
 		}
@@ -180,6 +255,7 @@ func init() {
 	getPipelineCmd.Flags().StringVarP(&exportPath, "exportPath", "", "", "Path to export objects - relative or absolute location")
 	getPipelineCmd.Flags().BoolVarP(&printForm, "form", "f", false, "Return pipeline inputs form(s)")
 	getPipelineCmd.Flags().BoolVarP(&printJson, "json", "", false, "Return JSON formatted Pipeline(s)")
+	getPipelineCmd.Flags().BoolVarP(&dependencies, "exportDependencies", "", false, "Export Pipeline dependencies (Endpoint, Pipelines, Variables, Custom Integrations)")
 
 	// Create
 	createCmd.AddCommand(createPipelineCmd)

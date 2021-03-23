@@ -94,7 +94,7 @@ type CodestreamAPIExecutions struct {
 		Step   string   `json:"step"`
 		Logs   []string `json:"logs"`
 	} `json:"workspaceResults"`
-	Tags []interface{} `json:"tags"`
+	Tags []string `json:"tags"`
 }
 
 // CodeStreamVariableResponse - Code Stream API Variable response
@@ -150,8 +150,8 @@ type CodeStreamPipeline struct {
 	} `json:"output"`
 	Starred struct {
 	} `json:"starred"`
-	StageOrder    []string    `json:"stageOrder"`
-	Stages        interface{} `json:"stages"`
+	StageOrder    []string               `json:"stageOrder"`
+	Stages        map[string]interface{} `json:"stages"`
 	Notifications struct {
 		Email   []interface{} `json:"email"`
 		Jira    []interface{} `json:"jira"`
@@ -173,8 +173,32 @@ type CodeStreamPipeline struct {
 	OutputMeta interface{}   `json:"_outputMeta"`
 	Warnings   []interface{} `json:"_warnings"`
 	Rollbacks  []interface{} `json:"rollbacks"`
-	Tags       []interface{} `json:"tags"`
+	Tags       []string      `json:"tags"`
 	State      string        `json:"state"`
+}
+
+type CodeStreamPipelineStage struct {
+	Tags      []string               `json:"tags"`
+	TaskOrder []string               `json:"taskOrder"`
+	Tasks     map[string]interface{} `json:"tasks"`
+}
+
+type CodeStreamPipelineTask struct {
+	Configured    bool              `json:"_configured"`
+	Endpoints     map[string]string `json:"endpoints"`
+	IgnoreFailure bool              `json:"ignoreFailure"`
+	Input         struct {
+		InputProperties map[string]string `json:"inputProperties"`
+		Action          string            `json:"action"`
+		Blueprint       string            `json:"blueprint"`
+		Name            string            `json:"name"`
+		Parameters      map[string]string `json:"parameters"`
+		Properties      map[string]string `json:"properties"`
+		Pipeline        string            `json:"pipeline"`
+	} `json:"input"`
+	PreCondition string   `json:"preCondition"`
+	Tags         []string `json:"tags"`
+	Type         string   `json:"type"`
 }
 
 // CodeStreamCreateExecutionRequest - Code Stream Create Execution Request

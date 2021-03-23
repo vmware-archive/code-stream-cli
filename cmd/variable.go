@@ -32,7 +32,7 @@ Get by Project
 			log.Fatalln(err)
 		}
 
-		response, err := getVariable(id, name, project)
+		response, err := getVariable(id, name, project, exportPath)
 		if err != nil {
 			log.Fatalln("Unable to get Code Stream Variables: ", err)
 		}
@@ -51,9 +51,6 @@ Get by Project
 			table := tablewriter.NewWriter(os.Stdout)
 			table.SetHeader([]string{"Id", "Name", "Project", "Type", "Description"})
 			for _, c := range response {
-				if exportPath != "" {
-					exportVariable(c, exportPath)
-				}
 				table.Append([]string{c.ID, c.Name, c.Project, c.Type, c.Description})
 			}
 			table.Render()
@@ -107,7 +104,7 @@ var updateVariableCmd = &cobra.Command{
 		if importPath != "" { // If we are importing a file
 			variables := importVariables(importPath)
 			for _, value := range variables {
-				exisitingVariable, err := getVariable("", value.Name, value.Project)
+				exisitingVariable, err := getVariable("", value.Name, value.Project, "")
 				if err != nil {
 					log.Println("Update failed - unable to find existing Code Stream Variable", value.Name, "in", value.Project)
 				} else {
