@@ -5,12 +5,10 @@ SPDX-License-Identifier: BSD-2-Clause
 package cmd
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -36,45 +34,54 @@ var getProjectCommand = &cobra.Command{
 		}
 
 		// Print result table
-		table := tablewriter.NewWriter(os.Stdout)
-		pipelineTable := tablewriter.NewWriter(os.Stdout)
-		variableTable := tablewriter.NewWriter(os.Stdout)
-		endpointTable := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"Id", "Name", "Description"})
+		// table := tablewriter.NewWriter(os.Stdout)
+		// pipelineTable := tablewriter.NewWriter(os.Stdout)
+		// variableTable := tablewriter.NewWriter(os.Stdout)
+		// endpointTable := tablewriter.NewWriter(os.Stdout)
+		// table.SetHeader([]string{"Id", "Name", "Description"})
 		for _, p := range response {
-			table.Append([]string{p.ID, p.Name, p.Description})
+			// table.Append([]string{p.ID, p.Name, p.Description})
 			if exportPath != "" {
 				tmpDir, err := ioutil.TempDir(os.TempDir(), "cs-cli-*")
 				if err != nil {
 					log.Fatalln(err)
 				}
 				zipFile := filepath.Join(exportPath, p.Name+".zip")
+				var zipFiles []string
 				log.Println(zipFile)
 				pipelines, _ := getPipelines("", "", p.Name, filepath.Join(tmpDir, p.Name, "pipelines"))
-				pipelineTable.SetHeader([]string{"Id", "Name", "Project", "Description"})
+				//pipelineTable.SetHeader([]string{"Id", "Name", "Project", "Description"})
 				for _, c := range pipelines {
-					pipelineTable.Append([]string{c.ID, c.Name, c.Project, c.Description})
+					zipFiles = append(zipFiles, filepath.Join(tmpDir, p.Name, "pipelines", c.Name+".yaml"))
+					//pipelineTable.Append([]string{c.ID, c.Name, c.Project, c.Description})
 				}
-				variables, _ := getVariable("", "", p.Name, filepath.Join(tmpDir, p.Name, ""))
-				variableTable.SetHeader([]string{"Id", "Name", "Project", "Description"})
-				for _, c := range variables {
-					variableTable.Append([]string{c.ID, c.Name, c.Project, c.Description})
+				variables, _ := getVariable("", "", p.Name, filepath.Join(tmpDir, p.Name))
+				//variableTable.SetHeader([]string{"Id", "Name", "Project", "Description"})
+				if len(variables) > 0 {
+					zipFiles = append(zipFiles, filepath.Join(tmpDir, p.Name, "variables.yaml"))
 				}
+				// for _, c := range variables {
+				// 	//variableTable.Append([]string{c.ID, c.Name, c.Project, c.Description})
+				// }
 				endpoints, _ := getEndpoint("", "", p.Name, "", filepath.Join(tmpDir, p.Name, "endpoints"))
-				endpointTable.SetHeader([]string{"ID", "Name", "Project", "Type", "Description"})
+				//endpointTable.SetHeader([]string{"ID", "Name", "Project", "Type", "Description"})
 				for _, c := range endpoints {
-					endpointTable.Append([]string{c.ID, c.Name, c.Project, c.Type, c.Description})
+					zipFiles = append(zipFiles, filepath.Join(tmpDir, p.Name, c.Name+".yaml"))
+					//endpointTable.Append([]string{c.ID, c.Name, c.Project, c.Type, c.Description})
+				}
+				if err := ZipFiles(zipFile, zipFiles, tmpDir); err != nil {
+					log.Fatalln(err)
 				}
 			}
 		}
-		fmt.Println("Project")
-		table.Render()
-		fmt.Println("Pipelines")
-		pipelineTable.Render()
-		fmt.Println("Variables")
-		variableTable.Render()
-		fmt.Println("Endpoints")
-		endpointTable.Render()
+		// fmt.Println("Project")
+		// table.Render()
+		// fmt.Println("Pipelines")
+		// pipelineTable.Render()
+		// fmt.Println("Variables")
+		// variableTable.Render()
+		// fmt.Println("Endpoints")
+		// endpointTable.Render()
 	},
 }
 

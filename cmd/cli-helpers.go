@@ -83,7 +83,7 @@ func removeDuplicateStrings(elements []string) []string {
 	return result
 }
 
-func ZipFiles(filename string, files []string) error {
+func ZipFiles(filename string, files []string, basedir string) error {
 	newZipFile, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -95,14 +95,14 @@ func ZipFiles(filename string, files []string) error {
 
 	// Add files to zip
 	for _, file := range files {
-		if err = AddFileToZip(zipWriter, file); err != nil {
+		if err = AddFileToZip(zipWriter, file, basedir); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func AddFileToZip(zipWriter *zip.Writer, filename string) error {
+func AddFileToZip(zipWriter *zip.Writer, filename string, basedir string) error {
 	fileToZip, err := os.Open(filename)
 	if err != nil {
 		return err
@@ -119,7 +119,10 @@ func AddFileToZip(zipWriter *zip.Writer, filename string) error {
 	}
 	// Using FileInfoHeader() above only uses the basename of the file. If we want
 	// to preserve the folder structure we can overwrite this with the full path.
-	header.Name = filename
+	fmt.Println(basedir)
+	fmt.Println(filename)
+	fmt.Println(strings.ReplaceAll(filename, basedir, ""))
+	header.Name = strings.ReplaceAll(filename, basedir, "")
 
 	// Change to deflate to gain better compression
 	// see http://golang.org/pkg/archive/zip/#pkg-constants
