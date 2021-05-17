@@ -7,6 +7,7 @@ package cmd
 import (
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"strconv"
 	"strings"
 
@@ -40,7 +41,8 @@ func getExecutions(id string, status string, name string, nested bool) ([]*Codes
 		SetAuthToken(targetConfig.accesstoken).
 		Get("https://" + targetConfig.server + "/pipeline/api/executions")
 	if queryResponse.IsError() {
-		return nil, queryResponse.Error().(error)
+		//return nil, queryResponse.Error().(error)
+		return nil, errors.New(queryResponse.Error().(*CodeStreamException).Message)
 	}
 
 	for _, value := range queryResponse.Result().(*documentsList).Documents {
@@ -74,7 +76,7 @@ func deleteExecution(id string) (*CodestreamAPIExecutions, error) {
 		SetAuthToken(targetConfig.accesstoken).
 		Delete("https://" + targetConfig.server + "/pipeline/api/executions/" + id)
 	if queryResponse.IsError() {
-		return nil, queryResponse.Error().(error)
+		return nil, errors.New(queryResponse.Error().(*CodeStreamException).Message)
 	}
 	return queryResponse.Result().(*CodestreamAPIExecutions), err
 }
@@ -106,7 +108,7 @@ func createExecution(id string, inputs string, comment string) (*CodeStreamCreat
 		SetAuthToken(targetConfig.accesstoken).
 		Post("https://" + targetConfig.server + "/pipeline/api/pipelines/" + id + "/executions")
 	if queryResponse.IsError() {
-		return nil, queryResponse.Error().(error)
+		return nil, errors.New(queryResponse.Error().(*CodeStreamException).Message)
 	}
 	return queryResponse.Result().(*CodeStreamCreateExecutionResponse), nil
 }
