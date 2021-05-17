@@ -20,6 +20,11 @@ type AuthenticationRequest struct {
 	Domain   string `json:"domain"`
 }
 
+// TokenRequest - vRA Authentication request structure
+type TokenRequest struct {
+	RefreshToken string `json:"refresh_token"`
+}
+
 // AuthenticationResponse - Authentication response structure
 type AuthenticationResponse struct {
 	Scope        string `json:"scope"`
@@ -30,15 +35,24 @@ type AuthenticationResponse struct {
 	ExpiresIn    int    `json:"expires_in"`
 }
 
-// AuthenticationRequestCloud - vRA Authentication request structure for Cloud
-type AuthenticationRequestCloud struct {
+// ApiAuthentication - vRA Authentication request structure for API login with a refresh token
+type ApiAuthentication struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
-// AuthenticationResponseCloud - Authentication response structure for Cloud
-type AuthenticationResponseCloud struct {
+// ApiAuthenticationResponse - Authentication response structure for API login with a refresh token
+type ApiAuthenticationResponse struct {
 	TokenType string `json:"tokenType"`
 	Token     string `json:"token"`
+}
+
+// ApiAuthenticationError - API Authentication error structure
+type ApiAuthenticationError struct {
+	Message       string `json:"message"`
+	StatusCode    int64  `json:"statusCode"`
+	ErrorCode     int64  `json:"errorCode"`
+	ServerErrorId string `json:"serverErrorId"`
+	DocumentKind  string `json:"documentKind"`
 }
 
 // AuthenticationError - Authentication error structure

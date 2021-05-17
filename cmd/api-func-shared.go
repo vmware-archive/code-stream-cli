@@ -18,52 +18,85 @@ import (
 )
 
 func ensureTargetConnection() error {
-	// If the targetConfig.accesstoken is not set or testAccesToken returns false
-	if !testAccessToken() {
-		var authError error
-		// Authenticate
-		if targetConfig.apitoken != "" {
-			targetConfig.accesstoken, authError = authenticateCloud(targetConfig)
-		} else {
-			targetConfig.accesstoken, authError = authenticateOnPrem(targetConfig)
+	if testAccessToken() { // If the Access Token is OK
+		log.Debugln("Access Token is valid")
+	} else {
+		var refreshTokenError, credentialError error
+		targetConfig.accesstoken, refreshTokenError = authenticateApiToken(targetConfig.server, targetConfig.apitoken) // Test the API Token (refresh_token)
+		if refreshTokenError != nil {                                                                                  // We could not get an access token from the API Token
+			log.Debugln("Refresh Token is invalid")
+			if targetConfig.server == "api.mgmt.cloud.vmware.com" { // If it's vRA Cloud we have no credentials to authenticate
+				return refreshTokenError // Return the token error
+			}
+			targetConfig.apitoken, credentialError = authenticateCredentials(targetConfig.server, targetConfig.username, targetConfig.password, targetConfig.domain)
+			if credentialError != nil {
+				return credentialError // Return the credential error
+			}
+			// Try again, now we have a new access token
+			targetConfig.accesstoken, refreshTokenError = authenticateApiToken(targetConfig.server, targetConfig.apitoken) // Test the API Token (refresh_token)
+			if refreshTokenError != nil {
+				return refreshTokenError
+			}
 		}
-		if authError != nil {
-			return authError
-		}
-		if viper.ConfigFileUsed() != "" {
+
+		if viper.ConfigFileUsed() != "" { // If we're using a Config file
 			viper.Set("target."+currentTargetName+".accesstoken", targetConfig.accesstoken)
+			viper.Set("target."+currentTargetName+".apitoken", targetConfig.apitoken)
 			viper.WriteConfig()
 		}
+
 	}
 	return nil
 }
 
-func authenticateOnPrem(target config) (string, error) {
-	log.Debugln("Authenticating vRA")
+// authenticateCredentials - returns the API Refresh Token for vRA On-premesis (8.0.1+)
+func authenticateCredentials(server string, username string, password string, domain string) (string, error) {
+	log.Debugln("Authenticating vRA with Credentials")
+	var authPath string
+	var authBody AuthenticationRequest
+	authBody.Username = username
+	authBody.Password = password
 	client := resty.New()
-	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
-		SetBody(AuthenticationRequest{target.username, target.password, target.domain}).
+
+	if domain == "" {
+		log.Debugln("Basic Auth")
+		// Use Basic Authentication
+		authPath = "/csp/gateway/am/api/login?access_token"
+	} else {
+		log.Debugln("Enhanced Auth")
+		// Use Enhanced Login (e.g. domain users)
+		authPath = "/csp/gateway/am/idp/auth/login?access_token"
+		authBody.Domain = domain
+	}
+
+	loginResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
+		SetBody(authBody).
 		SetResult(&AuthenticationResponse{}).
 		SetError(&AuthenticationError{}).
-		Post("https://" + target.server + "/csp/gateway/am/idp/auth/login?access_token")
-	if queryResponse.IsError() {
-		return "", errors.New(queryResponse.Error().(*AuthenticationError).ServerMessage)
+		Post("https://" + server + authPath)
+	if loginResponse.IsError() {
+		log.Debugln("Authentication failed")
+		return "", errors.New(loginResponse.Error().(*AuthenticationError).ServerMessage)
 	}
-	return queryResponse.Result().(*AuthenticationResponse).AccessToken, err
+	log.Debugln("Authentication succeeded")
+	return loginResponse.Result().(*AuthenticationResponse).RefreshToken, err
 }
-func authenticateCloud(target config) (string, error) {
-	log.Debugln("Authenticating vRA Cloud")
+
+// authenticateApiToken - get vRA Access token (valid for 8h)
+func authenticateApiToken(server string, token string) (string, error) {
+	log.Debug("Attempting to authenticate the API Refresh Token")
 	client := resty.New()
 	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
-		SetBody(AuthenticationRequestCloud{target.apitoken}).
-		SetResult(&AuthenticationResponseCloud{}).
-		SetError(&AuthenticationError{}).
-		Post("https://" + target.server + "/iaas/api/login")
+		SetBody(ApiAuthentication{token}).
+		SetResult(&ApiAuthenticationResponse{}).
+		SetError(&ApiAuthenticationError{}).
+		Post("https://" + server + "/iaas/api/login")
 	if queryResponse.IsError() {
-		log.Debugln("Authentication failed!", queryResponse.RawResponse)
-		return "", errors.New(queryResponse.Error().(*AuthenticationError).ServerMessage)
+		log.Debug("Refresh Token failed")
+		return "", errors.New(queryResponse.Error().(*ApiAuthenticationError).Message)
 	}
-	return queryResponse.Result().(*AuthenticationResponseCloud).Token, err
+	log.Debug("Refresh Token succeeded")
+	return queryResponse.Result().(*ApiAuthenticationResponse).Token, err
 }
 
 func testAccessToken() bool {
