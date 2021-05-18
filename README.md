@@ -68,6 +68,34 @@ CS_DOMAIN="cmbu.local"
 cs-cli get execution
 ```
 
+### Certificates
+By default cs-cli will use the OS's certificate trust to determine whether the vRealize Automation Code Stream API certificate is trusted. To ignore certificate warnings, use the `--ignoreCertificateWarnings` flag:
+
+```bash
+❯ cs-cli get execution
+WARN[0000] Get "https://wdc-fd-vra8-01.cmbu.local/pipeline/api/user-preferences": x509: certificate has expired or is not yet valid: current time 2021-05-18T13:21:44+01:00 is after 2020-10-17T16:06:34Z 
+FATA[0001] Post "https://wdc-fd-vra8-01.cmbu.local/csp/gateway/am/api/login?access_token": x509: certificate has expired or is not yet valid: current time 2021-05-18T13:21:45+01:00 is after 2020-10-17T16:06:34Z 
+exit status 1
+❯ cs-cli get execution --ignoreCertificateWarnings
++--------------------------------------+--------------------------------+------------+-----------+-----------------------------------------+
+|                  ID                  |              NAME              |  PROJECT   |  STATUS   |                 MESSAGE                 |
++--------------------------------------+--------------------------------+------------+-----------+-----------------------------------------+
+| a86ae170-ef23-4d2a-8cfc-5de75767a78b | Packer-Template-Builds#44      | Field Demo | COMPLETED | Execution Completed.                    |
+| f82eb2f8-0b5f-4b17-9053-4101a696ce08 | Packer-Template-Builds#27      | Field Demo | COMPLETED | Execution Completed.                    |
+| 656cbe5e-84f7-4e2e-a6a5-60e0734a5a6a | Blue-Green Deployment#1        | Field Demo | CANCELED  | test-active-deployment.user-validation: |
+|                                      |                                |            |           | Execution canceled by smcgeown.         |
+| 0c0af1ca-5ec9-4aab-b027-311a1e483224 | TKG Workload Cluster#34        | Field Demo | FAILED    | Build.Install TKG CLI: Script           |
+|                                      |                                |            |           | execution failed.                       |
+| cc57d3d0-e38e-458b-8296-bfd75b4b9571 | Packer-Template-Builds#21      | Field Demo | COMPLETED | Execution Completed.                    |
+| f1ccba1b-1018-4f1b-899b-12420973e9b2 | Install Ubuntu with            | Field Demo | COMPLETED | Execution Completed.                    |
+|                                      | Software#20                    |            |           |                                         |
+| 5924cdf8-756b-4412-87e9-242f40059ee3 | Field-Demo-Chat-App#5          | Field Demo | COMPLETED | Execution Completed.                    |
++--------------------------------------+--------------------------------+------------+-----------+-----------------------------------------+
+```
+
+### Debug
+Use the `--debug` flag to enable debug logging.
+
 ### Working with targets
 
 List available targets:
