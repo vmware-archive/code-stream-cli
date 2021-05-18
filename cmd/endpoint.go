@@ -73,7 +73,7 @@ var createEndpointCmd = &cobra.Command{
 			}
 			for _, yamlFilePath := range yamlFilePaths {
 				yamlFileName := filepath.Base(yamlFilePath)
-				err := importYaml(yamlFilePath, "create", "", "endpoint")
+				err := importYaml(yamlFilePath, "create", project, "endpoint")
 				if err != nil {
 					log.Warnln("Failed to import", yamlFilePath, "as Endpoint", err)
 				} else {
@@ -165,6 +165,7 @@ func init() {
 	// Create
 	createCmd.AddCommand(createEndpointCmd)
 	createEndpointCmd.Flags().StringVarP(&importPath, "importPath", "c", "", "YAML configuration file to import")
+	createEndpointCmd.Flags().StringVarP(&project, "project", "p", "", "Manually specify the Project in which to create the Endpoint (overrides YAML)")
 	createEndpointCmd.MarkFlagRequired("importPath")
 	// Update
 	updateCmd.AddCommand(updateEndpointCmd)

@@ -362,3 +362,12 @@ type CodeStreamPipelineYaml struct {
 	StageOrder  []string    `yaml:"stageOrder"`
 	Stages      interface{} `yaml:"stages"`
 }
+
+type CodeStreamEndpointYaml struct {
+	Project     string            `yaml:"project"`
+	Kind        string            `yaml:"kind"`
+	Name        string            `yaml:"name"`
+	Description string            `yaml:"description"`
+	Type        string            `yaml:"type"`
+	Properties  map[string]string `yaml:"properties"`
+}

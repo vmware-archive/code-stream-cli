@@ -149,7 +149,7 @@ func exportYaml(name, project, path, object string) error {
 // importYaml import a yaml pipeline or endpoint
 func importYaml(yamlPath, action, project, importType string) error {
 	var pipeline CodeStreamPipelineYaml
-	var endpoint CodeStreamEndpoint
+	var endpoint CodeStreamEndpointYaml
 
 	qParams["action"] = action
 	yamlBytes, err := ioutil.ReadFile(yamlPath)
@@ -157,18 +157,18 @@ func importYaml(yamlPath, action, project, importType string) error {
 		return err
 	}
 
-	if project != "" {
+	if project != "" { // If the project flag is set we need to update the project value
 		if importType == "pipeline" {
 			yamlErr := yaml.Unmarshal(yamlBytes, &pipeline)
 			if yamlErr != nil {
-				log.Fatalf("error: %v", yamlErr)
+				return yamlErr
 			}
 			pipeline.Project = project
 			yamlBytes, _ = yaml.Marshal(pipeline)
 		} else {
 			yamlErr := yaml.Unmarshal(yamlBytes, &endpoint)
 			if yamlErr != nil {
-				log.Fatalf("error: %v", yamlErr)
+				return yamlErr
 			}
 			endpoint.Project = project
 			yamlBytes, _ = yaml.Marshal(endpoint)
