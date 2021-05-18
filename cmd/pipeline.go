@@ -184,7 +184,7 @@ var updatePipelineCmd = &cobra.Command{
 		}
 		for _, yamlFilePath := range yamlFilePaths {
 			yamlFileName := filepath.Base(yamlFilePath)
-			err := importYaml(yamlFilePath, "apply")
+			err := importYaml(yamlFilePath, "apply", "", "endpoint")
 			if err != nil {
 				log.Warnln("Failed to import", yamlFilePath, "as Pipeline", err)
 			}
@@ -215,7 +215,7 @@ var createPipelineCmd = &cobra.Command{
 		}
 		for _, yamlFilePath := range yamlFilePaths {
 			yamlFileName := filepath.Base(yamlFilePath)
-			err := importYaml(yamlFilePath, "create")
+			err := importYaml(yamlFilePath, "create", project, "pipeline")
 			if err != nil {
 				log.Warnln("Failed to import", yamlFilePath, "as Pipeline", err)
 			} else {
@@ -260,7 +260,7 @@ func init() {
 	// Create
 	createCmd.AddCommand(createPipelineCmd)
 	createPipelineCmd.Flags().StringVarP(&importPath, "importPath", "", "", "YAML configuration file to import")
-	// createPipelineCmd.Flags().StringVarP(&project, "project", "p", "", "Manually specify the Project in which to create the Pipeline (overrides YAML)")
+	createPipelineCmd.Flags().StringVarP(&project, "project", "p", "", "Manually specify the Project in which to create the Pipeline (overrides YAML)")
 	createPipelineCmd.MarkFlagRequired("importPath")
 	// Update
 	updateCmd.AddCommand(updatePipelineCmd)
@@ -270,6 +270,5 @@ func init() {
 	// Delete
 	deleteCmd.AddCommand(deletePipelineCmd)
 	deletePipelineCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the Pipeline to delete")
-	deletePipelineCmd.MarkFlagRequired("id")
 
 }

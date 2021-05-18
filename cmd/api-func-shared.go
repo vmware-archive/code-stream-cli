@@ -147,12 +147,34 @@ func exportYaml(name, project, path, object string) error {
 }
 
 // importYaml import a yaml pipeline or endpoint
-func importYaml(yamlPath, action string) error {
+func importYaml(yamlPath, action, project, importType string) error {
+	var pipeline CodeStreamPipelineYaml
+	var endpoint CodeStreamEndpoint
+
 	qParams["action"] = action
 	yamlBytes, err := ioutil.ReadFile(yamlPath)
 	if err != nil {
 		return err
 	}
+
+	if project != "" {
+		if importType == "pipeline" {
+			yamlErr := yaml.Unmarshal(yamlBytes, &pipeline)
+			if yamlErr != nil {
+				log.Fatalf("error: %v", yamlErr)
+			}
+			pipeline.Project = project
+			yamlBytes, _ = yaml.Marshal(pipeline)
+		} else {
+			yamlErr := yaml.Unmarshal(yamlBytes, &endpoint)
+			if yamlErr != nil {
+				log.Fatalf("error: %v", yamlErr)
+			}
+			endpoint.Project = project
+			yamlBytes, _ = yaml.Marshal(endpoint)
+		}
+	}
+
 	yamlPayload := string(yamlBytes)
 	client := resty.New()
 	queryResponse, _ := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().

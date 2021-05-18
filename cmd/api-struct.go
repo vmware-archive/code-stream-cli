@@ -347,3 +347,18 @@ type CodeStreamProjectList struct {
 	Size             int  `json:"size"`
 	Empty            bool `json:"empty"`
 }
+
+type CodeStreamPipelineYaml struct {
+	Project     string      `yaml:"project"`
+	Kind        string      `yaml:"kind"`
+	Name        string      `yaml:"name"`
+	Icon        string      `yaml:"icon"`
+	Enabled     bool        `yaml:"enabled"`
+	Description string      `yaml:"description"`
+	Concurrency int         `yaml:"concurrency"`
+	Input       interface{} `yaml:"input"`
+	InputMeta   interface{} `yaml:"_inputMeta"`
+	Workspace   interface{} `yaml:"workspace"`
+	StageOrder  []string    `yaml:"stageOrder"`
+	Stages      interface{} `yaml:"stages"`
+}

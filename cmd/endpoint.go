@@ -73,7 +73,7 @@ var createEndpointCmd = &cobra.Command{
 			}
 			for _, yamlFilePath := range yamlFilePaths {
 				yamlFileName := filepath.Base(yamlFilePath)
-				err := importYaml(yamlFilePath, "create")
+				err := importYaml(yamlFilePath, "create", "", "endpoint")
 				if err != nil {
 					log.Warnln("Failed to import", yamlFilePath, "as Endpoint", err)
 				} else {
@@ -107,7 +107,7 @@ var updateEndpointCmd = &cobra.Command{
 			}
 			for _, yamlFilePath := range yamlFilePaths {
 				yamlFileName := filepath.Base(yamlFilePath)
-				err := importYaml(yamlFilePath, "apply")
+				err := importYaml(yamlFilePath, "apply", "", "endpoint")
 				if err != nil {
 					log.Warnln("Failed to import", yamlFilePath, "as Endpoint", err)
 				} else {
