@@ -164,6 +164,8 @@ cs-cli create pipeline --importPath /Users/sammcgeown/Desktop/cs-cli/pipelines
 cs-cli update pipeline --importPath /my/updated-pipe.yaml
 # Update existing pipelines from folder
 cs-cli update pipeline --importPath /Users/sammcgeown/Desktop/cs-cli/pipelines
+# Import a pipeline to a specific Project (overriding the YAML definition)
+cs-cli create pipeline --importPath export/pipelines/Field-Demo-Chat-App.yaml --project "Field Demo"
 ```
 
 
@@ -268,6 +270,8 @@ cs-cli create endpoint --importPath /path/to/my/endpoint.yaml
 # Note: You cannot change the endpoint name - this
 #       will result in a new endpoint being created
 cs-cli update endpoint --importPath updated-endpoint.yaml
+# Import an endpoint to a specific Project (overriding the YAML)
+cs-cli create endpoint --importPath /path/to/my/endpoint.yaml --project "Field Demo"
 ```
 
 Delete an endpoint
