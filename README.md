@@ -289,3 +289,48 @@ cs-cli get customintegration --id c145b52e-c797-49d1-88a5-1d70e7788d03
 # Get custom integration by name
 cs-cli get customintegration --name base64Encode
 ```
+
+
+## Shell Completions
+Basic shell completion is now available using the `cs-cli completion` command.
+
+```bash
+To load completions:
+
+Bash:
+
+  $ source <(cs-cli completion bash)
+
+  # To load completions for each session, execute once:
+  # Linux:
+  $ cs-cli completion bash > /etc/bash_completion.d/cs-cli
+  # macOS:
+  $ cs-cli completion bash > /usr/local/etc/bash_completion.d/cs-cli
+
+Zsh:
+
+  # If shell completion is not already enabled in your environment,
+  # you will need to enable it.  You can execute the following once:
+
+  $ echo "autoload -U compinit; compinit" >> ~/.zshrc
+
+  # To load completions for each session, execute once:
+  $ cs-cli completion zsh > "${fpath[1]}/_cs-cli"
+
+  # You will need to start a new shell for this setup to take effect.
+
+fish:
+
+  $ cs-cli completion fish | source
+
+  # To load completions for each session, execute once:
+  $ cs-cli completion fish > ~/.config/fish/completions/cs-cli.fish
+
+PowerShell:
+
+  PS> cs-cli completion powershell | Out-String | Invoke-Expression
+
+  # To load completions for every new session, run:
+  PS> cs-cli completion powershell > cs-cli.ps1
+  # and source this file from your PowerShell profile.
+```
