@@ -49,7 +49,7 @@ func ensureTargetConnection() error {
 	return nil
 }
 
-// authenticateCredentials - returns the API Refresh Token for vRA On-premesis (8.0.1+)
+// authenticateCredentials - returns the API Refresh Token for vRA On-premises (8.0.1+)
 func authenticateCredentials(server string, username string, password string, domain string) (string, error) {
 	log.Debugln("Authenticating vRA with Credentials")
 	var authPath string
