@@ -44,7 +44,7 @@ cs-cli get execution --status Failed`,
 
 		response, err := getPipelines(id, name, project, exportPath)
 		if err != nil {
-			log.Println("Unable to get Code Stream Pipelines: ", err)
+			log.Errorln("Unable to get Code Stream Pipelines: ", err)
 		}
 		var resultCount = len(response)
 		if resultCount == 0 {
@@ -101,14 +101,14 @@ cs-cli get execution --status Failed`,
 						if task.Type == "Custom" {
 							customintegrations = append(customintegrations, task.Input.Name)
 						}
-						log.Println("-- [Task]", n, "(", task.Type, ")")
+						log.Infoln("-- [Task]", n, "(", task.Type, ")")
 					}
 				}
 				if dependencies {
 					variables = removeDuplicateStrings(variables)
 					sort.Strings(variables)
 					if len(variables) > 0 {
-						log.Println(c.Name, "depends on Variables:", strings.Join(variables, ", "))
+						log.Infoln(c.Name, "depends on Variables:", strings.Join(variables, ", "))
 						for _, v := range variables {
 							getVariable("", v, c.Project, exportPath)
 						}
@@ -116,7 +116,7 @@ cs-cli get execution --status Failed`,
 					pipelines = removeDuplicateStrings(pipelines)
 					sort.Strings(pipelines)
 					if len(pipelines) > 0 {
-						log.Println(c.Name, "depends on Pipelines:", strings.Join(pipelines, ", "))
+						log.Infoln(c.Name, "depends on Pipelines:", strings.Join(pipelines, ", "))
 						for _, p := range pipelines {
 							getPipelines("", p, c.Project, filepath.Join(exportPath, "pipelines"))
 						}
@@ -124,7 +124,7 @@ cs-cli get execution --status Failed`,
 					endpoints = removeDuplicateStrings(endpoints)
 					sort.Strings(endpoints)
 					if len(endpoints) > 0 {
-						log.Println(c.Name, "depends on Endpoints:", strings.Join(endpoints, ", "))
+						log.Infoln(c.Name, "depends on Endpoints:", strings.Join(endpoints, ", "))
 						for _, e := range endpoints {
 							getEndpoint("", e, c.Project, "", filepath.Join(exportPath, "endpoints"))
 						}
@@ -132,7 +132,7 @@ cs-cli get execution --status Failed`,
 					customintegrations = removeDuplicateStrings(customintegrations)
 					sort.Strings(customintegrations)
 					if len(customintegrations) > 0 {
-						log.Println(c.Name, "depends on Custom Integrations:", strings.Join(customintegrations, ", "))
+						log.Infoln(c.Name, "depends on Custom Integrations:", strings.Join(customintegrations, ", "))
 						for _, ci := range customintegrations {
 							getCustomIntegration("", ci)
 						}
@@ -149,10 +149,10 @@ var updatePipelineCmd = &cobra.Command{
 	Use:   "pipeline",
 	Short: "Update a Pipeline",
 	Long: `Update a Pipeline
-	Enable/Disable/Release:
-	cs-cli update pipeline --id d0185f04-2e87-4f3c-b6d7-ee58abba3e92 --state enabled/disabled/released
-	Update from YAML
-	cs-cli update pipeline --importPath "/Users/sammcgeown/Desktop/pipelines/SSH Exports.yaml"
+# Enable/Disable/Release:
+cs-cli update pipeline --id d0185f04-2e87-4f3c-b6d7-ee58abba3e92 --state enabled/disabled/released
+# Update from YAML
+cs-cli update pipeline --importPath "/Users/sammcgeown/Desktop/pipelines/SSH Exports.yaml"
 	`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if state != "" {
@@ -173,9 +173,9 @@ var updatePipelineCmd = &cobra.Command{
 		if state != "" {
 			response, err := patchPipeline(id, `{"state":"`+state+`"}`)
 			if err != nil {
-				log.Println("Unable to update Code Stream Pipeline: ", err)
+				log.Errorln("Unable to update Code Stream Pipeline: ", err)
 			}
-			log.Println("Setting pipeline " + response.Name + " to " + state)
+			log.Infoln("Setting pipeline " + response.Name + " to " + state)
 		}
 
 		yamlFilePaths := getYamlFilePaths(importPath)
@@ -199,8 +199,8 @@ var createPipelineCmd = &cobra.Command{
 	Short: "Create a Pipeline",
 	Long: `Create a Pipeline by importing a YAML specification.
 	
-	Create from YAML
-	  cs-cli create pipeline --importPath "/Users/sammcgeown/Desktop/pipelines/SSH Exports.yaml"
+# Create from YAML
+cs-cli create pipeline --importPath "/Users/sammcgeown/Desktop/pipelines/SSH Exports.yaml"
 	`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		return nil
@@ -229,19 +229,36 @@ var createPipelineCmd = &cobra.Command{
 var deletePipelineCmd = &cobra.Command{
 	Use:   "pipeline",
 	Short: "Delete a Pipeline",
-	Long: `Delete a Pipeline with a specific ID
-	
-	`,
+	Long: `Delete a Pipeline with a specific ID, Name or by Project
+
+# Delete by ID
+cs-cli delete pipeline --id "pipeline ID"
+
+# Delete by Name
+cs-cli delete pipeline --name "My Pipeline"
+
+# Delete by Name and Project
+cs-cli delete pipeline --name "My Pipeline" --project "My Project"
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := ensureTargetConnection(); err != nil {
 			log.Fatalln(err)
 		}
+		if id != "" {
+			response, err := deletePipeline(id)
+			if err != nil {
+				log.Errorln("Delete Pipeline failed:", err)
+			}
+			log.Infoln("Pipeline with id " + response.ID + " deleted")
+		} else if project != "" {
+			response, err := deletePipelineInProject(project)
+			if err != nil {
+				log.Errorln("Delete Pipelines in "+project+" failed:", err)
+			} else {
+				log.Infoln(len(response), "Pipelines deleted")
+			}
 
-		response, err := deletePipeline(id)
-		if err != nil {
-			log.Fatalln("Delete Pipeline failed:", err)
 		}
-		log.Println("Pipeline with id " + response.ID + " deleted")
 
 	},
 }
@@ -270,5 +287,6 @@ func init() {
 	// Delete
 	deleteCmd.AddCommand(deletePipelineCmd)
 	deletePipelineCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the Pipeline to delete")
+	deletePipelineCmd.Flags().StringVarP(&project, "project", "p", "", "Delete all Pipelines in the specified Project")
 
 }

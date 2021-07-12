@@ -7,6 +7,7 @@ package cmd
 import (
 	"crypto/tls"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/go-resty/resty/v2"
@@ -85,9 +86,31 @@ func deletePipeline(id string) (*CodeStreamPipeline, error) {
 		SetHeader("Accept", "application/json").
 		SetResult(&CodeStreamPipeline{}).
 		SetAuthToken(targetConfig.accesstoken).
+		SetError(&CodeStreamException{}).
 		Delete("https://" + targetConfig.server + "/pipeline/api/pipelines/" + id)
 	if queryResponse.IsError() {
-		return nil, queryResponse.Error().(error)
+		return nil, errors.New(queryResponse.Error().(*CodeStreamException).Message)
 	}
 	return queryResponse.Result().(*CodeStreamPipeline), err
+}
+
+func deletePipelineInProject(project string) ([]*CodeStreamPipeline, error) {
+	var deletedPipes []*CodeStreamPipeline
+	pipelines, err := getPipelines("", "", project, "")
+	if err != nil {
+		return nil, err
+	}
+	confirm := askForConfirmation("This will attempt to delete " + fmt.Sprint(len(pipelines)) + " Pipelines in " + project + ", are you sure?")
+	if confirm {
+		for _, pipeline := range pipelines {
+			deletedPipe, err := deletePipeline(pipeline.ID)
+			if err != nil {
+				log.Warnln("Unable to delete "+pipeline.Name, err)
+			}
+			deletedPipes = append(deletedPipes, deletedPipe)
+		}
+		return deletedPipes, nil
+	} else {
+		return nil, errors.New("user declined")
+	}
 }

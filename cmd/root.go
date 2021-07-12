@@ -36,11 +36,9 @@ var (
 	value       string
 	description string
 	status      string
-	// exportFile  string
-	// importFile  string
-	printJson  bool
-	exportPath string
-	importPath string
+	printJson   bool
+	exportPath  string
+	importPath  string
 )
 
 var qParams = map[string]string{
@@ -66,8 +64,7 @@ var rootCmd = &cobra.Command{
 // Execute is the main process
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		log.Println(err)
-		os.Exit(1)
+		log.Warnln(err)
 	}
 }
 
@@ -81,11 +78,12 @@ func init() {
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	// Debug logging
+	log.SetFormatter(&log.TextFormatter{TimestampFormat: "2006-01-02 15:04:05", FullTimestamp: true})
 	if debug {
-		log.Println("Debug logging enabled")
 		log.SetLevel(log.DebugLevel)
+		log.Debugln("Debug logging enabled")
 	} else {
-		log.SetLevel(log.WarnLevel)
+		log.SetLevel(log.InfoLevel)
 	}
 	// Home directory
 	home, err := homedir.Dir()
@@ -102,7 +100,7 @@ func initConfig() {
 
 	// If we're using ENV variables
 	if viper.Get("server") != nil { // CS_SERVER environment variable is set
-		log.Println("Using ENV variables")
+		log.Debugln("Using ENV variables")
 		targetConfig = config{
 			server:      sanitize.URL(viper.GetString("server")),
 			username:    viper.GetString("username"),
@@ -131,7 +129,7 @@ func initConfig() {
 		}
 		currentTargetName = viper.GetString("currentTargetName")
 		if currentTargetName != "" {
-			log.Println("Using config:", viper.ConfigFileUsed(), "Target:", currentTargetName)
+			log.Debugln("Using config:", viper.ConfigFileUsed(), "Target:", currentTargetName)
 			configuration := viper.Sub("target." + currentTargetName)
 			if configuration == nil { // Sub returns nil if the key cannot be found
 				log.Fatalln("Target configuration not found")

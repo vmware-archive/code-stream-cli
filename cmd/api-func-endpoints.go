@@ -6,10 +6,13 @@ package cmd
 
 import (
 	"crypto/tls"
+	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/mitchellh/mapstructure"
+	log "github.com/sirupsen/logrus"
 )
 
 func getEndpoint(id, name, project, endpointtype string, exportPath string) ([]*CodeStreamEndpoint, error) {
@@ -72,4 +75,26 @@ func deleteEndpoint(id string) (*CodeStreamEndpoint, error) {
 		return nil, queryResponse.Error().(error)
 	}
 	return queryResponse.Result().(*CodeStreamEndpoint), err
+}
+
+func deleteEndpointByProject(project string) ([]*CodeStreamEndpoint, error) {
+	var deletedEndpoints []*CodeStreamEndpoint
+	Endpoints, err := getEndpoint("", "", project, "", "")
+	if err != nil {
+		return nil, err
+	}
+	confirm := askForConfirmation("This will attempt to delete " + fmt.Sprint(len(Endpoints)) + " Endpoints in " + project + ", are you sure?")
+	if confirm {
+
+		for _, endpoint := range Endpoints {
+			deletedEndpoint, err := deleteEndpoint(endpoint.ID)
+			if err != nil {
+				log.Warnln("Unable to delete "+endpoint.Name, err)
+			}
+			deletedEndpoints = append(deletedEndpoints, deletedEndpoint)
+		}
+		return deletedEndpoints, nil
+	} else {
+		return nil, errors.New("user declined")
+	}
 }

@@ -150,9 +150,9 @@ Examples:
 // 		if viper.IsSet("target." + name) {
 // 			err := Unset(name)
 // 			if err != nil {
-// 				log.Println(err)
+// 				log.Errorln(err)
 // 			}
-// 			log.Println("Target deleted.")
+// 			log.Infoln("Target deleted.")
 // 		}
 // 	},
 // }

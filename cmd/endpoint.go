@@ -5,7 +5,6 @@ SPDX-License-Identifier: BSD-2-Clause
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -28,12 +27,12 @@ var getEndpointCmd = &cobra.Command{
 
 		response, err := getEndpoint(id, name, project, typename, exportPath)
 		if err != nil {
-			log.Println("Unable to get endpoints: ", err)
+			log.Infoln("Unable to get endpoints: ", err)
 		}
 		var resultCount = len(response)
 		if resultCount == 0 {
 			// No results
-			log.Println("No results found")
+			log.Infoln("No results found")
 		} else if resultCount == 1 {
 			PrettyPrint(response[0])
 		} else {
@@ -123,15 +122,26 @@ var deleteEndpointCmd = &cobra.Command{
 	Use:   "endpoint",
 	Short: "Delete an Endpoint",
 	Long: `Delete an Endpoint with a specific Endpoint ID or Name
-	
+
+# Delete by ID:
+cs-cli delete endpoint --id "Endpoint ID"
+
+# Delete by Name:
+cs-cli delete endpoint --name "Endpoint Name"
+
+# Delete by Project and Name:
+cs-cli delete endpoint --project "My Project" --name "Endpoint Name"
+
+# Delete all Endpoints in Project (prompts for confirmation):
+cs-cli delete endpoint --project "My Project"
 	`,
 	Args: func(cmd *cobra.Command, args []string) error {
-		if id != "" && name != "" {
-			return errors.New("please specify either endpoint name or endpoint id")
-		}
-		if id == "" && name == "" {
-			return errors.New("please specify endpoint name or endpoint id")
-		}
+		// if id != "" && name != "" {
+		// 	return errors.New("please specify either endpoint name or endpoint id")
+		// }
+		// if id == "" && name == "" {
+		// 	return errors.New("please specify endpoint name or endpoint id")
+		// }
 
 		return nil
 	},
@@ -147,11 +157,22 @@ var deleteEndpointCmd = &cobra.Command{
 			id = response[0].ID
 		}
 
-		response, err := deleteEndpoint(id)
-		if err != nil {
-			log.Println("Unable to delete Endpoint: ", err)
+		if id != "" {
+
+			response, err := deleteEndpoint(id)
+			if err != nil {
+				log.Errorln("Unable to delete Endpoint: ", err)
+			}
+			log.Infoln("Endpoint with id " + response.ID + " deleted")
+		} else if project != "" {
+			response, err := deleteEndpointByProject(project)
+			if err != nil {
+				log.Errorln("Unable to delete Endpoint: ", err)
+			}
+			log.Infoln(len(response), "Endpoints deleted")
+
 		}
-		fmt.Println("Endpoint with id " + response.ID + " deleted")
+
 	},
 }
 
@@ -175,5 +196,6 @@ func init() {
 	deleteCmd.AddCommand(deleteEndpointCmd)
 	deleteEndpointCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the Endpoint to delete")
 	deleteEndpointCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the Endpoint to delete")
+	deleteEndpointCmd.Flags().StringVarP(&project, "project", "p", "", "Delete Endpoints by Project")
 
 }

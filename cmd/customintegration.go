@@ -33,12 +33,12 @@ Get by Project
 		}
 		response, err := getCustomIntegration(id, name)
 		if err != nil {
-			log.Println("Unable to get Code Stream CustomIntegrations: ", err)
+			log.Errorln("Unable to get Code Stream CustomIntegrations: ", err)
 		}
 		var resultCount = len(response)
 		if resultCount == 0 {
 			// No results
-			log.Println("No results found")
+			log.Infoln("No results found")
 		} else if resultCount == 1 {
 			// Print the single result
 			//if export {
@@ -78,15 +78,15 @@ Get by Project
 // 				}
 // 				createResponse, err := createCustomIntegration(value.Name, value.Description, value.Type, value.Project, value.Value)
 // 				if err != nil {
-// 					log.Println("Unable to create Code Stream CustomIntegration: ", err)
+// 					log.Errorln("Unable to create Code Stream CustomIntegration: ", err)
 // 				} else {
-// 					log.Println("Created customintegration", createResponse.Name, "in", createResponse.Project)
+// 					log.Infoln("Created customintegration", createResponse.Name, "in", createResponse.Project)
 // 				}
 // 			}
 // 		} else {
 // 			createResponse, err := createCustomIntegration(name, description, typename, project, value)
 // 			if err != nil {
-// 				log.Println("Unable to create Code Stream CustomIntegration: ", err)
+// 				log.Errorln("Unable to create Code Stream CustomIntegration: ", err)
 // 			}
 // 			PrettyPrint(createResponse)
 // 		}
@@ -108,22 +108,22 @@ Get by Project
 // 			for _, value := range customintegrations {
 // 				exisitingCustomIntegration, err := getCustomIntegration("", value.Name, value.Project)
 // 				if err != nil {
-// 					log.Println("Update failed - unable to find existing Code Stream CustomIntegration", value.Name, "in", value.Project)
+// 					log.Infoln("Update failed - unable to find existing Code Stream CustomIntegration", value.Name, "in", value.Project)
 // 				} else {
 // 					_, err := updateCustomIntegration(exisitingCustomIntegration[0].ID, value.Name, value.Description, value.Type, value.Value)
 // 					if err != nil {
-// 						log.Println("Unable to update Code Stream CustomIntegration: ", err)
+// 						log.Infoln("Unable to update Code Stream CustomIntegration: ", err)
 // 					} else {
-// 						log.Println("Updated customintegration", value.Name)
+// 						log.Infoln("Updated customintegration", value.Name)
 // 					}
 // 				}
 // 			}
 // 		} else { // Else we are updating using flags
 // 			updateResponse, err := updateCustomIntegration(id, name, description, typename, value)
 // 			if err != nil {
-// 				log.Println("Unable to update Code Stream CustomIntegration: ", err)
+// 				log.Infoln("Unable to update Code Stream CustomIntegration: ", err)
 // 			}
-// 			log.Println("Updated customintegration", updateResponse.Name)
+// 			log.Infoln("Updated customintegration", updateResponse.Name)
 // 		}
 // 	},
 // }
@@ -145,9 +145,9 @@ Get by Project
 
 // 		response, err := deleteCustomIntegration(id)
 // 		if err != nil {
-// 			log.Println("Unable to delete customintegration: ", err)
+// 			log.Infoln("Unable to delete customintegration: ", err)
 // 		}
-// 		log.Println("CustomIntegration with id " + response.ID + " deleted")
+// 		log.Infoln("CustomIntegration with id " + response.ID + " deleted")
 // 	},
 // }
 

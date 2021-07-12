@@ -19,14 +19,14 @@ var getVariableCmd = &cobra.Command{
 	Short: "Get Variables",
 	Long: `Get Code Stream Variables by name, project or by id - e.g:
 
-Get by ID
-	cs-cli get variable --id 6b7936d3-a19d-4298-897a-65e9dc6620c8
+# Get Variable by ID
+cs-cli get variable --id 6b7936d3-a19d-4298-897a-65e9dc6620c8
 	
-Get by Name
-	cs-cli get variable --name my-variable
+# Get Variable by Name
+cs-cli get variable --name my-variable
 	
-Get by Project
-	cs-cli get variable --project production`,
+# Get Variable by Project
+cs-cli get variable --project production`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := ensureTargetConnection(); err != nil {
 			log.Fatalln(err)
@@ -76,17 +76,18 @@ var createVariableCmd = &cobra.Command{
 				}
 				createResponse, err := createVariable(value.Name, value.Description, value.Type, value.Project, value.Value)
 				if err != nil {
-					log.Println("Unable to create Code Stream Variable: ", err)
+					log.Warnln("Unable to create Code Stream Variable: ", err)
 				} else {
-					log.Println("Created variable", createResponse.Name, "in", createResponse.Project)
+					log.Infoln("Created variable", createResponse.Name, "in", createResponse.Project)
 				}
 			}
 		} else {
 			createResponse, err := createVariable(name, description, typename, project, value)
 			if err != nil {
-				log.Println("Unable to create Code Stream Variable: ", err)
+				log.Errorln("Unable to create Code Stream Variable: ", err)
+			} else {
+				PrettyPrint(createResponse)
 			}
-			PrettyPrint(createResponse)
 		}
 	},
 }
@@ -106,22 +107,22 @@ var updateVariableCmd = &cobra.Command{
 			for _, value := range variables {
 				exisitingVariable, err := getVariable("", value.Name, value.Project, "")
 				if err != nil {
-					log.Println("Update failed - unable to find existing Code Stream Variable", value.Name, "in", value.Project)
+					log.Errorln("Update failed - unable to find existing Code Stream Variable", value.Name, "in", value.Project)
 				} else {
 					_, err := updateVariable(exisitingVariable[0].ID, value.Name, value.Description, value.Type, value.Value)
 					if err != nil {
-						log.Println("Unable to update Code Stream Variable: ", err)
+						log.Errorln("Unable to update Code Stream Variable: ", err)
 					} else {
-						log.Println("Updated variable", value.Name)
+						log.Infoln("Updated variable", value.Name)
 					}
 				}
 			}
 		} else { // Else we are updating using flags
 			updateResponse, err := updateVariable(id, name, description, typename, value)
 			if err != nil {
-				log.Println("Unable to update Code Stream Variable: ", err)
+				log.Errorln("Unable to update Code Stream Variable: ", err)
 			}
-			log.Println("Updated variable", updateResponse.Name)
+			log.Infoln("Updated variable", updateResponse.Name)
 		}
 	},
 }
@@ -130,17 +131,39 @@ var updateVariableCmd = &cobra.Command{
 var deleteVariableCmd = &cobra.Command{
 	Use:   "variable",
 	Short: "Delete a Variable",
-	Long:  `Delete a Variable.`,
+	Long: `Delete a Variable.
+# Delete by ID
+cs-cli delete variable --id "variable ID"
+
+# Delete by Name
+cs-cli delete variable --name "My Variable"
+
+# Delete by Name and Project
+cs-cli delete variable --name "My Variable" --project "My Project"
+
+# Delete all Variables in Project
+cs-cli delete variable --project "My Project"
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := ensureTargetConnection(); err != nil {
 			log.Fatalln(err)
 		}
 
-		response, err := deleteVariable(id)
-		if err != nil {
-			log.Fatalln("Unable to delete variable: ", err)
+		if id != "" {
+			response, err := deleteVariable(id)
+			if err != nil {
+				log.Errorln("Unable to delete variable: ", err)
+			} else {
+				log.Infoln("Variable with id " + response.ID + " deleted")
+			}
+		} else if project != "" {
+			response, err := deleteVariableByProject(project)
+			if err != nil {
+				log.Errorln("Delete Variables in "+project+" failed:", err)
+			} else {
+				log.Infoln(len(response), "Variables deleted")
+			}
 		}
-		log.Println("Variable with id " + response.ID + " deleted")
 	},
 }
 
@@ -169,8 +192,10 @@ func init() {
 	updateVariableCmd.Flags().StringVarP(&description, "description", "d", "", "Update the description of the variable")
 	updateVariableCmd.Flags().StringVarP(&importPath, "importpath", "", "", "Path to a YAML file with the variables to import")
 	//updateVariableCmd.MarkFlagRequired("id")
+
 	// Delete Variable
 	deleteCmd.AddCommand(deleteVariableCmd)
 	deleteVariableCmd.Flags().StringVarP(&id, "id", "i", "", "Delete variable by id")
-	deleteVariableCmd.MarkFlagRequired("id")
+	deleteVariableCmd.Flags().StringVarP(&project, "project", "p", "", "The project in which to delete the variable, or delete all variables in project")
+
 }

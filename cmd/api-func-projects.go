@@ -39,7 +39,7 @@ func getProject(id, name string) ([]*CodeStreamProject, error) {
 		return nil, queryResponse.Error().(error)
 	}
 
-	log.Println(queryResponse.Request.URL)
+	log.Debugln(queryResponse.Request.URL)
 
 	for _, value := range queryResponse.Result().(*CodeStreamProjectList).Content {
 		c := CodeStreamProject{}

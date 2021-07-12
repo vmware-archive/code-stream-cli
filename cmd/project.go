@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -25,7 +26,7 @@ var getProjectCommand = &cobra.Command{
 
 		response, err := getProject(id, name)
 		if err != nil {
-			log.Println("Unable to get Code Stream Projects: ", err)
+			log.Errorln("Unable to get Code Stream Projects: ", err)
 		}
 		var resultCount = len(response)
 		if resultCount == 0 {
@@ -34,13 +35,13 @@ var getProjectCommand = &cobra.Command{
 		}
 
 		// Print result table
-		// table := tablewriter.NewWriter(os.Stdout)
+		table := tablewriter.NewWriter(os.Stdout)
 		// pipelineTable := tablewriter.NewWriter(os.Stdout)
 		// variableTable := tablewriter.NewWriter(os.Stdout)
 		// endpointTable := tablewriter.NewWriter(os.Stdout)
 		// table.SetHeader([]string{"Id", "Name", "Description"})
 		for _, p := range response {
-			// table.Append([]string{p.ID, p.Name, p.Description})
+			table.Append([]string{p.ID, p.Name, p.Description})
 			if exportPath != "" {
 				tmpDir, err := ioutil.TempDir(os.TempDir(), "cs-cli-*")
 				if err != nil {
@@ -48,7 +49,7 @@ var getProjectCommand = &cobra.Command{
 				}
 				zipFile := filepath.Join(exportPath, p.Name+".zip")
 				var zipFiles []string
-				log.Println(zipFile)
+				log.Debugln(zipFile)
 				pipelines, _ := getPipelines("", "", p.Name, filepath.Join(tmpDir, p.Name, "pipelines"))
 				//pipelineTable.SetHeader([]string{"Id", "Name", "Project", "Description"})
 				for _, c := range pipelines {
@@ -75,7 +76,7 @@ var getProjectCommand = &cobra.Command{
 			}
 		}
 		// fmt.Println("Project")
-		// table.Render()
+		table.Render()
 		// fmt.Println("Pipelines")
 		// pipelineTable.Render()
 		// fmt.Println("Variables")

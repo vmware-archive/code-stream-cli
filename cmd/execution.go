@@ -36,12 +36,12 @@ var getExecutionCmd = &cobra.Command{
 
 		response, err := getExecutions(id, status, name, nested)
 		if err != nil {
-			log.Println("Unable to get executions: ", err)
+			log.Errorln("Unable to get executions: ", err)
 		}
 		var resultCount = len(response)
 		if resultCount == 0 {
 			// No results
-			log.Println("No results found")
+			log.Infoln("No results found")
 		} else if resultCount == 1 {
 			PrettyPrint(response[0])
 		} else {
@@ -71,9 +71,9 @@ var delExecutionCmd = &cobra.Command{
 
 		response, err := deleteExecution(id)
 		if err != nil {
-			log.Println("Unable to delete execution: ", err)
+			log.Errorln("Unable to delete execution: ", err)
 		}
-		log.Println("Execution with id " + response.ID + " deleted")
+		log.Infoln("Execution with id " + response.ID + " deleted")
 
 	},
 }
@@ -92,9 +92,9 @@ var createExecutionCmd = &cobra.Command{
 
 		response, err := createExecution(id, inputs, comments)
 		if err != nil {
-			log.Println("Unable to create execution: ", err)
+			log.Errorln("Unable to create execution: ", err)
 		}
-		log.Println("Execution " + response.ExecutionLink + " created")
+		log.Infoln("Execution " + response.ExecutionLink + " created")
 
 	},
 }

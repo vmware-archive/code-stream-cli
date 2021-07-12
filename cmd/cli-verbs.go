@@ -14,7 +14,7 @@ import (
 // getCmd represents the get command
 var getCmd = &cobra.Command{
 	Use:   "get",
-	Short: "Get resources in Code Stream",
+	Short: "Get resources",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -28,7 +28,7 @@ to quickly create a Cobra application.`,
 // updateCmd represents the update command
 var updateCmd = &cobra.Command{
 	Use:   "update",
-	Short: "Update resources in Code Stream",
+	Short: "Update resources",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -42,7 +42,7 @@ to quickly create a Cobra application.`,
 // createCmd represents the create command
 var createCmd = &cobra.Command{
 	Use:   "create",
-	Short: "Create resources in Code Stream",
+	Short: "Create resources",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -56,7 +56,7 @@ to quickly create a Cobra application.`,
 // deleteCmd represents the delete command
 var deleteCmd = &cobra.Command{
 	Use:   "delete",
-	Short: "Delete resources in Code Stream",
+	Short: "Delete resources",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 

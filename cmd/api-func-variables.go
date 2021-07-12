@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -53,7 +54,7 @@ func getVariable(id, name, project, exportPath string) ([]*CodeStreamVariableRes
 		return nil, queryResponse.Error().(error)
 	}
 
-	log.Println(queryResponse.Request.URL)
+	log.Debugln(queryResponse.Request.URL)
 
 	for _, value := range queryResponse.Result().(*documentsList).Documents {
 		c := CodeStreamVariableResponse{}
@@ -76,7 +77,7 @@ func getVariableByID(id string) (*CodeStreamVariableResponse, error) {
 		SetAuthToken(targetConfig.accesstoken).
 		Get("https://" + targetConfig.server + "/pipeline/api/variables/" + id)
 	if queryResponse.IsError() {
-		log.Println("GET Variable failed", err)
+		log.Errorln("GET Variable failed", err)
 	}
 	return queryResponse.Result().(*CodeStreamVariableResponse), err
 }
@@ -151,6 +152,28 @@ func deleteVariable(id string) (*CodeStreamVariableResponse, error) {
 	return queryResponse.Result().(*CodeStreamVariableResponse), err
 }
 
+func deleteVariableByProject(project string) ([]*CodeStreamVariableResponse, error) {
+	var deletedVariables []*CodeStreamVariableResponse
+	Variables, err := getVariable("", "", project, "")
+	if err != nil {
+		return nil, err
+	}
+	confirm := askForConfirmation("This will attempt to delete " + fmt.Sprint(len(Variables)) + " variables in " + project + ", are you sure?")
+	if confirm {
+
+		for _, Variable := range Variables {
+			deletedVariable, err := deleteVariable(Variable.ID)
+			if err != nil {
+				log.Warnln("Unable to delete "+Variable.Name, err)
+			}
+			deletedVariables = append(deletedVariables, deletedVariable)
+		}
+		return deletedVariables, nil
+	} else {
+		return nil, errors.New("user declined")
+	}
+}
+
 // exportVariable - Export a variable to YAML
 func exportVariable(variable interface{}, exportPath string) {
 	var exportFile string
@@ -159,7 +182,7 @@ func exportVariable(variable interface{}, exportPath string) {
 	mapstructure.Decode(variable, &c)
 	yaml, err := yaml.Marshal(c)
 	if err != nil {
-		log.Println("Unable to export variable ", c.Name)
+		log.Errorln("Unable to export variable ", c.Name)
 	}
 
 	if filepath.Ext(exportPath) != ".yaml" {

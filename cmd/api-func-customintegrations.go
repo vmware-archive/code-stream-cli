@@ -108,7 +108,7 @@ func getCustomIntegration(id, name string) ([]*CodeStreamCustomIntegration, erro
 // 		SetAuthToken(targetConfig.accesstoken).
 // 		Delete("https://" + targetConfig.server + "/pipeline/api/variables/" + id)
 // 	if response.IsError() {
-// 		log.Println("Create CustomIntegration failed", err)
+// 		log.Errorln("Create CustomIntegration failed", err)
 // 		os.Exit(1)
 // 	}
 // 	return response.Result().(*CodeStreamCustomIntegrationResponse), err
@@ -121,7 +121,7 @@ func getCustomIntegration(id, name string) ([]*CodeStreamCustomIntegration, erro
 // 	mapstructure.Decode(variable, &c)
 // 	yaml, err := yaml.Marshal(c)
 // 	if err != nil {
-// 		log.Println("Unable to export variable ", c.Name)
+// 		log.Errorln("Unable to export variable ", c.Name)
 // 	}
 // 	if exportFile == "" {
 // 		exportFile = "variables.yaml"
