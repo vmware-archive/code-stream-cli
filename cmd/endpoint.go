@@ -123,13 +123,13 @@ var deleteEndpointCmd = &cobra.Command{
 	Short: "Delete an Endpoint",
 	Long: `Delete an Endpoint with a specific Endpoint ID or Name
 
-# Delete by ID:
+# Delete Endpoint by ID:
 cs-cli delete endpoint --id "Endpoint ID"
 
-# Delete by Name:
+# Delete Endpoint by Name:
 cs-cli delete endpoint --name "Endpoint Name"
 
-# Delete by Project and Name:
+# Delete Endpoint by Project and Name:
 cs-cli delete endpoint --project "My Project" --name "Endpoint Name"
 
 # Delete all Endpoints in Project (prompts for confirmation):

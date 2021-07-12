@@ -131,14 +131,15 @@ var updateVariableCmd = &cobra.Command{
 var deleteVariableCmd = &cobra.Command{
 	Use:   "variable",
 	Short: "Delete a Variable",
-	Long: `Delete a Variable.
-# Delete by ID
+	Long: `Delete a Variable
+
+# Delete Variable by ID
 cs-cli delete variable --id "variable ID"
 
-# Delete by Name
+# Delete Variable by Name
 cs-cli delete variable --name "My Variable"
 
-# Delete by Name and Project
+# Delete Variable by Name and Project
 cs-cli delete variable --name "My Variable" --project "My Project"
 
 # Delete all Variables in Project

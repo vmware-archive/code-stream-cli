@@ -239,6 +239,9 @@ cs-cli delete pipeline --name "My Pipeline"
 
 # Delete by Name and Project
 cs-cli delete pipeline --name "My Pipeline" --project "My Project"
+
+# Delete all pipelines in Project
+cs-cli delete pipeline --project "My Project"
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := ensureTargetConnection(); err != nil {

@@ -173,6 +173,15 @@ Delete a pipeline:
 ```bash
 # Delete pipeline by ID
 cs-cli delete pipeline --id 7a3b41af-0e49-4e3d-999b-6c4c5ec55956
+
+# Delete pipeline by Name
+cs-cli delete pipeline --name "My Pipeline"
+
+# Delete pipeline by Name and Project
+cs-cli delete pipeline --name "My Pipeline" --project "My Project"
+
+# Delete all pipelines in Project
+cs-cli delete pipeline --project "My Project"
 ```
 
 ## Working with Variables
@@ -199,6 +208,18 @@ cs-cli create variable --importfile variables.yaml --project TestProject
 
 # Update existing variables from file
 cs-cli update variable --importfile variables.yaml
+
+# Delete Variable by ID
+cs-cli delete variable --id 50613ab6-6f25-4976-8b3e-5be7a4bc60eb
+
+# Delete Variable by Name
+cs-cli delete variable --name "My Variable"
+
+# Delete Variable by Name and Project
+cs-cli delete variable --name "My Variable" --project "My Project"
+
+# Delete all Variables in Project
+cs-cli delete variable --project "My Project"
 ```
 *Note that SECRET variables will not export, so if you export your secrets, be sure to add the value data before re-importing them!*
 
@@ -278,6 +299,16 @@ Delete an endpoint
 ```bash
 # Delete endpoint by ID
 cs-cli delete endpoint --id 8c36f59a-2fcf-4039-8b48-1026f601a4b0
+
+# Delete Endpoint by Name:
+cs-cli delete endpoint --name "Endpoint Name"
+
+# Delete Endpoint by Project and Name:
+cs-cli delete endpoint --project "My Project" --name "Endpoint Name"
+
+# Delete all Endpoints in Project (prompts for confirmation):
+cs-cli delete endpoint --project "My Project"
+
 ```
 ## Working with Custom Integrations
 
