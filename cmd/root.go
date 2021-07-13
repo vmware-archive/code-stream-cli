@@ -28,6 +28,9 @@ var (
 	// Global Flags
 	debug      bool
 	ignoreCert bool
+	// API Paging
+	count int
+	skip  int
 	// Command Flags
 	id          string
 	name        string
@@ -73,6 +76,9 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cs-cli.yaml)")
 	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Enable debug logging")
 	rootCmd.PersistentFlags().BoolVar(&ignoreCert, "ignoreCertificateWarnings", false, "Disable HTTPS Certificate Validation")
+	// API Paging
+	rootCmd.PersistentFlags().IntVar(&count, "count", 100, "API Paging - Count")
+	rootCmd.PersistentFlags().IntVar(&skip, "skip", 0, "API Paging - Skip")
 }
 
 // initConfig reads in config file and ENV variables if set.

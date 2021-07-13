@@ -8,6 +8,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -16,7 +17,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func getExecutions(id string, status string, name string, nested bool) ([]*CodestreamAPIExecutions, error) {
+func getExecutions(id string, project string, status string, name string, nested bool) ([]*CodestreamAPIExecutions, error) {
 	var arrExecutions []*CodestreamAPIExecutions
 	if id != "" {
 		x, err := getExecution("/codestream/api/executions/" + id)
@@ -28,7 +29,10 @@ func getExecutions(id string, status string, name string, nested bool) ([]*Codes
 	}
 	client := resty.New()
 	var qParams = make(map[string]string)
+
 	qParams["$orderby"] = "_requestTimeInMicros desc"
+	qParams["$top"] = fmt.Sprint(count)
+	qParams["$skip"] = fmt.Sprint(skip)
 
 	var filters []string
 	if status != "" {
@@ -47,6 +51,8 @@ func getExecutions(id string, status string, name string, nested bool) ([]*Codes
 		qParams["$filter"] = "(" + strings.Join(filters, ") and (") + ")"
 		log.Debugln(qParams["$filter"])
 	}
+
+	log.Debug(qParams)
 
 	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
@@ -94,6 +100,27 @@ func deleteExecution(id string) (*CodestreamAPIExecutions, error) {
 		return nil, errors.New(queryResponse.Error().(*CodeStreamException).Message)
 	}
 	return queryResponse.Result().(*CodestreamAPIExecutions), err
+}
+
+func deleteExecutions(project string, status string, name string, nested bool) ([]*CodestreamAPIExecutions, error) {
+	var deletedExecutions []*CodestreamAPIExecutions
+	Executions, err := getExecutions("", project, status, name, nested)
+	if err != nil {
+		return nil, err
+	}
+	confirm := askForConfirmation("This will attempt to delete " + fmt.Sprint(len(Executions)) + " Executions in " + project + ", are you sure?")
+	if confirm {
+		for _, Execution := range Executions {
+			deletedExecution, err := deleteExecution(Execution.ID)
+			if err != nil {
+				log.Warnln("Unable to delete "+Execution.ID, err)
+			}
+			deletedExecutions = append(deletedExecutions, deletedExecution)
+		}
+		return deletedExecutions, nil
+	} else {
+		return nil, errors.New("user declined")
+	}
 }
 
 func createExecution(id string, inputs string, comment string) (*CodeStreamCreateExecutionResponse, error) {

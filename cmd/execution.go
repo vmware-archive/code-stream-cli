@@ -34,7 +34,7 @@ var getExecutionCmd = &cobra.Command{
 			log.Fatalln(err)
 		}
 
-		response, err := getExecutions(id, status, name, nested)
+		response, err := getExecutions(id, project, status, name, nested)
 		if err != nil {
 			log.Errorln("Unable to get executions: ", err)
 		}
@@ -68,13 +68,21 @@ var delExecutionCmd = &cobra.Command{
 		if err := ensureTargetConnection(); err != nil {
 			log.Fatalln(err)
 		}
-
-		response, err := deleteExecution(id)
-		if err != nil {
-			log.Errorln("Unable to delete execution: ", err)
+		if id != "" {
+			response, err := deleteExecution(id)
+			if err != nil {
+				log.Errorln("Unable to delete execution: ", err)
+			} else {
+				log.Infoln("Execution with id " + response.ID + " deleted")
+			}
+		} else if project != "" {
+			response, err := deleteExecutions(project, status, name, nested)
+			if err != nil {
+				log.Errorln("Unable to delete executions: ", err)
+			} else {
+				log.Infoln(len(response), "Executions deleted")
+			}
 		}
-		log.Infoln("Execution with id " + response.ID + " deleted")
-
 	},
 }
 
@@ -109,8 +117,11 @@ func init() {
 	getExecutionCmd.Flags().BoolVarP(&nested, "nested", "", false, "Include nested executions")
 	// Delete
 	deleteCmd.AddCommand(delExecutionCmd)
-	delExecutionCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the pipeline to delete")
-	delExecutionCmd.MarkFlagRequired("id")
+	delExecutionCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the pipeline to delete executions for")
+	delExecutionCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the execution to delete")
+	delExecutionCmd.Flags().StringVarP(&status, "status", "s", "", "Delete executions by status (Completed|Waiting|Pausing|Paused|Resuming|Running)")
+	delExecutionCmd.Flags().StringVarP(&project, "project", "p", "", "Delete executions by Project")
+	delExecutionCmd.Flags().BoolVarP(&nested, "nested", "", false, "Delete nested executions")
 	// Create
 	createCmd.AddCommand(createExecutionCmd)
 	createExecutionCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the pipeline to execute")
