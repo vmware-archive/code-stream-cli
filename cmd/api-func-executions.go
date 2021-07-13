@@ -13,6 +13,7 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/mitchellh/mapstructure"
+	log "github.com/sirupsen/logrus"
 )
 
 func getExecutions(id string, status string, name string, nested bool) ([]*CodestreamAPIExecutions, error) {
@@ -28,16 +29,30 @@ func getExecutions(id string, status string, name string, nested bool) ([]*Codes
 	client := resty.New()
 	var qParams = make(map[string]string)
 	qParams["$orderby"] = "_requestTimeInMicros desc"
+
+	var filters []string
 	if status != "" {
-		qParams["$filter"] = "((status eq '" + strings.ToUpper(status) + "') and (_nested eq '" + strconv.FormatBool(nested) + "'))"
+		filters = append(filters, "(status eq '"+strings.ToUpper(status)+"')")
 	}
 	if name != "" {
-		qParams["$filter"] = "((name eq '" + name + "') and (_nested eq '" + strconv.FormatBool(nested) + "'))"
+		filters = append(filters, "(name eq '"+name+"')")
 	}
+	if nested {
+		filters = append(filters, "(_nested eq '"+strconv.FormatBool(nested)+"')")
+	}
+	if project != "" {
+		filters = append(filters, "(project eq '"+project+"')")
+	}
+	if len(filters) > 0 {
+		qParams["$filter"] = "(" + strings.Join(filters, ") and (") + ")"
+		log.Debugln(qParams["$filter"])
+	}
+
 	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
 		SetQueryParams(qParams).
 		SetHeader("Accept", "application/json").
 		SetResult(&documentsList{}).
+		SetError(&CodeStreamException{}).
 		SetAuthToken(targetConfig.accesstoken).
 		Get("https://" + targetConfig.server + "/pipeline/api/executions")
 	if queryResponse.IsError() {

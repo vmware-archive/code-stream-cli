@@ -105,6 +105,7 @@ func init() {
 	getExecutionCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the pipeline to list executions for")
 	getExecutionCmd.Flags().StringVarP(&id, "id", "i", "", "ID of the executions to list")
 	getExecutionCmd.Flags().StringVarP(&status, "status", "s", "", "Filter executions by status (Completed|Waiting|Pausing|Paused|Resuming|Running)")
+	getExecutionCmd.Flags().StringVarP(&project, "project", "p", "", "Filter executions by Project")
 	getExecutionCmd.Flags().BoolVarP(&nested, "nested", "", false, "Include nested executions")
 	// Delete
 	deleteCmd.AddCommand(delExecutionCmd)

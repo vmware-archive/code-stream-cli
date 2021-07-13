@@ -101,7 +101,7 @@ cs-cli get execution --status Failed`,
 						if task.Type == "Custom" {
 							customintegrations = append(customintegrations, task.Input.Name)
 						}
-						log.Infoln("-- [Task]", n, "(", task.Type, ")")
+						log.Debugln("-- [Task]", n, "(", task.Type, ")")
 					}
 				}
 				if dependencies {
