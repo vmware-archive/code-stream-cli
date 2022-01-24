@@ -85,17 +85,32 @@ func authenticateCredentials(server string, username string, password string, do
 // authenticateApiToken - get vRA Access token (valid for 8h)
 func authenticateApiToken(server string, token string) (string, error) {
 	log.Debug("Attempting to authenticate the API Refresh Token")
+	var queryResponse *resty.Response
+	var err error
 	client := resty.New()
-	queryResponse, err := client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
-		SetBody(ApiAuthentication{token}).
-		SetResult(&ApiAuthenticationResponse{}).
-		SetError(&ApiAuthenticationError{}).
-		Post("https://" + server + "/iaas/api/login")
+	if server == "api.mgmt.cloud.vmware.com" {
+		// use the cloud Authentication URL
+		queryResponse, err = client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
+			SetFormData(map[string]string{"refresh_token": token}).
+			SetResult(&ApiAuthenticationResponse{}).
+			SetError(&ApiAuthenticationError{}).
+			Post("https://console.cloud.vmware.com/csp/gateway/am/api/auth/api-tokens/authorize")
+	} else {
+		// use vRA 8 legacy API
+		queryResponse, err = client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: ignoreCert}).R().
+			SetBody(ApiAuthentication{token}).
+			SetResult(&ApiAuthenticationResponse{}).
+			SetError(&ApiAuthenticationError{}).
+			Post("https://" + server + "/iaas/api/login")
+	}
 	if queryResponse.IsError() {
 		log.Debug("Refresh Token failed")
 		return "", errors.New(queryResponse.Error().(*ApiAuthenticationError).Message)
 	}
 	log.Debug("Refresh Token succeeded")
+	if server == "api.mgmt.cloud.vmware.com" {
+		return queryResponse.Result().(*ApiAuthenticationResponse).AccessToken, err
+	}
 	return queryResponse.Result().(*ApiAuthenticationResponse).Token, err
 }
 

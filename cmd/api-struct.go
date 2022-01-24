@@ -42,8 +42,9 @@ type ApiAuthentication struct {
 
 // ApiAuthenticationResponse - Authentication response structure for API login with a refresh token
 type ApiAuthenticationResponse struct {
-	TokenType string `json:"tokenType"`
-	Token     string `json:"token"`
+	TokenType   string `json:"tokenType"`
+	Token       string `json:"token"`
+	AccessToken string `json:"access_token"`
 }
 
 // ApiAuthenticationError - API Authentication error structure
