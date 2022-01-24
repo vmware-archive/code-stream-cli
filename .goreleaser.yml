@@ -50,7 +50,7 @@ dockers:
     image_templates:
     - "sammcgeown/cs-cli:latest-amd64"
     - "sammcgeown/cs-cli:v{{ .Major }}.{{ .Minor }}-amd64"
-    use_buildx: true
+    use: buildx
   -
     goos: linux
     goarch: arm64
